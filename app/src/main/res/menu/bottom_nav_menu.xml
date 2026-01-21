@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_prayer"
+        android:title="Prayer"
+        android:icon="@drawable/ic_home" />
+    <item
+        android:id="@+id/nav_quran"
+        android:title="@string/al_quran"
+        android:icon="@drawable/ic_quran" />
+    <item
+        android:id="@+id/nav_hadith"
+        android:title="@string/string_hadith"
+        android:icon="@drawable/ic_book" />
+    <item
+        android:id="@+id/nav_settings"
+        android:title="@string/string_settings"
+        android:icon="@drawable/ic_settings" />
+</menu>
