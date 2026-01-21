@@ -47,7 +47,7 @@ public class PrayerRepository {
 
     private void fetchFromNetwork(double latitude, double longitude, int method, String date,
             MutableLiveData<PrayerTimeEntity> liveData) {
-        apiService.getPrayerTimes(latitude, longitude, method).enqueue(new Callback<PrayerResponse>() {
+        apiService.getPrayerTimes(date, latitude, longitude, method).enqueue(new Callback<PrayerResponse>() {
             @Override
             public void onResponse(Call<PrayerResponse> call, Response<PrayerResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().data != null) {

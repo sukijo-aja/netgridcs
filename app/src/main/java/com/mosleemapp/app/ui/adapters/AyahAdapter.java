@@ -57,6 +57,9 @@ public class AyahAdapter extends RecyclerView.Adapter<AyahAdapter.AyahViewHolder
             tvAyahNumber.setText(String.valueOf(ayah.numberInSurah));
             tvAyahText.setText(ayah.text);
             tvAyahTranslation.setText(ayah.translation);
+
+            float fontSize = com.mosleemapp.app.utils.SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
+            tvAyahText.setTextSize(fontSize);
         }
     }
 }

@@ -57,6 +57,9 @@ public class HadithDetailAdapter extends RecyclerView.Adapter<HadithDetailAdapte
             tvHadithNumber.setText("Hadith No. " + hadith.number);
             tvHadithArabic.setText(hadith.arab);
             tvHadithTranslation.setText(hadith.id);
+
+            float fontSize = com.mosleemapp.app.utils.SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
+            tvHadithArabic.setTextSize(fontSize);
         }
     }
 }
