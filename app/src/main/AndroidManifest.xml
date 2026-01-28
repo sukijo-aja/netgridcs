@@ -6,6 +6,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,7 +17,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
+        android:supportsRtl="false"
         android:theme="@style/Theme.MoslemApp"
         tools:targetApi="31">
         <activity
@@ -28,6 +32,21 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".ui.activities.SurahDetailActivity" />
         <activity android:name=".ui.activities.HadithDetailActivity" />
+        <activity 
+            android:name=".ui.activities.ReminderActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" 
+            android:excludeFromRecents="true"
+            android:showOnLockScreen="true"
+            android:launchMode="singleInstance" />
+
+        <receiver android:name=".receivers.PrayerAlarmReceiver" />
+        <activity android:name=".ui.activities.TasbihActivity" />
+        <activity android:name=".ui.activities.DetailActivity" />
+        <activity android:name=".ui.activities.DuaActivity" />
+        
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/admob_app_id" />
     </application>
 
 </manifest>

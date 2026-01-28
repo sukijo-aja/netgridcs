@@ -14,6 +14,15 @@ import com.mosleemapp.app.databinding.FragmentPrayerBinding;
 import com.mosleemapp.app.ui.PrayerAdapter;
 import com.mosleemapp.app.ui.viewmodel.PrayerViewModel;
 
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import com.google.android.gms.ads.nativead.NativeAd;
+import com.google.android.gms.ads.nativead.NativeAdView;
+import com.mosleemapp.app.utils.AdMobUtil;
+import com.mosleemapp.app.R;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +53,8 @@ public class PrayerFragment extends Fragment {
         
         // Observe Data
         observeViewModel();
+        
+        loadNativeAd();
     }
 
     private void observeViewModel() {
@@ -51,22 +62,16 @@ public class PrayerFragment extends Fragment {
             if (prayerTimeEntity != null) {
                 Map<String, String> timings = new HashMap<>();
                 timings.put("Fajr", prayerTimeEntity.fajr);
+                timings.put("Sunrise", prayerTimeEntity.sunrise);
                 timings.put("Dhuhr", prayerTimeEntity.dhuhr);
                 timings.put("Asr", prayerTimeEntity.asr);
                 timings.put("Maghrib", prayerTimeEntity.maghrib);
+                timings.put("Sunset", prayerTimeEntity.sunset);
                 timings.put("Isha", prayerTimeEntity.isha);
+                timings.put("Imsak", prayerTimeEntity.imsak);
+                timings.put("Lastthird", prayerTimeEntity.lastThird);
                 adapter.setPrayerTimes(timings);
-                
-                binding.tvTitle.setText("Prayer Times");
             }
-        });
-
-        viewModel.getNextPrayerName().observe(getViewLifecycleOwner(), name -> {
-            binding.tvNextPrayerName.setText(name);
-        });
-
-        viewModel.getNextPrayerTimeRemaining().observe(getViewLifecycleOwner(), time -> {
-            binding.tvCountdown.setText(time);
         });
     }
 
@@ -74,5 +79,44 @@ public class PrayerFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private void loadNativeAd() {
+        AdMobUtil.initialize(getContext());
+        AdMobUtil.loadBanner(binding.adView);
+    }
+
+    private void populateNativeAdView(NativeAd nativeAd, NativeAdView adView) {
+        adView.setMediaView(adView.findViewById(R.id.ad_media));
+        adView.setHeadlineView(adView.findViewById(R.id.ad_headline));
+        adView.setBodyView(adView.findViewById(R.id.ad_body));
+        adView.setCallToActionView(adView.findViewById(R.id.ad_call_to_action));
+        adView.setIconView(adView.findViewById(R.id.ad_icon));
+
+        ((TextView) adView.getHeadlineView()).setText(nativeAd.getHeadline());
+        adView.getMediaView().setMediaContent(nativeAd.getMediaContent());
+
+        if (nativeAd.getBody() == null) {
+            adView.getBodyView().setVisibility(View.INVISIBLE);
+        } else {
+            adView.getBodyView().setVisibility(View.VISIBLE);
+            ((TextView) adView.getBodyView()).setText(nativeAd.getBody());
+        }
+
+        if (nativeAd.getCallToAction() == null) {
+            adView.getCallToActionView().setVisibility(View.INVISIBLE);
+        } else {
+            adView.getCallToActionView().setVisibility(View.VISIBLE);
+            ((Button) adView.getCallToActionView()).setText(nativeAd.getCallToAction());
+        }
+
+        if (nativeAd.getIcon() == null) {
+            adView.getIconView().setVisibility(View.GONE);
+        } else {
+            ((ImageView) adView.getIconView()).setImageDrawable(nativeAd.getIcon().getDrawable());
+            adView.getIconView().setVisibility(View.VISIBLE);
+        }
+
+        adView.setNativeAd(nativeAd);
     }
 }

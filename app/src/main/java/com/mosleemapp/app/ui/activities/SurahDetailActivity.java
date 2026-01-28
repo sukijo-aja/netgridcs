@@ -88,7 +88,7 @@ public class SurahDetailActivity extends AppCompatActivity {
             @Override
             public void onError(String message) {
                 showLoading(false);
-                Toast.makeText(SurahDetailActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SurahDetailActivity.this, getString(R.string.error_prefix, message), Toast.LENGTH_SHORT).show();
             }
         });
     }

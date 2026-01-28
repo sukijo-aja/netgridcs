@@ -16,7 +16,7 @@ import com.mosleemapp.app.data.local.entity.HadithBookEntity;
 import com.mosleemapp.app.data.local.entity.HadithEntity;
 import com.mosleemapp.app.data.local.entity.SurahEntity;
 
-@Database(entities = { PrayerTimeEntity.class, SurahEntity.class, AyahEntity.class, HadithBookEntity.class, HadithEntity.class }, version = 2, exportSchema = false)
+@Database(entities = { PrayerTimeEntity.class, SurahEntity.class, AyahEntity.class, HadithBookEntity.class, HadithEntity.class }, version = 5, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract PrayerDao prayerDao();

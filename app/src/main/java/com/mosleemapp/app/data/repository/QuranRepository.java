@@ -14,6 +14,7 @@ import com.mosleemapp.app.data.models.AyahResponse;
 import com.mosleemapp.app.data.models.SurahResponse;
 import com.mosleemapp.app.data.remote.QuranApiService;
 import com.mosleemapp.app.data.remote.RetrofitClient;
+import com.mosleemapp.app.utils.LocaleHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +32,11 @@ public class QuranRepository {
     private QuranDao quranDao;
     private QuranApiService apiService;
     private ExecutorService executorService;
+    private Context context;
     private static final String BASE_URL = "https://api.alquran.cloud/v1/";
 
     public QuranRepository(Context context) {
+        this.context = context;
         AppDatabase db = AppDatabase.getDatabase(context);
         quranDao = db.quranDao();
         executorService = Executors.newSingleThreadExecutor();
@@ -92,25 +95,44 @@ public class QuranRepository {
     }
 
     private void fetchAyahsFromApi(int surahNumber, Callback<List<AyahResponse.Ayah>> callback) {
-        apiService.getSurahDetail(surahNumber).enqueue(new retrofit2.Callback<AyahResponse>() {
+        String editions = "quran-uthmani,en.sahih,id.indonesian";
+
+        apiService.getSurahDetail(surahNumber, editions).enqueue(new retrofit2.Callback<AyahResponse>() {
             @Override
             public void onResponse(Call<AyahResponse> call, Response<AyahResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().data != null && !response.body().data.isEmpty()) {
                     List<AyahResponse.SurahDetail> data = response.body().data;
-                    List<AyahResponse.Ayah> arabicAyahs = data.get(0).ayahs;
                     
-                    if (data.size() > 1) {
-                         List<AyahResponse.Ayah> translationAyahs = data.get(1).ayahs;
-                         for (int i = 0; i < arabicAyahs.size(); i++) {
-                             if (i < translationAyahs.size()) {
-                                 arabicAyahs.get(i).translation = translationAyahs.get(i).text;
-                             }
-                         }
+                    // Assuming API returns in order of editions requested: 0=Arabic, 1=English, 2=Indonesian
+                    // Ideally we should check edition field inside response but for now we rely on index if consistent
+                    List<AyahResponse.Ayah> arabicAyahs = data.get(0).ayahs;
+                    List<AyahResponse.Ayah> englishAyahs = (data.size() > 1) ? data.get(1).ayahs : null;
+                    List<AyahResponse.Ayah> indoAyahs = (data.size() > 2) ? data.get(2).ayahs : null;
+                    
+                    
+                    
+                    executorService.execute(() -> {
+                         // We map everything to entities first to save
+                         quranDao.insertAyahs(mapAyahsToEntities(arabicAyahs, englishAyahs, indoAyahs, surahNumber));
+                    });
+                    
+                    // For callback, we return a list where 'translation' field is populated based on current locale?
+                    // OR we return a modified object.
+                    // Actually, let's map back from the entities we just created (or mapped objects)
+                    // But we are on background thread, so let's reuse api response for speed but we need to populate translation field for the UI to show *something* immediately?
+                    // Better yet: return the objects with BOTH translations if possible, orlet adapter decide?
+                    // The Adapter expects AyahResponse.Ayah which has 'translation' field.
+                    // We should probably populate 'translation' with the current app language preference here for immediate display
+                    
+                    String currentLang = getLanguageCode();
+                    for (int i = 0; i < arabicAyahs.size(); i++) {
+                        if (currentLang.equals("id") && indoAyahs != null && i < indoAyahs.size()) {
+                            arabicAyahs.get(i).translation = indoAyahs.get(i).text;
+                        } else if (englishAyahs != null && i < englishAyahs.size()) {
+                            arabicAyahs.get(i).translation = englishAyahs.get(i).text;
+                        }
                     }
 
-                    executorService.execute(() -> {
-                        quranDao.insertAyahs(mapAyahsToEntities(arabicAyahs, surahNumber));
-                    });
                     callback.onSuccess(arabicAyahs);
                 } else {
                     callback.onError("Failed to fetch ayahs");
@@ -122,6 +144,13 @@ public class QuranRepository {
                 callback.onError(t.getMessage());
             }
         });
+    }
+
+    private String getLanguageCode() {
+         String lang = LocaleHelper.getLanguage(context);
+         if (lang.equals("in")) return "id";
+         if (lang.equals("ar")) return "ar";
+         return "en";
     }
     
     // Mappers
@@ -155,14 +184,22 @@ public class QuranRepository {
         return surahs;
     }
 
-    private List<AyahEntity> mapAyahsToEntities(List<AyahResponse.Ayah> ayahs, int surahId) {
+    private List<AyahEntity> mapAyahsToEntities(List<AyahResponse.Ayah> arabicAyahs, List<AyahResponse.Ayah> enAyahs, List<AyahResponse.Ayah> idAyahs, int surahId) {
         List<AyahEntity> entities = new ArrayList<>();
-        for (AyahResponse.Ayah ayah : ayahs) {
+        for (int i = 0; i < arabicAyahs.size(); i++) {
+             AyahResponse.Ayah ayah = arabicAyahs.get(i);
             AyahEntity entity = new AyahEntity();
             entity.surahId = surahId;
             entity.number = ayah.number;
             entity.text = ayah.text;
-            entity.translation = ayah.translation;
+            
+            if (enAyahs != null && i < enAyahs.size()) {
+                entity.translationEn = enAyahs.get(i).text;
+            }
+             if (idAyahs != null && i < idAyahs.size()) {
+                entity.translationId = idAyahs.get(i).text;
+            }
+            
             entity.numberInSurah = ayah.numberInSurah;
             entity.juz = ayah.juz;
             entity.manzil = ayah.manzil;
@@ -176,12 +213,19 @@ public class QuranRepository {
     }
 
     private List<AyahResponse.Ayah> mapEntitiesToAyahs(List<AyahEntity> entities) {
+        String currentLang = getLanguageCode();
         List<AyahResponse.Ayah> ayahs = new ArrayList<>();
         for (AyahEntity entity : entities) {
             AyahResponse.Ayah ayah = new AyahResponse.Ayah();
             ayah.number = entity.number;
             ayah.text = entity.text;
-            ayah.translation = entity.translation;
+            
+            if (currentLang.equals("id")) {
+                ayah.translation = entity.translationId;
+            } else {
+                ayah.translation = entity.translationEn;
+            }
+            
             ayah.numberInSurah = entity.numberInSurah;
             ayah.juz = entity.juz;
             ayah.manzil = entity.manzil;

@@ -9,6 +9,6 @@ public interface QuranApiService {
     @GET("surah")
     Call<SurahResponse> getSurahs();
 
-    @GET("surah/{number}/editions/menu_quran-uthmani,id.indonesian")
-    Call<AyahResponse> getSurahDetail(@retrofit2.http.Path("number") int number);
+    @GET("surah/{number}/editions/{editions}")
+    Call<AyahResponse> getSurahDetail(@retrofit2.http.Path("number") int number, @retrofit2.http.Path("editions") String editions);
 }

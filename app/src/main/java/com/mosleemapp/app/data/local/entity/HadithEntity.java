@@ -20,4 +20,5 @@ public class HadithEntity {
     public int number;
     public String arab;
     public String translation;
+    public String language;
 }

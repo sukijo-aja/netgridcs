@@ -31,6 +31,14 @@ public class PrayerResponse {
         public String maghrib;
         @SerializedName("Isha")
         public String isha;
+        @SerializedName("Sunrise")
+        public String sunrise;
+        @SerializedName("Sunset")
+        public String sunset;
+        @SerializedName("Imsak")
+        public String imsak;
+        @SerializedName("Lastthird")
+        public String lastThird;
     }
 
     public static class DateInfo {

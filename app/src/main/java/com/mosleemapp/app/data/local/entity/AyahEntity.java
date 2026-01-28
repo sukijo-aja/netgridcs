@@ -17,7 +17,8 @@ public class AyahEntity {
     public int surahId;
     public int number;
     public String text;
-    public String translation;
+    public String translationEn;
+    public String translationId;
     public int numberInSurah;
     public int juz;
     public int manzil;

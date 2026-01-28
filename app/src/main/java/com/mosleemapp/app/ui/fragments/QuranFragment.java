@@ -5,6 +5,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.mosleemapp.app.R;
 import com.mosleemapp.app.data.models.SurahResponse;
 import com.mosleemapp.app.data.remote.QuranApiService;
 import com.mosleemapp.app.databinding.FragmentQuranBinding;
@@ -30,6 +33,11 @@ import android.content.SharedPreferences;
 import androidx.appcompat.widget.SearchView;
 import java.util.ArrayList;
 import java.util.List;
+
+import android.widget.Button;
+import com.google.android.gms.ads.nativead.NativeAd;
+import com.google.android.gms.ads.nativead.NativeAdView;
+import com.mosleemapp.app.utils.AdMobUtil;
 
 import com.mosleemapp.app.data.repository.QuranRepository;
 
@@ -70,6 +78,8 @@ public class QuranFragment extends Fragment {
 
         // Fetch Data
         fetchSurahs();
+        
+        loadNativeAd();
     }
 
     @Override
@@ -108,7 +118,7 @@ public class QuranFragment extends Fragment {
             @Override
             public void onError(String message) {
                 if (getContext() != null) {
-                    Toast.makeText(getContext(), "Error: " + message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.error_prefix, message), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -150,5 +160,44 @@ public class QuranFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private void loadNativeAd() {
+        AdMobUtil.initialize(getContext());
+        AdMobUtil.loadBanner(binding.adView);
+    }
+
+    private void populateNativeAdView(NativeAd nativeAd, NativeAdView adView) {
+        adView.setMediaView(adView.findViewById(R.id.ad_media));
+        adView.setHeadlineView(adView.findViewById(R.id.ad_headline));
+        adView.setBodyView(adView.findViewById(R.id.ad_body));
+        adView.setCallToActionView(adView.findViewById(R.id.ad_call_to_action));
+        adView.setIconView(adView.findViewById(R.id.ad_icon));
+
+        ((TextView) adView.getHeadlineView()).setText(nativeAd.getHeadline());
+        adView.getMediaView().setMediaContent(nativeAd.getMediaContent());
+
+        if (nativeAd.getBody() == null) {
+            adView.getBodyView().setVisibility(View.INVISIBLE);
+        } else {
+            adView.getBodyView().setVisibility(View.VISIBLE);
+            ((TextView) adView.getBodyView()).setText(nativeAd.getBody());
+        }
+
+        if (nativeAd.getCallToAction() == null) {
+            adView.getCallToActionView().setVisibility(View.INVISIBLE);
+        } else {
+            adView.getCallToActionView().setVisibility(View.VISIBLE);
+            ((Button) adView.getCallToActionView()).setText(nativeAd.getCallToAction());
+        }
+
+        if (nativeAd.getIcon() == null) {
+            adView.getIconView().setVisibility(View.GONE);
+        } else {
+            ((ImageView) adView.getIconView()).setImageDrawable(nativeAd.getIcon().getDrawable());
+            adView.getIconView().setVisibility(View.VISIBLE);
+        }
+
+        adView.setNativeAd(nativeAd);
     }
 }

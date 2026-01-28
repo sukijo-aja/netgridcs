@@ -79,7 +79,7 @@ public class HadithDetailActivity extends AppCompatActivity {
             @Override
             public void onError(String message) {
                 showLoading(false);
-                Toast.makeText(HadithDetailActivity.this, "Error: " + message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(HadithDetailActivity.this, getString(R.string.error_prefix, message), Toast.LENGTH_SHORT).show();
             }
         });
     }

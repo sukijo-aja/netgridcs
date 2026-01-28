@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.mosleemapp.app.data.local.AppDatabase;
 import com.mosleemapp.app.data.local.PrayerDao;
 import com.mosleemapp.app.data.local.PrayerTimeEntity;
+import com.mosleemapp.app.data.local.DefaultPrayerData;
 import com.mosleemapp.app.data.remote.AladhanApiService;
 import com.mosleemapp.app.data.remote.RetrofitClient;
 import com.mosleemapp.app.data.remote.model.PrayerResponse;
@@ -37,6 +38,14 @@ public class PrayerRepository {
             if (localData != null) {
                 data.postValue(localData);
             } else {
+                // Return default data immediately so UI is not empty
+                PrayerTimeEntity defaultEntity = DefaultPrayerData.getDefault(date);
+                
+                // Persist it so it exists in the DB (resolves "prayer time not exist" issue)
+                prayerDao.insertPrayerTimes(Collections.singletonList(defaultEntity));
+                
+                data.postValue(defaultEntity);
+                
                 // Fetch from network
                 fetchFromNetwork(latitude, longitude, method, date, data);
             }
@@ -67,7 +76,11 @@ public class PrayerRepository {
                             timings.dhuhr,
                             timings.asr,
                             timings.maghrib,
-                            timings.isha);
+                            timings.isha,
+                            timings.sunrise,
+                            timings.sunset,
+                            timings.imsak,
+                            timings.lastThird);
 
                     // Save to DB
                     AppDatabase.databaseWriteExecutor.execute(() -> {
@@ -80,6 +93,7 @@ public class PrayerRepository {
             @Override
             public void onFailure(Call<PrayerResponse> call, Throwable t) {
                 // Handle error
+                android.util.Log.e("PrayerRepository", "Failed to fetch prayer times", t);
             }
         });
     }

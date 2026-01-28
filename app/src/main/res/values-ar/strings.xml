@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">تطبيق مسلم</string>
+    <string name="al_quran">القرآن الكريم</string>
+    <string name="string_hadith">الحديث</string>
+    <string name="string_settings">الإعدادات</string>
+    <string name="manage_prayer_alarms">إدارة تنبيهات الصلاة</string>
+    <string name="location_permission_required">إذن الموقع مطلوب لأوقات صلاة دقيقة</string>
+    <string name="double_back_to_exit">الرجاء الضغط على رجوع مرة أخرى للخروج</string>
+    <string name="location_updated">تم تحديث الموقع</string>
+    <string name="reminders_enabled">تم تفعيل التذكيرات</string>
+    <string name="reminders_disabled">تم تعطيل التذكيرات</string>
+    <string name="reminder_offset_updated">تم تحديث توقيت التذكير</string>
+    <string name="error_prefix">خطأ: %1$s</string>
+    <string name="reminder_for_prayer_enabled">تذكير %1$s مفعل</string>
+    <string name="reminder_for_prayer_disabled">تذكير %1$s معطل</string>
+    <string name="language">اللغة</string>
+    <string name="select_language">اختر اللغة</string>
+    <string name="reset_all">Reset All</string>
+    <string name="label_font_size">Arabic Font Size</string>
+    <string name="home">Home</string>
+    <string name="prayer">Prayer</string>
+</resources>

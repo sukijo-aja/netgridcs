@@ -3,12 +3,14 @@ package com.mosleemapp.app.ui.viewmodel;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.mosleemapp.app.R;
 import com.mosleemapp.app.data.local.PrayerTimeEntity;
 import com.mosleemapp.app.data.repository.PrayerRepository;
 
@@ -46,6 +48,7 @@ public class PrayerViewModel extends AndroidViewModel {
             prayerData.postValue(entity);
             if (entity != null) {
                 startCountdown(entity);
+                com.mosleemapp.app.utils.AlarmScheduler.schedulePrayerAlarms(getApplication(), entity);
             }
         });
     }
@@ -66,7 +69,7 @@ public class PrayerViewModel extends AndroidViewModel {
                 // Mock calculation for MVP
                 // In real app: parse entity.fajr, entity.dhuhr... find next.
                 // For now, static countdown.
-                nextPrayerName.postValue("Asr");
+                nextPrayerName.postValue("Dzuhur");
                 nextPrayerTimeRemaining.postValue("-00:45:00"); 
                 timerHandler.postDelayed(this, 1000);
             }

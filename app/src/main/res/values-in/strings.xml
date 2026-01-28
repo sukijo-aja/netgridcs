@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mosleem App</string>
+    <string name="al_quran">Al Quran</string>
+    <string name="string_hadith">Hadits</string>
+    <string name="string_settings">Pengaturan</string>
+    <string name="manage_prayer_alarms">Atur Alarm Sholat</string>
+    <string name="location_permission_required">Izin lokasi diperlukan untuk waktu sholat yang akurat</string>
+    <string name="double_back_to_exit">Tekan KEMBALI lagi untuk keluar</string>
+    <string name="location_updated">Lokasi Diperbarui</string>
+    <string name="reminders_enabled">Pengingat Diaktifkan</string>
+    <string name="reminders_disabled">Pengingat Dinonaktifkan</string>
+    <string name="reminder_offset_updated">Offset pengingat diperbarui</string>
+    <string name="error_prefix">Kesalahan: %1$s</string>
+    <string name="reminder_for_prayer_enabled">Pengingat %1$s Diaktifkan</string>
+    <string name="reminder_for_prayer_disabled">Pengingat %1$s Dinonaktifkan</string>
+    <string name="language">Bahasa</string>
+    <string name="select_language">Pilih Bahasa</string>
+    <string name="reset_all">Reset All</string>
+    <string name="label_font_size">Arabic Font Size</string>
+    <string name="home">Beranda</string>
+    <string name="prayer">Sholat</string>
+</resources>

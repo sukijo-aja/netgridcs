@@ -64,6 +64,9 @@ public class SurahAdapter extends RecyclerView.Adapter<SurahAdapter.SurahViewHol
             binding.tvEnglishNameTranslation.setText(surah.englishNameTranslation);
             binding.tvNameArabic.setText(surah.name);
             binding.tvVerses.setText(surah.numberOfAyahs + " Verses");
+
+            float fontSize = com.mosleemapp.app.utils.SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
+            binding.tvNameArabic.setTextSize(fontSize);
         }
     }
 }
