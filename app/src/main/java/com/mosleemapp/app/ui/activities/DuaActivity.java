@@ -3,6 +3,7 @@ package com.mosleemapp.app.ui.activities;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,19 +12,26 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.ads.nativead.NativeAdView;
 import com.mosleemapp.app.R;
-import com.mosleemapp.app.data.models.DuaItem;
+import androidx.lifecycle.ViewModelProvider;
+import com.mosleemapp.app.data.local.entity.DuaEntity;
 import com.mosleemapp.app.ui.adapters.DuaAdapter;
+import com.mosleemapp.app.ui.viewmodel.DuaViewModel;
 import com.mosleemapp.app.utils.AdMobUtil;
+
+import java.util.ArrayList;
+
+import com.mosleemapp.app.ui.adapters.CategoryAdapter;
 import java.util.ArrayList;
 import java.util.List;
-import android.widget.FrameLayout;
 
 public class DuaActivity extends BaseActivity {
 
-    private RecyclerView rvDuaList;
+    private RecyclerView rvDuaList, rvCategories;
     private DuaAdapter adapter;
-    private List<DuaItem> duaList;
+    private CategoryAdapter categoryAdapter;
+    private DuaViewModel viewModel;
     private FrameLayout flAdPlaceholder;
+    private List<String> categories = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,42 +39,68 @@ public class DuaActivity extends BaseActivity {
         setContentView(R.layout.activity_dua);
 
         ImageView btnBack = findViewById(R.id.btnBack);
+        ImageView btnSync = findViewById(R.id.btnSync);
         rvDuaList = findViewById(R.id.rvDuaList);
+        rvCategories = findViewById(R.id.rvCategories);
         flAdPlaceholder = findViewById(R.id.flAdPlaceholder);
 
         btnBack.setOnClickListener(v -> finish());
-
-        setupDuaList();
         
+        // Setup ViewModel
+        viewModel = new ViewModelProvider(this).get(DuaViewModel.class);
+        
+        btnSync.setOnClickListener(v -> {
+            android.widget.Toast.makeText(this, "Syncing data...", android.widget.Toast.LENGTH_SHORT).show();
+            viewModel.syncDuas();
+        });
         rvDuaList.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new DuaAdapter(duaList);
+        adapter = new DuaAdapter(new ArrayList<>());
         rvDuaList.setAdapter(adapter);
+
+        // Categories Setup
+        categories.add("All"); // Default
+        categoryAdapter = new CategoryAdapter(categories, (category, position) -> {
+            categoryAdapter.setSelectedPosition(position);
+            filterDuas(category);
+        });
+        rvCategories.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        rvCategories.setAdapter(categoryAdapter);
+
+        // Setup ViewModel
+        viewModel = new ViewModelProvider(this).get(DuaViewModel.class);
+        
+        // Initial Load (All)
+        viewModel.getAllDuas().observe(this, duas -> {
+            if (duas != null) {
+                adapter.setDuas(duas);
+            }
+        });
+
+        // Load Categories
+        viewModel.getAllCategories().observe(this, cats -> {
+            if (cats != null) {
+                categories.clear();
+                categories.add("All");
+                categories.addAll(cats);
+                categoryAdapter.notifyDataSetChanged();
+            }
+        });
 
         // Load Native Ad
         loadNativeAd();
     }
 
-    private void setupDuaList() {
-        duaList = new ArrayList<>();
-        duaList.add(new DuaItem("Before Sleeping", "بِسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا", "Bismika Allahumma amutu wa ahya", "In Your name, O Allah, I die and I live."));
-        duaList.add(new DuaItem("Waking Up", "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ", "Alhamdu lillahil-ladhi ahyana ba'da ma amatana wa ilaihin-nushur", "All praise is due to Allah who gave us life after He had caused us to die, and unto Him is the resurrection."));
-        duaList.add(new DuaItem("Entering the Toilet", "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ", "Allahumma inni a'udhu bika minal-khubuthi wal-khaba'ith", "O Allah, I seek refuge with You from the male and female noxious beings."));
-        duaList.add(new DuaItem("Leaving the Toilet", "غُفْرَانَكَ", "Gufranak", "(I seek) Your forgiveness."));
-        duaList.add(new DuaItem("Before Eating", "بِسْمِ اللهِ", "Bismillah", "In the name of Allah."));
-        duaList.add(new DuaItem("After Eating", "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ", "Alhamdu lillahil-ladhi at'amana wa saqana wa ja'alana Muslimin", "All praise is due to Allah who fed us, gave us drink, and made us Muslims."));
-        duaList.add(new DuaItem("Leaving Home", "بِسْمِ اللهِ تَوَكَّلْتُ عَلَى اللهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ", "Bismillahi tawakkaltu 'alallahi, wa la hawla wa la quwwata illa billah", "In the name of Allah, I place my trust in Allah, and there is no might nor power except with Allah."));
-        duaList.add(new DuaItem("Entering Home", "بِسْمِ اللهِ وَلَجْنَا، وَبِسْمِ اللهِ خَرَجْنَا، وَعَلَى رَبِّنَا تَوَكَّلْنَا", "Bismillahi walajna, wa bismillahi kharajna, wa 'ala Rabbina tawakkalna", "In the name of Allah we enter, and in the name of Allah we leave, and upon our Lord we place our trust."));
+    private void filterDuas(String category) {
+        if (category.equals("All")) {
+            viewModel.getAllDuas().observe(this, duas -> adapter.setDuas(duas));
+        } else {
+            viewModel.getDuasByCategory(category).observe(this, duas -> adapter.setDuas(duas));
+        }
     }
     
     private void loadNativeAd() {
-        AdMobUtil.loadNativeAd(this, nativeAd -> {
-            if (isDestroyed()) return;
-            
-            NativeAdView adView = (NativeAdView) getLayoutInflater().inflate(R.layout.ad_native, null);
-            populateNativeAdView(nativeAd, adView);
-            flAdPlaceholder.removeAllViews();
-            flAdPlaceholder.addView(adView);
-        });
+        AdMobUtil.initialize(getApplicationContext());
+        AdMobUtil.loadBanner(findViewById(R.id.adView));
     }
 
     private void populateNativeAdView(NativeAd nativeAd, NativeAdView adView) {

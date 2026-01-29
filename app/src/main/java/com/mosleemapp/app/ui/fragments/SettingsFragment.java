@@ -120,10 +120,23 @@ public class SettingsFragment extends Fragment {
             bottomSheet.show(getParentFragmentManager(), PrayerSettingsBottomSheet.TAG);
         });
 
-        // Language Selection
         Button btnLanguage = view.findViewById(R.id.btnLanguage);
         updateLanguageButtonText(btnLanguage);
         btnLanguage.setOnClickListener(v -> showLanguageDialog());
+        
+        // Show User ID
+        TextView tvUserId = view.findViewById(R.id.tvUserId);
+        String userId = settingsManager.getUserId();
+        // Format to make it look a bit nicer, maybe just show first segment or full
+        tvUserId.setText("User ID: " + userId);
+        tvUserId.setOnLongClickListener(v -> {
+            // Copy to clipboard option
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("User ID", userId);
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(requireContext(), "User ID copied", Toast.LENGTH_SHORT).show();
+            return true;
+        });
     }
 
     private void updateLanguageButtonText(Button button) {

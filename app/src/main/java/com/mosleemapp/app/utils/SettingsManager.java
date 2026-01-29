@@ -80,4 +80,13 @@ public class SettingsManager {
     public void setPremium(boolean isPremium) {
         sharedPreferences.edit().putBoolean("is_premium", isPremium).apply();
     }
+
+    public String getUserId() {
+        String userId = sharedPreferences.getString("user_id", null);
+        if (userId == null) {
+            userId = java.util.UUID.randomUUID().toString();
+            sharedPreferences.edit().putString("user_id", userId).apply();
+        }
+        return userId;
+    }
 }

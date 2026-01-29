@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.ads.nativead.NativeAdView;
 import com.mosleemapp.app.utils.AdMobUtil;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,8 +75,9 @@ public class HomeFragment extends Fragment {
                  intent.putExtra("EXTRA_TITLE", item.getTitle());
                  startActivity(intent);
             }
+
         });
-        binding.rvHomeMenu.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+//        binding.rvHomeMenu.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));        binding.rvHomeMenu.setLayoutManager(new GridLayoutManager(getContext(), 4));
         binding.rvHomeMenu.setAdapter(menuAdapter);
 
         viewModel = new ViewModelProvider(requireActivity()).get(PrayerViewModel.class);

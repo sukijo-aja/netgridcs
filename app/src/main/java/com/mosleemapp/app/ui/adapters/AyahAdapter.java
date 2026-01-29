@@ -3,6 +3,7 @@ package com.mosleemapp.app.ui.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.mosleemapp.app.R;
 import com.mosleemapp.app.data.models.AyahResponse;
+import com.mosleemapp.app.utils.ShareUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +47,14 @@ public class AyahAdapter extends RecyclerView.Adapter<AyahAdapter.AyahViewHolder
         private TextView tvAyahNumber;
         private TextView tvAyahText;
         private TextView tvAyahTranslation;
+        private ImageView btnShare;
 
         public AyahViewHolder(@NonNull View itemView) {
             super(itemView);
             tvAyahNumber = itemView.findViewById(R.id.tvAyahNumber);
             tvAyahText = itemView.findViewById(R.id.tvAyahText);
             tvAyahTranslation = itemView.findViewById(R.id.tvAyahTranslation);
+            btnShare = itemView.findViewById(R.id.btnShare);
         }
 
         public void bind(AyahResponse.Ayah ayah) {
@@ -60,6 +64,31 @@ public class AyahAdapter extends RecyclerView.Adapter<AyahAdapter.AyahViewHolder
 
             float fontSize = com.mosleemapp.app.utils.SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
             tvAyahText.setTextSize(fontSize);
+
+            btnShare.setOnClickListener(v -> {
+//                String shareContent = ayah.text + "("+ ayah.numberInSurah +")\n"+ ayah.translation + "\n\n Shared via MosleemApp";
+//                ShareUtil.shareText(v.getContext(), "Share Quran", shareContent);
+
+                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(v.getContext());
+                builder.setTitle("Share Qur'an");
+                builder.setCancelable(true);
+                builder.setIcon(R.mipmap.ic_launcher);
+                String[] options = {"Share as Text", "Share as Image"};
+                builder.setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        String shareContent = ayah.text + "("+ ayah.numberInSurah +")\n"+ ayah.translation + "\n\n Shared via MosleemApp";
+                        ShareUtil.shareText(v.getContext(), "Share Quran", shareContent);
+                    } else {
+                        tvAyahNumber.setVisibility(View.GONE);
+                        btnShare.setVisibility(View.GONE);
+                        ShareUtil.shareViewAsImage(v.getContext(), itemView, "Share Qur'an Image");
+                        btnShare.setVisibility(View.VISIBLE);
+                        tvAyahNumber.setVisibility(View.VISIBLE);
+                    }
+                });
+                builder.show();
+
+            });
         }
     }
 }
