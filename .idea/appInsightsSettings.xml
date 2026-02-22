@@ -22,10 +22,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.mosleemapp.app" />
+                  <option name="mobileSdkAppId" value="1:918294205518:android:8a0c66be90e9cc8d1cdf1f" />
+                  <option name="projectId" value="mosleemapps" />
+                  <option name="projectNumber" value="918294205518" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

@@ -125,17 +125,99 @@ public class SettingsFragment extends Fragment {
         btnLanguage.setOnClickListener(v -> showLanguageDialog());
         
         // Show User ID
-        TextView tvUserId = view.findViewById(R.id.tvUserId);
-        String userId = settingsManager.getUserId();
-        // Format to make it look a bit nicer, maybe just show first segment or full
-        tvUserId.setText("User ID: " + userId);
+        final TextView tvUserId = view.findViewById(R.id.tvUserId);
+        
+        // Initial check
+        String currentId = settingsManager.getUserId();
+        tvUserId.setText("User ID: " + currentId);
+
+        if ("Fetching...".equals(currentId)) {
+            com.mosleemapp.app.utils.FirebaseUtil.getInstance(requireContext()).getInstallationId(id -> {
+                if (isAdded()) {
+                    if (id != null) {
+                        tvUserId.setText("User ID: " + id);
+                    } else {
+                        tvUserId.setText("User ID: Error fetching ID");
+                    }
+                }
+            });
+        }
+
         tvUserId.setOnLongClickListener(v -> {
+            String uid = settingsManager.getUserId();
             // Copy to clipboard option
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText("User ID", userId);
+            android.content.ClipData clip = android.content.ClipData.newPlainText("User ID", uid);
             clipboard.setPrimaryClip(clip);
             Toast.makeText(requireContext(), "User ID copied", Toast.LENGTH_SHORT).show();
             return true;
+        });
+
+        Button btnResetData = view.findViewById(R.id.btnResetData);
+        btnResetData.setOnClickListener(v -> {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Reset Data")
+                    .setMessage("This will delete all local Quran data and force the app to fetch from the internet again. Are you sure?")
+                    .setPositiveButton("Reset", (dialog, which) -> {
+                        resetData();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
+
+        Button btnDownloadAll = view.findViewById(R.id.btnDownloadAll);
+        btnDownloadAll.setOnClickListener(v -> {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Download All Resources")
+                    .setMessage("This will download the entire Quran (Arabic, English, Indonesian) for offline use. This may take a few minutes (approx. 10MB).")
+                    .setPositiveButton("Download", (dialog, which) -> {
+                        startDownloadAll();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
+    }
+
+    private void startDownloadAll() {
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(requireContext());
+        progressDialog.setMessage("Downloading Quran Data... Please wait.");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        com.mosleemapp.app.data.repository.QuranRepository repository = new com.mosleemapp.app.data.repository.QuranRepository(requireContext());
+        repository.downloadAllData(new com.mosleemapp.app.data.repository.QuranRepository.Callback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean data) {
+                 if (isAdded()) {
+                    progressDialog.dismiss();
+                    Toast.makeText(requireContext(), "Download Complete! You can now use the app offline.", Toast.LENGTH_LONG).show();
+                 }
+            }
+
+            @Override
+            public void onError(String message) {
+                if (isAdded()) {
+                    progressDialog.dismiss();
+                    Toast.makeText(requireContext(), "Download Failed: " + message, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    private void resetData() {
+        java.util.concurrent.ExecutorService executor = java.util.concurrent.Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            com.mosleemapp.app.data.local.AppDatabase db = com.mosleemapp.app.data.local.AppDatabase.getDatabase(requireContext());
+            db.quranDao().deleteAllAyahs();
+            db.quranDao().deleteAllSurahs();
+            
+            // Clear last read prefs
+            android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MoslemAppPrefs", android.content.Context.MODE_PRIVATE);
+            prefs.edit().remove("last_read_surah_number").remove("last_read_surah_name").apply();
+
+            requireActivity().runOnUiThread(() -> {
+                Toast.makeText(requireContext(), "Data reset. Restart app or go to Home to re-fetch.", Toast.LENGTH_LONG).show();
+            });
         });
     }
 

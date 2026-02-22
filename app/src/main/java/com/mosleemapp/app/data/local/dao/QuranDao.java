@@ -29,4 +29,10 @@ public interface QuranDao {
     
     @Query("SELECT COUNT(*) FROM ayahs WHERE surahId = :surahId")
     int getAyahCountBySurahId(int surahId);
+
+    @Query("DELETE FROM surahs")
+    void deleteAllSurahs();
+
+    @Query("DELETE FROM ayahs")
+    void deleteAllAyahs();
 }

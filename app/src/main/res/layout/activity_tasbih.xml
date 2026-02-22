@@ -133,14 +133,10 @@
             app:layout_constraintTop_toTopOf="parent"
             />
 
-        <TextView
+        <com.mosleemapp.app.ui.custom.OdometerCounterView
             android:id="@+id/tvActiveCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0"
-            android:textSize="80sp"
-            android:textStyle="bold"
-            android:textColor="@color/primary_green"
             app:layout_constraintTop_toBottomOf="@id/tvActiveName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>

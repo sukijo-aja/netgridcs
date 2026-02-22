@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,7 +32,7 @@ public class TasbihActivity extends BaseActivity {
     
     // Main UI Elements
     private TextView tvActiveName;
-    private TextView tvActiveCount;
+    private com.mosleemapp.app.ui.custom.OdometerCounterView tvActiveCount;
     private CardView btnTap;
 
     @SuppressLint("MissingInflatedId")
@@ -46,6 +48,8 @@ public class TasbihActivity extends BaseActivity {
         tvActiveName = findViewById(R.id.tvActiveName);
         tvActiveCount = findViewById(R.id.tvActiveCount);
         btnTap = findViewById(R.id.btnTap);
+
+        // OdometerCounterView handles its own view factory/animations internally
 
         prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
@@ -67,7 +71,9 @@ public class TasbihActivity extends BaseActivity {
             @Override
             public void onItemSelect(TasbihItem item, int position) {
                 adapter.setSelectedPosition(position);
-                updateMainDisplay(item);
+                 // Reset animation for selection change to avoid weird transitions or just set current text
+                tvActiveCount.setValue(item.getCount(), false); // No animation on select
+                tvActiveName.setText(item.getName());
             }
 
             @Override
@@ -88,11 +94,13 @@ public class TasbihActivity extends BaseActivity {
         
         // Initialize Main Display with first item
         if (!tasbihList.isEmpty()) {
-            updateMainDisplay(tasbihList.get(0));
+            tvActiveCount.setValue(tasbihList.get(0).getCount(), false);
+            tvActiveName.setText(tasbihList.get(0).getName());
         }
 
-        // Tap Button Logic
+    // Tap Button Logic
         btnTap.setOnClickListener(v -> {
+            stopPulseAnimation(); // Stop animation on interaction
             TasbihItem activeItem = adapter.getSelectedItem();
             if (activeItem != null) {
                 activeItem.setCount(activeItem.getCount() + 1);
@@ -115,15 +123,68 @@ public class TasbihActivity extends BaseActivity {
             TasbihItem activeItem = adapter.getSelectedItem();
             if (activeItem != null) {
                 updateMainDisplay(activeItem);
+                startPulseAnimation(); // Restart animation if reset to 0
             }
         });
+
+        // Start animation if initial count is 0
+        if (tasbihList.isEmpty() || tasbihList.get(0).getCount() == 0) {
+            startPulseAnimation();
+        }
 
         btnBack.setOnClickListener(v -> finish());
         
         // AdMob
         AdMobUtil.initialize(this);
         AdMobUtil.loadBanner(findViewById(R.id.adView));
+
+//        btnTap.setOnLongClickListener(v -> {
+//            startSimulation();
+//            return true;
+//        });
     }
+    
+    // Simulation Logic
+//    private android.os.Handler simulationHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+//    private Runnable simulationRunnable;
+//    private boolean isSimulating = false;
+//
+//    private void startSimulation() {
+//        if (isSimulating) {
+//            // Stop if already running
+//            isSimulating = false;
+//            if (simulationRunnable != null) simulationHandler.removeCallbacks(simulationRunnable);
+//            return;
+//        }
+//
+//        isSimulating = true;
+//        TasbihItem activeItem = adapter.getSelectedItem();
+//        if (activeItem == null) return;
+//
+//        // Start from 100
+//        activeItem.setCount(1);
+//        updateMainDisplay(activeItem);
+//
+//        simulationRunnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                if (!isSimulating || activeItem.getCount() >= 999) {
+//                    isSimulating = false;
+//                    saveCount(activeItem); // Save final state
+//                    return;
+//                }
+//
+//                activeItem.setCount(activeItem.getCount() + 1);
+//                updateMainDisplay(activeItem);
+//
+//                // Speed: 50ms per number
+//                simulationHandler.postDelayed(this, 1);
+//            }
+//        };
+//
+//        simulationHandler.post(simulationRunnable);
+//        android.widget.Toast.makeText(this, "Simulation Started (100 -> 999)", android.widget.Toast.LENGTH_SHORT).show();
+//    }
     
     private void updateSoundIcon(ImageView btnSound) {
         boolean isSoundEnabled = prefs.getBoolean("sound_enabled", false);
@@ -151,7 +212,7 @@ public class TasbihActivity extends BaseActivity {
     
     private void updateMainDisplay(TasbihItem item) {
         tvActiveName.setText(item.getName());
-        tvActiveCount.setText(String.valueOf(item.getCount()));
+        tvActiveCount.setValue(item.getCount(),false); // Defaults to animate=true
     }
 
     private void initializeData() {
@@ -172,5 +233,39 @@ public class TasbihActivity extends BaseActivity {
 
     private void saveCount(TasbihItem item) {
         prefs.edit().putInt("count_" + item.getId(), item.getCount()).apply();
+    }
+    
+    // Animation Logic
+    private android.animation.ObjectAnimator scaleX, scaleY;
+    
+    private void startPulseAnimation() {
+        if (scaleX != null && scaleX.isRunning()) return;
+
+        scaleX = android.animation.ObjectAnimator.ofFloat(btnTap, "scaleX", 1f, 1.1f, 1f);
+        scaleY = android.animation.ObjectAnimator.ofFloat(btnTap, "scaleY", 1f, 1.1f, 1f);
+
+        scaleX.setRepeatCount(android.animation.ObjectAnimator.INFINITE);
+        scaleY.setRepeatCount(android.animation.ObjectAnimator.INFINITE);
+        
+        scaleX.setDuration(1000);
+        scaleY.setDuration(1000);
+
+        android.animation.AnimatorSet set = new android.animation.AnimatorSet();
+        set.play(scaleX).with(scaleY);
+        set.start();
+    }
+    
+    private void stopPulseAnimation() {
+        if (scaleX != null) {
+            scaleX.cancel();
+            scaleX = null;
+        }
+        if (scaleY != null) {
+             scaleY.cancel();
+             scaleY = null;
+        }
+        // Reset scale to normal
+        btnTap.setScaleX(1f);
+        btnTap.setScaleY(1f);
     }
 }

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.mosleemapp.app.databinding.FragmentHomeBinding;
 import com.mosleemapp.app.ui.activities.DetailActivity;
 import com.mosleemapp.app.ui.activities.DuaActivity;
+import com.mosleemapp.app.ui.activities.QiblaActivity;
 import com.mosleemapp.app.ui.activities.TasbihActivity;
 import com.mosleemapp.app.ui.adapters.HomeMenuAdapter;
 import com.mosleemapp.app.ui.viewmodel.PrayerViewModel;
@@ -52,12 +53,15 @@ public class HomeFragment extends Fragment {
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Tasbih", R.drawable.ic_tasbih));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Quran", R.drawable.ic_quran));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Dua", R.drawable.dua));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Tracker", R.drawable.ic_history));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Qibla", R.drawable.ic_history)); // Let's use history or another available icon for now, ideally an ic_compass
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Premium", R.drawable.ic_premium));
 //        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Favorites", R.drawable.ic_favorite));
 
         HomeMenuAdapter menuAdapter = new HomeMenuAdapter(menuItems, item -> {
-            com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = 
-                requireActivity().findViewById(R.id.bottom_navigation);
-            
+            com.google.android.material.bottomnavigation.BottomNavigationView bottomNav =
+                    requireActivity().findViewById(R.id.bottom_navigation);
+
             if (item.getTitle().equals("Prayer")) {
                 bottomNav.setSelectedItemId(R.id.nav_prayer);
             } else if (item.getTitle().equals("Quran")) {
@@ -65,31 +69,62 @@ public class HomeFragment extends Fragment {
             } else if (item.getTitle().equals("Settings")) {
                 bottomNav.setSelectedItemId(R.id.nav_settings);
             } else if (item.getTitle().equals("Hadith")) {
-                 bottomNav.setSelectedItemId(R.id.nav_hadith);
+                bottomNav.setSelectedItemId(R.id.nav_hadith);
             } else if (item.getTitle().equals("Tasbih")) {
-                 startActivity(new android.content.Intent(getContext(), TasbihActivity.class));
+                startActivity(new android.content.Intent(getContext(), TasbihActivity.class));
             } else if (item.getTitle().equals("Dua")) {
-                 startActivity(new android.content.Intent(getContext(), DuaActivity.class));
+                startActivity(new android.content.Intent(getContext(), DuaActivity.class));
+            } else if (item.getTitle().equals("Premium")) {
+               startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.PurchaseActivity.class));
+            } else if (item.getTitle().equals("Tracker")) {
+                startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.PrayerTrackerActivity.class));
+            } else if (item.getTitle().equals("Qibla")) {
+                startActivity(new android.content.Intent(getContext(), QiblaActivity.class));
             } else {
-                 android.content.Intent intent = new android.content.Intent(getContext(), DetailActivity.class);
-                 intent.putExtra("EXTRA_TITLE", item.getTitle());
-                 startActivity(intent);
+                android.content.Intent intent = new android.content.Intent(getContext(), DetailActivity.class);
+                intent.putExtra("EXTRA_TITLE", item.getTitle());
+                startActivity(intent);
             }
 
         });
-//        binding.rvHomeMenu.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));        binding.rvHomeMenu.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        int spanCount = 4;
+//        if (getResources().getConfiguration().screenWidthDp >= 600) {
+//            spanCount = 4;
+//        } else if (getResources().getConfiguration().screenWidthDp >= 360) {
+//            spanCount = 3;
+//        } else {
+//            spanCount = 2;
+//        }
+        binding.rvHomeMenu.setLayoutManager(new GridLayoutManager(getContext(), spanCount));
         binding.rvHomeMenu.setAdapter(menuAdapter);
 
         viewModel = new ViewModelProvider(requireActivity()).get(PrayerViewModel.class);
         observeViewModel();
+    }
         
+    @Override
+    public void onResume() {
+        super.onResume();
         loadNativeAd();
     }
-    
+
     private void loadNativeAd() {
+        com.mosleemapp.app.utils.SettingsManager settingsManager = com.mosleemapp.app.utils.SettingsManager.getInstance(requireContext());
+        if (settingsManager.isPremium()) {
+            if (binding != null) {
+                binding.flAdPlaceholder.removeAllViews();
+            }
+            return;
+        }
+
         AdMobUtil.loadNativeAd(requireContext(), nativeAd -> {
             if (binding == null) return; // Fragment destroyed
             
+            // Re-check premium status in case it changed while ad was loading
+            if (settingsManager.isPremium()) {
+                return;
+            }
+
             // Inflate Native Ad Layout
             NativeAdView adView = (NativeAdView) getLayoutInflater().inflate(R.layout.ad_native, null);
                 

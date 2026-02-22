@@ -16,8 +16,21 @@
     <string name="reminder_for_prayer_disabled">Pengingat %1$s Dinonaktifkan</string>
     <string name="language">Bahasa</string>
     <string name="select_language">Pilih Bahasa</string>
-    <string name="reset_all">Reset All</string>
-    <string name="label_font_size">Arabic Font Size</string>
+    <string name="reset_all">Atur Ulang Semua</string>
+    <string name="label_font_size">Ukuran Font Arab</string>
     <string name="home">Beranda</string>
     <string name="prayer">Sholat</string>
+
+    <!-- Purchase Activity -->
+    <string name="premium_access">Akses Premium</string>
+    <string name="unlock_all_features">Buka Semua Fitur</string>
+    <string name="premium_desc">Dapatkan akses tak terbatas ke semua fitur dengan paket premium kami. Anda dapat membatalkan kapan saja.</string>
+    <string name="monthly">Bulanan</string>
+    <string name="monthly_price">$2.99 / Bulan</string>
+    <string name="annually">Tahunan</string>
+    <string name="annually_price">$29.99 / Tahun</string>
+    <string name="save_percent">Hemat 17%</string>
+    <string name="purchase_simulated">Simulasi pembelian untuk: %1$s</string>
+    <string name="purchase_successful">Pembelian Berhasil! Terima kasih.</string>
+    <string name="check_your_internet_connection_and_try_again">Periksa koneksi internet Anda dan coba lagi.</string>
 </resources>

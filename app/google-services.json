@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "918294205518",
+    "project_id": "mosleemapps",
+    "storage_bucket": "mosleemapps.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:918294205518:android:8a0c66be90e9cc8d1cdf1f",
+        "android_client_info": {
+          "package_name": "com.mosleemapp.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2nVGgE4Qoyp1Eh5XSf-rXyswnnLT5bVA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -92,7 +92,8 @@ public class HadithFragment extends Fragment {
              @Override
              public void onError(String message) {
                  if (getContext() != null) {
-                     Toast.makeText(getContext(), getString(R.string.error_prefix, message), Toast.LENGTH_SHORT).show();
+                     Toast.makeText(getContext(), getString(R.string.check_your_internet_connection_and_try_again), Toast.LENGTH_SHORT).show();
+                     android.util.Log.e("HadithFragment", "Error fetching surahs: " + message);
                  }
              }
         });

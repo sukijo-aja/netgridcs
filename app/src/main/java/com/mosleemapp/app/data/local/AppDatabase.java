@@ -16,15 +16,23 @@ import com.mosleemapp.app.data.local.entity.AyahEntity;
 import com.mosleemapp.app.data.local.entity.HadithBookEntity;
 import com.mosleemapp.app.data.local.entity.HadithEntity;
 import com.mosleemapp.app.data.local.entity.SurahEntity;
+import com.mosleemapp.app.data.local.dao.PrayerTrackerDao;
 import com.mosleemapp.app.data.local.entity.DuaEntity;
+import com.mosleemapp.app.data.local.entity.PrayerTrackerEntity;
 
-@Database(entities = { PrayerTimeEntity.class, SurahEntity.class, AyahEntity.class, HadithBookEntity.class, HadithEntity.class, DuaEntity.class }, version = 8, exportSchema = false)
+import com.mosleemapp.app.data.local.dao.CustomHabitDao;
+import com.mosleemapp.app.data.local.entity.CustomHabitEntity;
+import com.mosleemapp.app.data.local.entity.CustomHabitLogEntity;
+
+@Database(entities = { PrayerTimeEntity.class, SurahEntity.class, AyahEntity.class, HadithBookEntity.class, HadithEntity.class, DuaEntity.class, PrayerTrackerEntity.class, CustomHabitEntity.class, CustomHabitLogEntity.class }, version = 10, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract PrayerDao prayerDao();
     public abstract QuranDao quranDao();
     public abstract HadithDao hadithDao();
     public abstract DuaDao duaDao();
+    public abstract PrayerTrackerDao prayerTrackerDao();
+    public abstract CustomHabitDao customHabitDao();
 
     private static volatile AppDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;

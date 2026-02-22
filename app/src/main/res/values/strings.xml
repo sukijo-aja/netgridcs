@@ -27,4 +27,17 @@
     <string name="label_font_size">Arabic Font Size</string>
     <string name="home">Home</string>
     <string name="prayer">Prayer</string>
+    
+    <!-- Purchase Activity -->
+    <string name="premium_access">Premium Access</string>
+    <string name="unlock_all_features">Unlock All Features</string>
+    <string name="premium_desc">Get unlimited access to all features with our premium plans. You can cancel anytime.</string>
+    <string name="monthly">Monthly</string>
+    <string name="monthly_price">$2.99 / Month</string>
+    <string name="annually">Annually</string>
+    <string name="annually_price">$29.99 / Year</string>
+    <string name="save_percent">Save 17%</string>
+    <string name="purchase_simulated">Simulating purchase for: %1$s</string>
+    <string name="purchase_successful">Purchase Successful! Thank you.</string>
+    <string name="check_your_internet_connection_and_try_again">Check your internet connection and try again.</string>
 </resources>

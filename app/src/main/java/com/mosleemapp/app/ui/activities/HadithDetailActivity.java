@@ -79,7 +79,7 @@ public class HadithDetailActivity extends AppCompatActivity {
             @Override
             public void onError(String message) {
                 showLoading(false);
-                Toast.makeText(HadithDetailActivity.this, getString(R.string.error_prefix, message), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.check_your_internet_connection_and_try_again), Toast.LENGTH_SHORT).show();
             }
         });
     }

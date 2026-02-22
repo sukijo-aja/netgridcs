@@ -41,8 +41,15 @@ public class QuranRepository {
         quranDao = db.quranDao();
         executorService = Executors.newSingleThreadExecutor();
         
+        okhttp3.OkHttpClient client = new okhttp3.OkHttpClient.Builder()
+                .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         apiService = retrofit.create(QuranApiService.class);
@@ -135,7 +142,7 @@ public class QuranRepository {
 
                     callback.onSuccess(arabicAyahs);
                 } else {
-                    callback.onError("Failed to fetch ayahs");
+                    callback.onError("Failed to fetch ayahs. Please check your connection.");
                 }
             }
 
@@ -206,7 +213,12 @@ public class QuranRepository {
             entity.page = ayah.page;
             entity.ruku = ayah.ruku;
             entity.hizbQuarter = ayah.hizbQuarter;
-            entity.sajda = ayah.sajda;
+            if (ayah.sajda instanceof Boolean) {
+                entity.sajda = (Boolean) ayah.sajda;
+            } else {
+                // If it's not a boolean (e.g. it's an object/LinkedTreeMap), it means there IS a sajda
+                entity.sajda = ayah.sajda != null;
+            }
             entities.add(entity);
         }
         return entities;
@@ -236,6 +248,94 @@ public class QuranRepository {
             ayahs.add(ayah);
         }
         return ayahs;
+    }
+
+    public void downloadAllData(Callback<Boolean> callback) {
+        executorService.execute(() -> {
+            try {
+                // 1. Fetch Arabic (quran-uthmani) - BASE
+                Response<com.mosleemapp.app.data.models.CompleteQuranResponse> arResponse = apiService.getCompleteQuran("quran-uthmani").execute();
+                if (!arResponse.isSuccessful() || arResponse.body() == null) {
+                    new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> callback.onError("Failed to fetch Arabic data"));
+                    return;
+                }
+
+                // 2. Fetch English (en.sahih)
+                Response<com.mosleemapp.app.data.models.CompleteQuranResponse> enResponse = apiService.getCompleteQuran("en.sahih").execute();
+                
+                // 3. Fetch Indonesian (id.indonesian)
+                Response<com.mosleemapp.app.data.models.CompleteQuranResponse> idResponse = apiService.getCompleteQuran("id.indonesian").execute();
+
+                List<com.mosleemapp.app.data.models.CompleteQuranResponse.Surah> arSurahs = arResponse.body().data.surahs;
+                List<com.mosleemapp.app.data.models.CompleteQuranResponse.Surah> enSurahs = (enResponse.isSuccessful() && enResponse.body() != null) ? enResponse.body().data.surahs : null;
+                List<com.mosleemapp.app.data.models.CompleteQuranResponse.Surah> idSurahs = (idResponse.isSuccessful() && idResponse.body() != null) ? idResponse.body().data.surahs : null;
+
+                // Prepare Entities
+                List<SurahEntity> surahEntities = new ArrayList<>();
+                List<AyahEntity> ayahEntities = new ArrayList<>();
+
+                for (int i = 0; i < arSurahs.size(); i++) {
+                    com.mosleemapp.app.data.models.CompleteQuranResponse.Surah arSurah = arSurahs.get(i);
+                    com.mosleemapp.app.data.models.CompleteQuranResponse.Surah enSurah = (enSurahs != null && i < enSurahs.size()) ? enSurahs.get(i) : null;
+                    
+                    // Map Surah
+                    SurahEntity surahEntity = new SurahEntity();
+                    surahEntity.number = arSurah.number;
+                    surahEntity.name = arSurah.name;
+                    surahEntity.englishName = arSurah.englishName;
+                    surahEntity.englishNameTranslation = arSurah.englishNameTranslation;
+                    surahEntity.numberOfAyahs = arSurah.ayahs.size();
+                    surahEntity.revelationType = arSurah.revelationType;
+                    surahEntities.add(surahEntity);
+
+                    // Map Ayahs
+                    for (int j = 0; j < arSurah.ayahs.size(); j++) {
+                        com.mosleemapp.app.data.models.CompleteQuranResponse.Ayah arAyah = arSurah.ayahs.get(j);
+                        AyahEntity ayahEntity = new AyahEntity();
+                        ayahEntity.surahId = arSurah.number;
+                        ayahEntity.number = arAyah.number;
+                        ayahEntity.text = arAyah.text;
+                        ayahEntity.numberInSurah = arAyah.numberInSurah;
+                        ayahEntity.juz = arAyah.juz;
+                        ayahEntity.manzil = arAyah.manzil;
+                        ayahEntity.page = arAyah.page;
+                        ayahEntity.ruku = arAyah.ruku;
+                        ayahEntity.hizbQuarter = arAyah.hizbQuarter;
+                        
+                        // Handle Sajda
+                         if (arAyah.sajda instanceof Boolean) {
+                            ayahEntity.sajda = (Boolean) arAyah.sajda;
+                        } else {
+                            ayahEntity.sajda = arAyah.sajda != null;
+                        }
+
+                        // Translations
+                        if (enSurah != null && j < enSurah.ayahs.size()) {
+                            ayahEntity.translationEn = enSurah.ayahs.get(j).text;
+                        }
+                        
+                        if (idSurahs != null && i < idSurahs.size()) {
+                             com.mosleemapp.app.data.models.CompleteQuranResponse.Surah idSurah = idSurahs.get(i);
+                             if (j < idSurah.ayahs.size()) {
+                                 ayahEntity.translationId = idSurah.ayahs.get(j).text;
+                             }
+                        }
+
+                        ayahEntities.add(ayahEntity);
+                    }
+                }
+
+                // Bulk Insert
+                quranDao.insertSurahs(surahEntities);
+                quranDao.insertAyahs(ayahEntities);
+                
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> callback.onSuccess(true));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> callback.onError("Error downloading: " + e.getMessage()));
+            }
+        });
     }
 
     public interface Callback<T> {

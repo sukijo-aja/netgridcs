@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="200dp"
+    android:viewportWidth="48"
+    android:viewportHeight="200">
+    <!-- Center pivot -->
+    <path
+        android:fillColor="#0288D1"
+        android:pathData="M24,100m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
+    <!-- Top needle (pointing to Qibla) -->
+    <path
+        android:fillColor="#F44336"
+        android:pathData="M24,10 L30,95 Q24,108 18,95 Z" />
+    <!-- Bottom needle (counter-balance) -->
+    <path
+        android:fillColor="#E0E0E0"
+        android:pathData="M24,190 L18,105 Q24,92 30,105 Z" />
+</vector>

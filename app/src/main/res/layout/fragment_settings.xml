@@ -30,20 +30,11 @@
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switchReminder"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
             android:text="Enable Prayer Alarms"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginBottom="4dp" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchPremium"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Simulate Premium User (No Ads)"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="24dp" />
 
         <TextView
             android:id="@+id/tvPreReminderLabel"
@@ -121,6 +112,43 @@
                 android:padding="16dp"
                 android:gravity="center" />
         </androidx.cardview.widget.CardView>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="24dp"/>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switchPremium"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:text="Simulate Premium User (No Ads)"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginVertical="16dp" />
+
+        <Button
+            android:id="@+id/btnResetData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reset Data (Test Online)"
+            android:backgroundTint="@color/design_default_color_error"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.Material3.Button.OutlinedButton"/>
+
+        <Button
+            android:id="@+id/btnDownloadAll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Download All Resources (Offline)"
+            android:backgroundTint="@color/primary_green"
+            android:textColor="@android:color/white"
+            android:drawableEnd="@android:drawable/stat_sys_download"
+            android:drawableTint="@android:color/white"
+            android:layout_marginBottom="16dp"
+            style="@style/Widget.Material3.Button.OutlinedButton.Icon"/>
+
 
     </LinearLayout>
 

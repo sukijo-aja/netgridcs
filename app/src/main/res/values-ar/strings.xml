@@ -16,8 +16,21 @@
     <string name="reminder_for_prayer_disabled">تذكير %1$s معطل</string>
     <string name="language">اللغة</string>
     <string name="select_language">اختر اللغة</string>
-    <string name="reset_all">Reset All</string>
-    <string name="label_font_size">Arabic Font Size</string>
-    <string name="home">Home</string>
-    <string name="prayer">Prayer</string>
+    <string name="reset_all">إعادة تعيين الكل</string>
+    <string name="label_font_size">حجم الخط العربي</string>
+    <string name="home">الرئيسية</string>
+    <string name="prayer">الصلاة</string>
+
+    <!-- Purchase Activity -->
+    <string name="premium_access">وصول مميز</string>
+    <string name="unlock_all_features">فتح جميع الميزات</string>
+    <string name="premium_desc">احصل على وصول غير محدود لجميع الميزات مع خططنا المميزة. يمكنك الإلغاء في أي وقت.</string>
+    <string name="monthly">شهري</string>
+    <string name="monthly_price">$2.99 / شهر</string>
+    <string name="annually">سنوي</string>
+    <string name="annually_price">$29.99 / سنة</string>
+    <string name="save_percent">وفر 17%</string>
+    <string name="purchase_simulated">محاكاة الشراء لـ: %1$s</string>
+    <string name="purchase_successful">تم الشراء بنجاح! شكراً لك.</string>
+    <string name="check_your_internet_connection_and_try_again">تحقق من اتصالك بالإنترنت وحاول مرة أخرى.</string>
 </resources>

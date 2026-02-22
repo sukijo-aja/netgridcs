@@ -2,6 +2,8 @@ package com.mosleemapp.app.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import com.google.firebase.installations.FirebaseInstallations;
+
 
 public class SettingsManager {
     private static final String PREF_NAME = "MoslemAppPrefs";
@@ -84,9 +86,25 @@ public class SettingsManager {
     public String getUserId() {
         String userId = sharedPreferences.getString("user_id", null);
         if (userId == null) {
-            userId = java.util.UUID.randomUUID().toString();
-            sharedPreferences.edit().putString("user_id", userId).apply();
+            // Trigger fetch but return a temporary placeholder or wait
+            // ideally we return what we have. If null, we fetch.
+            fetchFirebaseId();
+            return "Fetching...";
         }
         return userId;
+    }
+
+    public void fetchFirebaseId() {
+        FirebaseInstallations.getInstance().getId()
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    String fid = task.getResult();
+                    sharedPreferences.edit().putString("user_id", fid).apply();
+                } else {
+                    // Fallback to UUID
+                    String uuid = java.util.UUID.randomUUID().toString();
+                    sharedPreferences.edit().putString("user_id", uuid).apply();
+                }
+            });
     }
 }

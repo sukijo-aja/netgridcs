@@ -43,6 +43,22 @@
         <activity android:name=".ui.activities.TasbihActivity" />
         <activity android:name=".ui.activities.DetailActivity" />
         <activity android:name=".ui.activities.DuaActivity" />
+        <activity android:name=".ui.activities.PurchaseActivity"
+            android:label="Prayer Tracker"
+            android:theme="@style/Theme.MoslemApp"
+            android:parentActivityName=".MainActivity" />
+
+        <activity android:name=".ui.activities.PrayerTrackerActivity"
+            android:label="Prayer Tracker"
+            android:theme="@style/Theme.MoslemApp"
+            android:parentActivityName=".MainActivity"/>
+            
+        <activity android:name=".ui.activities.QiblaActivity"
+            android:label="Qibla Compass"
+            android:theme="@style/Theme.MoslemApp"
+            android:screenOrientation="fullSensor"
+            android:parentActivityName=".MainActivity"
+            tools:ignore="DiscouragedApi" />
         
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
