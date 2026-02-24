@@ -4,6 +4,8 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.mosleemapp.app.R;
 import com.mosleemapp.app.data.models.SurahResponse;
 import com.mosleemapp.app.databinding.ItemSurahBinding;
 import java.util.ArrayList;
@@ -62,8 +64,12 @@ public class SurahAdapter extends RecyclerView.Adapter<SurahAdapter.SurahViewHol
             binding.tvNumber.setText(String.valueOf(surah.number));
             binding.tvEnglishName.setText(surah.englishName);
             binding.tvEnglishNameTranslation.setText(surah.englishNameTranslation);
-            binding.tvNameArabic.setText(surah.name);
-            binding.tvVerses.setText(surah.numberOfAyahs + " Verses");
+            // Remove "سورة" prefix (with or without diacritical marks/harakat)
+            String arabicName = surah.name != null
+                    ? surah.name.replaceAll("س[\\u0610-\\u065F\\u0670\\u06D6-\\u06ED]*و[\\u0610-\\u065F\\u0670\\u06D6-\\u06ED]*ر[\\u0610-\\u065F\\u0670\\u06D6-\\u06ED]*ة[\\u0610-\\u065F\\u0670\\u06D6-\\u06ED]*\\s*", "").trim()
+                    : "";
+            binding.tvNameArabic.setText(arabicName);
+            binding.tvVerses.setText(" ("+surah.numberOfAyahs + " "+ itemView.getContext().getString(R.string.verses) +")");
 
             float fontSize = com.mosleemapp.app.utils.SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
             binding.tvNameArabic.setTextSize(fontSize);

@@ -20,6 +20,7 @@
     <string name="label_font_size">Ukuran Font Arab</string>
     <string name="home">Beranda</string>
     <string name="prayer">Sholat</string>
+    <string name="verses">ayat</string>
 
     <!-- Purchase Activity -->
     <string name="premium_access">Akses Premium</string>
@@ -33,4 +34,14 @@
     <string name="purchase_simulated">Simulasi pembelian untuk: %1$s</string>
     <string name="purchase_successful">Pembelian Berhasil! Terima kasih.</string>
     <string name="check_your_internet_connection_and_try_again">Periksa koneksi internet Anda dan coba lagi.</string>
+    <string name="moslem_app">Moslem App</string>
+
+    <!-- Auto Silent Mode -->
+    <string name="auto_silent_mode">Mode Senyap Otomatis</string>
+    <string name="auto_silent_mode_desc">Otomatis mengubah ponsel ke mode getar saat waktu sholat</string>
+    <string name="silent_duration">Durasi Senyap</string>
+    <string name="silent_mode_enabled">Mode Senyap Otomatis Diaktifkan</string>
+    <string name="silent_mode_disabled">Mode Senyap Otomatis Dinonaktifkan</string>
+    <string name="silent_mode_restored">Mode dering dikembalikan</string>
+    <string name="dnd_permission_required">Izin Jangan Ganggu diperlukan. Silakan berikan akses di pengaturan.</string>
 </resources>

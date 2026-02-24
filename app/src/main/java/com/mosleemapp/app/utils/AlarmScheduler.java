@@ -56,6 +56,45 @@ public class AlarmScheduler {
             cancelPendingIntent(context, alarmManager, i);
             cancelPendingIntent(context, alarmManager, i + 10);
         }
+        // Cancel restore-ringer alarm
+        cancelRestoreRingerAlarm(context, alarmManager);
+    }
+
+    /**
+     * Schedule an alarm to restore the ringer mode after the given duration.
+     */
+    @SuppressLint("ScheduleExactAlarm")
+    public static void scheduleRestoreRingerAlarm(Context context, int durationMinutes) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager == null) return;
+
+        Intent intent = new Intent(context, PrayerAlarmReceiver.class);
+        intent.setAction(PrayerAlarmReceiver.ACTION_RESTORE_RINGER);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                99, // unique request code for restore-ringer
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        Calendar target = Calendar.getInstance();
+        target.add(Calendar.MINUTE, durationMinutes);
+
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, target.getTimeInMillis(), pendingIntent);
+        Log.d("AlarmScheduler", "Scheduled restore-ringer in " + durationMinutes + " minutes at " + target.getTime());
+    }
+
+    private static void cancelRestoreRingerAlarm(Context context, AlarmManager am) {
+        Intent intent = new Intent(context, PrayerAlarmReceiver.class);
+        intent.setAction(PrayerAlarmReceiver.ACTION_RESTORE_RINGER);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                99,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+        am.cancel(pendingIntent);
     }
 
     private static void cancelPendingIntent(Context context, AlarmManager am, int requestCode) {

@@ -11,8 +11,9 @@
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        app:iconifiedByDefault="false"
+        android:layout_marginBottom="4dp"
+        android:layout_marginHorizontal="4dp"
+        app:iconifiedByDefault="true"
         app:queryHint="Search Surah"
         android:background="@color/white"
         xmlns:app="http://schemas.android.com/apk/res-auto"/>
@@ -21,7 +22,8 @@
         android:id="@+id/cardLastRead"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginVertical="4dp"
+        android:layout_marginHorizontal="4dp"
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp"
         android:visibility="visible"
@@ -31,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="8dp"
+            android:padding="4dp"
             android:gravity="center_vertical"
             android:background="?attr/selectableItemBackground">
 
@@ -40,6 +42,7 @@
                 android:layout_height="50dp"
                 android:src="@mipmap/ic_launcher_round"
                 android:layout_marginEnd="16dp"
+                android:visibility="gone"
                 />
 
             <LinearLayout
@@ -53,21 +56,21 @@
                     android:layout_height="wrap_content"
                     android:text="Last Read"
                     android:textSize="12sp"
-                    android:textColor="#757575"/>
+                    android:textColor="#000000"/>
 
                 <TextView
                     android:id="@+id/tvLastReadSurah"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Surah Al-Fatiha"
-                    android:textSize="16sp"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="@android:color/black"/>
             </LinearLayout>
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:src="@android:drawable/ic_menu_directions"
                 app:tint="@color/primary_green"/>
 

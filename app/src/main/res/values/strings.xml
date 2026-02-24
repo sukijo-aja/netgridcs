@@ -15,7 +15,8 @@
     <string name="reminder_for_prayer_disabled">Reminders %1$s Disabled</string>
     <string name="language">Language</string>
     <string name="select_language">Select Language</string>
-    
+    <string name="verses">ayat</string>
+
     <!-- AdMob Test IDs -->
     <string name="admob_app_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
     <string name="admob_banner_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
@@ -40,4 +41,14 @@
     <string name="purchase_simulated">Simulating purchase for: %1$s</string>
     <string name="purchase_successful">Purchase Successful! Thank you.</string>
     <string name="check_your_internet_connection_and_try_again">Check your internet connection and try again.</string>
+    <string name="moslem_app">Moslem App</string>
+
+    <!-- Auto Silent Mode -->
+    <string name="auto_silent_mode">Auto Silent Mode</string>
+    <string name="auto_silent_mode_desc">Automatically set phone to vibrate during prayer time</string>
+    <string name="silent_duration">Silent Duration</string>
+    <string name="silent_mode_enabled">Auto Silent Mode Enabled</string>
+    <string name="silent_mode_disabled">Auto Silent Mode Disabled</string>
+    <string name="silent_mode_restored">Ringer mode restored</string>
+    <string name="dnd_permission_required">Do Not Disturb permission required. Please grant access in settings.</string>
 </resources>

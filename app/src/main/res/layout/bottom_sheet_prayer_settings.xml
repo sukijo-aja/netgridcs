@@ -191,6 +191,56 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Auto Silent Mode Section -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="12dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/auto_silent_mode"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/auto_silent_mode_desc"
+        android:textSize="12sp"
+        android:textColor="#888888"
+        android:layout_marginBottom="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/bsSwitchAutoSilent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/auto_silent_mode" />
+
+        <TextView
+            android:id="@+id/tvSilentDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="15 min"
+            android:textColor="@color/primary_green"
+            android:textStyle="bold"
+            android:padding="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"/>
+    </LinearLayout>
+
     <Button
         android:id="@+id/btnCloseSheet"
         android:layout_width="match_parent"

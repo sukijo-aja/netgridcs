@@ -12,14 +12,25 @@ import androidx.core.app.NotificationCompat;
 
 import com.mosleemapp.app.R;
 import com.mosleemapp.app.ui.activities.ReminderActivity;
+import com.mosleemapp.app.utils.AlarmScheduler;
+import com.mosleemapp.app.utils.SettingsManager;
+import com.mosleemapp.app.utils.SilentModeManager;
 
 public class PrayerAlarmReceiver extends BroadcastReceiver {
 
     private static final String CHANNEL_ID = "prayer_reminder_channel";
     private static final String CHANNEL_NAME = "Prayer Reminders";
 
+    public static final String ACTION_RESTORE_RINGER = "com.mosleemapp.app.ACTION_RESTORE_RINGER";
+
     @Override
     public void onReceive(Context context, Intent intent) {
+        // Handle restore-ringer alarm
+        if (ACTION_RESTORE_RINGER.equals(intent.getAction())) {
+            SilentModeManager.restoreRingerMode(context);
+            return;
+        }
+
         String prayerName = intent.getStringExtra("prayer_name");
         boolean isPreReminder = intent.getBooleanExtra("is_pre_reminder", false);
         
@@ -31,6 +42,14 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
             showPreReminderNotification(context, prayerName);
         } else {
             showNotification(context, prayerName);
+
+            // Auto-silent mode: activate silent and schedule restore
+            SettingsManager sm = SettingsManager.getInstance(context);
+            if (sm.isAutoSilentEnabled() && SilentModeManager.hasDoNotDisturbPermission(context)) {
+                SilentModeManager.activateSilentMode(context);
+                int duration = sm.getAutoSilentDuration();
+                AlarmScheduler.scheduleRestoreRingerAlarm(context, duration);
+            }
         }
     }
 

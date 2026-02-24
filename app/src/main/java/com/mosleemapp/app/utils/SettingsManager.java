@@ -75,6 +75,24 @@ public class SettingsManager {
         sharedPreferences.edit().putInt("pre_prayer_reminder_minutes", minutes).apply();
     }
 
+    // --- Auto Silent Mode ---
+
+    public boolean isAutoSilentEnabled() {
+        return sharedPreferences.getBoolean("auto_silent_enabled", false);
+    }
+
+    public void setAutoSilentEnabled(boolean enabled) {
+        sharedPreferences.edit().putBoolean("auto_silent_enabled", enabled).apply();
+    }
+
+    public int getAutoSilentDuration() {
+        return sharedPreferences.getInt("auto_silent_duration", 15); // default 15 minutes
+    }
+
+    public void setAutoSilentDuration(int minutes) {
+        sharedPreferences.edit().putInt("auto_silent_duration", minutes).apply();
+    }
+
     public boolean isPremium() {
         return sharedPreferences.getBoolean("is_premium", false);
     }

@@ -39,6 +39,9 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
         Button btnClose = view.findViewById(R.id.btnCloseSheet);
         btnClose.setOnClickListener(v -> dismiss());
 
+        // Auto Silent Mode
+        setupAutoSilent(view, settingsManager);
+
         androidx.lifecycle.ViewModelProvider provider = new androidx.lifecycle.ViewModelProvider(requireActivity());
         com.mosleemapp.app.ui.viewmodel.PrayerViewModel viewModel = provider.get(com.mosleemapp.app.ui.viewmodel.PrayerViewModel.class);
         
@@ -112,5 +115,47 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
             case "Isha": return R.id.tvOffsetIsha;
             default: return 0;
         }
+    }
+
+    private void setupAutoSilent(View view, SettingsManager sm) {
+        SwitchMaterial swAutoSilent = view.findViewById(R.id.bsSwitchAutoSilent);
+        android.widget.TextView tvDuration = view.findViewById(R.id.tvSilentDuration);
+
+        // Initialize state
+        swAutoSilent.setChecked(sm.isAutoSilentEnabled());
+        updateSilentDurationUI(tvDuration, sm.getAutoSilentDuration());
+
+        swAutoSilent.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked && !com.mosleemapp.app.utils.SilentModeManager.hasDoNotDisturbPermission(requireContext())) {
+                // Need DND permission — show toast and open settings
+                android.widget.Toast.makeText(requireContext(), R.string.dnd_permission_required, android.widget.Toast.LENGTH_LONG).show();
+                com.mosleemapp.app.utils.SilentModeManager.requestDoNotDisturbPermission(requireContext());
+                swAutoSilent.setChecked(false);
+                return;
+            }
+            sm.setAutoSilentEnabled(isChecked);
+            String msg = getString(isChecked ? R.string.silent_mode_enabled : R.string.silent_mode_disabled);
+            android.widget.Toast.makeText(requireContext(), msg, android.widget.Toast.LENGTH_SHORT).show();
+        });
+
+        tvDuration.setOnClickListener(v -> showSilentDurationDialog(sm, tvDuration));
+    }
+
+    private void showSilentDurationDialog(SettingsManager sm, android.widget.TextView tvDuration) {
+        final String[] options = {"10 min", "15 min", "20 min", "30 min", "45 min", "60 min"};
+        final int[] values = {10, 15, 20, 30, 45, 60};
+
+        new android.app.AlertDialog.Builder(requireContext())
+                .setTitle(R.string.silent_duration)
+                .setItems(options, (dialog, which) -> {
+                    int selected = values[which];
+                    sm.setAutoSilentDuration(selected);
+                    updateSilentDurationUI(tvDuration, selected);
+                })
+                .show();
+    }
+
+    private void updateSilentDurationUI(android.widget.TextView tv, int minutes) {
+        tv.setText(minutes + " min");
     }
 }

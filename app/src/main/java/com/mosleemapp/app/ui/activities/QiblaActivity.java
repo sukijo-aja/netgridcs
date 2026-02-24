@@ -25,6 +25,7 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener, 
 
     private ImageView ivCompassDial;
     private ImageView ivQiblaNeedle;
+    private ImageView ivKaabaIcon;
     private TextView tvBearingInfo;
     private TextView tvDistanceInfo;
 
@@ -58,6 +59,7 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener, 
 
         ivCompassDial = findViewById(R.id.iv_compass_dial);
         ivQiblaNeedle = findViewById(R.id.iv_qibla_needle);
+        ivKaabaIcon = findViewById(R.id.iv_kaaba_icon);
         tvBearingInfo = findViewById(R.id.tv_bearingInfo);
         tvDistanceInfo = findViewById(R.id.tv_distanceInfo);
 
@@ -85,7 +87,6 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener, 
         locationManagerHelper = new LocationManagerHelper(this, this);
         locationManagerHelper.getLocation(); // Request location update
 
-        Log.i("QiblaActivity", "onCreate: " + currentLat + ", " + currentLng);
         calculateQibla(); // initial calculation with default coords
     }
 
@@ -156,6 +157,12 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener, 
         ivCompassDial.setRotation(currentCompassDegree);
         ivQiblaNeedle.setRotation(currentNeedleDegree);
 
+        // Position Kaaba icon on the edge of the compass at the Qibla direction
+        float radius = ivCompassDial.getWidth() / 2f - 30; // slightly inside the compass edge
+        double angleRad = Math.toRadians(currentNeedleDegree - 90); // -90 because 0° is up
+        ivKaabaIcon.setTranslationX((float) (radius * Math.cos(angleRad)));
+        ivKaabaIcon.setTranslationY((float) (radius * Math.sin(angleRad)));
+
         int displayAzimuth = (int) azimuthInDegrees;
         if(isLocationSet) {
             tvBearingInfo.setText(displayAzimuth + "° " + getDirectionString(displayAzimuth));
@@ -200,8 +207,6 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener, 
         float distanceInKm = distanceInMeters / 1000f;
 
         tvDistanceInfo.setText(String.format("Distance to Kaaba: %.0f km", distanceInKm));
-        Log.i("QiblaActivity", "onLocationReceived: " + currentLat + ", " + currentLng);
-
     }
 
     private float adjustAngle(float current, float target) {

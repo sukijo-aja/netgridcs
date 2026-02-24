@@ -54,7 +54,7 @@ public class HomeFragment extends Fragment {
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Quran", R.drawable.ic_quran));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Dua", R.drawable.dua));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Tracker", R.drawable.ic_history));
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Qibla", R.drawable.ic_history)); // Let's use history or another available icon for now, ideally an ic_compass
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Qibla", R.drawable.ic_kaaba));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Premium", R.drawable.ic_premium));
 //        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Favorites", R.drawable.ic_favorite));
 
@@ -185,6 +185,12 @@ public class HomeFragment extends Fragment {
 
         viewModel.getNextPrayerTimeRemaining().observe(getViewLifecycleOwner(), time -> {
             binding.tvCountdown.setText(time);
+        });
+
+        viewModel.getCityName().observe(getViewLifecycleOwner(), city -> {
+            if (city != null) {
+                binding.tvCity.setText(city);
+            }
         });
     }
 

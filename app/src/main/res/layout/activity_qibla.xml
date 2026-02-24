@@ -29,7 +29,7 @@
         android:id="@+id/tv_bearingInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="50dp"
         android:text="Calibrating..."
         android:textSize="18sp"
         android:textStyle="bold"
@@ -72,6 +72,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/ic_qibla_needle" />
+
+        <!-- Kaaba icon at the Qibla direction on compass edge -->
+        <ImageView
+            android:id="@+id/iv_kaaba_icon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_kaaba"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

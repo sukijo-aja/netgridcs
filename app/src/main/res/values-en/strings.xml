@@ -20,6 +20,7 @@
     <string name="label_font_size">Arabic Font Size</string>
     <string name="home">Home</string>
     <string name="prayer">Prayer</string>
+    <string name="verses">Verses</string>
 
     <!-- Purchase Activity -->
     <string name="premium_access">Premium Access</string>
@@ -32,4 +33,14 @@
     <string name="save_percent">Save 17%</string>
     <string name="purchase_simulated">Simulating purchase for: %1$s</string>
     <string name="purchase_successful">Purchase Successful! Thank you.</string>
+    <string name="moslem_app">Moslem App</string>
+
+    <!-- Auto Silent Mode -->
+    <string name="auto_silent_mode">Auto Silent Mode</string>
+    <string name="auto_silent_mode_desc">Automatically set phone to vibrate during prayer time</string>
+    <string name="silent_duration">Silent Duration</string>
+    <string name="silent_mode_enabled">Auto Silent Mode Enabled</string>
+    <string name="silent_mode_disabled">Auto Silent Mode Disabled</string>
+    <string name="silent_mode_restored">Ringer mode restored</string>
+    <string name="dnd_permission_required">Do Not Disturb permission required. Please grant access in settings.</string>
 </resources>

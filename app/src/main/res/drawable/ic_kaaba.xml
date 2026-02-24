@@ -1,0 +1,37 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- Shadow -->
+<!--    <path-->
+<!--        android:fillColor="#33000000"-->
+<!--        android:pathData="M50,92 L85,78 L50,85 L15,78 Z" />-->
+
+    <!-- Left face (darker) -->
+    <path
+        android:fillColor="#1A1A1A"
+        android:pathData="M15,30 L50,18 L50,78 L15,68 Z" />
+
+    <!-- Right face (lighter) -->
+    <path
+        android:fillColor="#2D2D2D"
+        android:pathData="M50,18 L85,30 L85,68 L50,78 Z" />
+
+    <!-- Top face -->
+    <path
+        android:fillColor="#3A3A3A"
+        android:pathData="M15,30 L50,18 L85,30 L50,42 Z" />
+
+    <!-- Gold band left (Kiswah) -->
+    <path
+        android:fillColor="#C6A84B"
+        android:pathData="M15,42 L50,30 L50,39 L15,51 Z" />
+
+    <!-- Gold band right (Kiswah) -->
+    <path
+        android:fillColor="#D4B85A"
+        android:pathData="M50,30 L85,42 L85,51 L50,39 Z" />
+
+</vector>

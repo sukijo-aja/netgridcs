@@ -33,4 +33,14 @@
     <string name="purchase_simulated">محاكاة الشراء لـ: %1$s</string>
     <string name="purchase_successful">تم الشراء بنجاح! شكراً لك.</string>
     <string name="check_your_internet_connection_and_try_again">تحقق من اتصالك بالإنترنت وحاول مرة أخرى.</string>
+    <string name="moslem_app">Moslem App</string>
+
+    <!-- Auto Silent Mode -->
+    <string name="auto_silent_mode">الوضع الصامت التلقائي</string>
+    <string name="auto_silent_mode_desc">تحويل الهاتف تلقائياً إلى وضع الاهتزاز أثناء وقت الصلاة</string>
+    <string name="silent_duration">مدة الصمت</string>
+    <string name="silent_mode_enabled">تم تفعيل الوضع الصامت التلقائي</string>
+    <string name="silent_mode_disabled">تم تعطيل الوضع الصامت التلقائي</string>
+    <string name="silent_mode_restored">تم استعادة وضع الرنين</string>
+    <string name="dnd_permission_required">إذن عدم الإزعاج مطلوب. يرجى منح الوصول في الإعدادات.</string>
 </resources>

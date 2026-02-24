@@ -16,6 +16,7 @@ import com.mosleemapp.app.data.repository.PrayerRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class PrayerViewModel extends AndroidViewModel {
@@ -23,6 +24,7 @@ public class PrayerViewModel extends AndroidViewModel {
     private final MutableLiveData<PrayerTimeEntity> prayerData = new MutableLiveData<>();
     private final MutableLiveData<String> nextPrayerName = new MutableLiveData<>();
     private final MutableLiveData<String> nextPrayerTimeRemaining = new MutableLiveData<>();
+    private final MutableLiveData<String> cityName = new MutableLiveData<>();
     
     // Default location (Jakarta)
     private double currentLat = -6.2088;
@@ -40,6 +42,7 @@ public class PrayerViewModel extends AndroidViewModel {
         this.currentLat = lat;
         this.currentLon = lon;
         fetchPrayerTimes();
+        resolveCity(lat, lon);
     }
 
     public void fetchPrayerTimes() {
@@ -59,6 +62,33 @@ public class PrayerViewModel extends AndroidViewModel {
     
     public LiveData<String> getNextPrayerName() { return nextPrayerName; }
     public LiveData<String> getNextPrayerTimeRemaining() { return nextPrayerTimeRemaining; }
+    public LiveData<String> getCityName() { return cityName; }
+
+    private void resolveCity(double lat, double lon) {
+        new Thread(() -> {
+            try {
+                android.location.Geocoder geocoder = new android.location.Geocoder(
+                        getApplication(), Locale.getDefault());
+                List<android.location.Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+                if (addresses != null && !addresses.isEmpty()) {
+                    StringBuilder result = new StringBuilder();
+                    android.location.Address address = addresses.get(0);
+                    String city = address.getLocality();
+                    result.append(address.getSubLocality());
+                    result.append(", ").append(city);
+                    result.append(", ").append(address.getSubAdminArea());
+//                    result.append(", ").append(address.getAdminArea());
+//                    if (city != null) {
+//                        String country = address.getCountryName();
+//                        if (country != null) result.append(", ").append(country);
+//                    }
+                    cityName.postValue(result.toString());
+                }
+            } catch (Exception e) {
+                Log.e("PrayerViewModel", "Geocoder failed", e);
+            }
+        }).start();
+    }
 
     private void startCountdown(PrayerTimeEntity entity) {
         if (timerRunnable != null) timerHandler.removeCallbacks(timerRunnable);

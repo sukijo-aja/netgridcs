@@ -9,13 +9,27 @@
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Moslem App"
+        android:text="@string/app_name"
         android:textSize="28sp"
         android:textStyle="bold"
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvCity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Location"
+        android:textSize="11sp"
+        android:maxLines="3"
+        android:textColor="@color/primary_green"
+        android:layout_marginHorizontal="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        />
         
     <androidx.cardview.widget.CardView
         android:id="@+id/cardCountdown"
@@ -25,7 +39,7 @@
         app:cardCornerRadius="16dp"
         app:cardElevation="6dp"
         app:cardBackgroundColor="@color/primary_green"
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintTop_toBottomOf="@id/tvCity"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
         
