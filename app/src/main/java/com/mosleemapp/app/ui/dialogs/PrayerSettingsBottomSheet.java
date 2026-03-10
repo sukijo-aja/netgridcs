@@ -18,10 +18,110 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
 
     public static final String TAG = "PrayerSettingsBottomSheet";
 
+    private androidx.activity.result.ActivityResultLauncher<String> requestPermissionLauncher;
+    private com.google.android.material.switchmaterial.SwitchMaterial switchReminder;
+    private boolean waitingForPermissionToggle = false;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.bottom_sheet_prayer_settings, container, false);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        requestPermissionLauncher = registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) {
+                // Now check for exact alarm permission
+                handleExactAlarmPermission();
+            } else {
+                android.widget.Toast.makeText(requireContext(), "Notification permission denied", android.widget.Toast.LENGTH_SHORT).show();
+                if (switchReminder != null) {
+                    switchReminder.setChecked(false);
+                }
+            }
+        });
+    }
+
+    private void handleExactAlarmPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            android.app.AlarmManager alarmManager = (android.app.AlarmManager) requireContext().getSystemService(android.content.Context.ALARM_SERVICE);
+            if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
+                android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                intent.setData(android.net.Uri.parse("package:" + requireContext().getPackageName()));
+                startActivity(intent);
+                waitingForPermissionToggle = true;
+                if (switchReminder != null) {
+                    switchReminder.setChecked(false);
+                }
+                android.widget.Toast.makeText(requireContext(), "Please grant exact alarm permission", android.widget.Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+        
+        // Both permissions are granted, we can enable it now
+        if (switchReminder != null && !switchReminder.isChecked()) {
+            switchReminder.setChecked(true); // This will re-trigger the listener but permissions are now granted
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        
+        if (waitingForPermissionToggle) {
+            waitingForPermissionToggle = false;
+            
+            boolean hasNotificationPerm = true;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                hasNotificationPerm = androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED;
+            }
+            
+            boolean hasExactAlarmPerm = true;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                android.app.AlarmManager alarmManager = (android.app.AlarmManager) requireContext().getSystemService(android.content.Context.ALARM_SERVICE);
+                if (alarmManager != null) {
+                    hasExactAlarmPerm = alarmManager.canScheduleExactAlarms();
+                }
+            }
+
+            if (hasNotificationPerm && hasExactAlarmPerm && switchReminder != null) {
+                switchReminder.setChecked(true);
+            }
+        }
+        
+        checkPermissionsAndSwitchState();
+    }
+
+    private void checkPermissionsAndSwitchState() {
+        if (switchReminder == null) return;
+        SettingsManager sm = SettingsManager.getInstance(requireContext());
+        if (sm.isReminderEnabled()) {
+            boolean hasNotificationPerm = true;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                hasNotificationPerm = androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED;
+            }
+            
+            boolean hasExactAlarmPerm = true;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                android.app.AlarmManager alarmManager = (android.app.AlarmManager) requireContext().getSystemService(android.content.Context.ALARM_SERVICE);
+                if (alarmManager != null) {
+                    hasExactAlarmPerm = alarmManager.canScheduleExactAlarms();
+                }
+            }
+
+            if (!hasNotificationPerm || !hasExactAlarmPerm) {
+                // If either is missing, we must turn off the reminder setting internally and uncheck the switch
+                sm.setReminderEnabled(false);
+                switchReminder.setChecked(false);
+                com.mosleemapp.app.utils.AlarmScheduler.cancelAlarms(requireContext());
+            } else {
+                if (!switchReminder.isChecked()) {
+                    switchReminder.setChecked(true); // they granted it from settings page just now
+                }
+            }
+        }
     }
 
     @Override
@@ -30,18 +130,37 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
 
         SettingsManager settingsManager = SettingsManager.getInstance(requireContext());
 
-        com.google.android.material.switchmaterial.SwitchMaterial switchReminder = view.findViewById(R.id.bsSwitchReminder);
+        switchReminder = view.findViewById(R.id.bsSwitchReminder);
         switchReminder.setChecked(settingsManager.isReminderEnabled());
         switchReminder.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    if (androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                        switchReminder.setChecked(false);
+                        
+                        new android.app.AlertDialog.Builder(requireContext())
+                                .setTitle("Permission Required")
+                                .setMessage("Notification permission is required to receive prayer reminders. If the system dialog does not appear, please enable it in Settings.")
+                                // .setPositiveButton("Request", (dialog, which) -> {
+                                //     requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+                                // })
+                                .setPositiveButton("Settings", (dialog, which) -> {
+                                    android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                                    intent.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName());
+                                    waitingForPermissionToggle = true;
+                                    startActivity(intent);
+                                })
+                                .setNegativeButton("Cancel", null)
+                                .show();
+                        return;
+                    }
+                }
+                
+                // If notification permission is already granted, moving to exact alarm check
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                     android.app.AlarmManager alarmManager = (android.app.AlarmManager) requireContext().getSystemService(android.content.Context.ALARM_SERVICE);
                     if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
-                        android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                        intent.setData(android.net.Uri.parse("package:" + requireContext().getPackageName()));
-                        startActivity(intent);
-                        switchReminder.setChecked(false);
-                        android.widget.Toast.makeText(requireContext(), "Please grant exact alarm permission first", android.widget.Toast.LENGTH_LONG).show();
+                        handleExactAlarmPermission();
                         return;
                     }
                 }
@@ -84,6 +203,34 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
 
         Button btnClose = view.findViewById(R.id.btnCloseSheet);
         btnClose.setOnClickListener(v -> dismiss());
+
+        Button btnTestNotification = view.findViewById(R.id.btnTestNotification);
+        btnTestNotification.setOnClickListener(v -> {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                if (androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                    new android.app.AlertDialog.Builder(requireContext())
+                            .setTitle("Permission Required")
+                            .setMessage("Notification permission is required to receive prayer reminders. If the system dialog does not appear, please enable it in Settings.")
+                            .setPositiveButton("Request", (dialog, which) -> {
+                                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+                            })
+                            .setNeutralButton("Settings", (dialog, which) -> {
+                                android.content.Intent appIntent = new android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                                appIntent.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName());
+                                startActivity(appIntent);
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                    return;
+                }
+            }
+            
+            android.content.Intent intent = new android.content.Intent(requireContext(), com.mosleemapp.app.receivers.PrayerAlarmReceiver.class);
+            intent.putExtra("prayer_name", "Test Prayer");
+            intent.putExtra("is_pre_reminder", false);
+            requireContext().sendBroadcast(intent);
+            android.widget.Toast.makeText(requireContext(), "Test notification requested", android.widget.Toast.LENGTH_SHORT).show();
+        });
 
         // Auto Silent Mode
         setupAutoSilent(view, settingsManager);

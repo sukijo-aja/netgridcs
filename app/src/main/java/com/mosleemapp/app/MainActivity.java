@@ -52,6 +52,16 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
                     // Fallback to default (ViewModel has default Jakarta coords)
                     viewModel.fetchPrayerTimes();
                 }
+
+                // Check and request exact alarm permission if on Android 12+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    android.app.AlarmManager alarmManager = (android.app.AlarmManager) getSystemService(android.content.Context.ALARM_SERVICE);
+                    if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
+                        android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                        intent.setData(android.net.Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    }
+                }
             });
 
     private boolean doubleBackToExitPressedOnce = false;
@@ -70,7 +80,7 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
         
         // Setup Location
         locationManagerHelper = new LocationManagerHelper(this, this);
-        checkLocationPermissions();
+        checkPermissions();
 
         // Setup Navigation
         setupBottomNavigation();
@@ -128,17 +138,37 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
                 .commit();
     }
 
-    private void checkLocationPermissions() {
+    private void checkPermissions() {
         // Trigger initial fetch with default/cached location so UI isn't empty
         viewModel.fetchPrayerTimes();
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            locationManagerHelper.getLocation();
+        java.util.List<String> permissionsToRequest = new java.util.ArrayList<>();
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissionsToRequest.add(Manifest.permission.ACCESS_FINE_LOCATION);
+            permissionsToRequest.add(Manifest.permission.ACCESS_COARSE_LOCATION);
         } else {
-            requestPermissionLauncher.launch(new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            });
+            locationManagerHelper.getLocation();
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
+
+        if (!permissionsToRequest.isEmpty()) {
+            requestPermissionLauncher.launch(permissionsToRequest.toArray(new String[0]));
+        } else {
+            // Already have permissions, directly check alarm permission
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                android.app.AlarmManager alarmManager = (android.app.AlarmManager) getSystemService(android.content.Context.ALARM_SERVICE);
+                if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
+                    android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                    intent.setData(android.net.Uri.parse("package:" + getPackageName()));
+                    startActivity(intent);
+                }
+            }
         }
     }
 

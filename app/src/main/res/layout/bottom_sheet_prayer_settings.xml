@@ -275,6 +275,16 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/btnTestNotification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Test Notification"
+        android:textColor="@color/primary_green_dark"
+        android:backgroundTint="@android:color/transparent"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_marginBottom="8dp"/>
+
+    <Button
         android:id="@+id/btnCloseSheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
