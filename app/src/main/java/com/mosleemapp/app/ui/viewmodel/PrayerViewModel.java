@@ -46,6 +46,8 @@ public class PrayerViewModel extends AndroidViewModel {
     public void updateLocation(double lat, double lon) {
         this.currentLat = lat;
         this.currentLon = lon;
+        appPreference.saveDouble("lat", lat);
+        appPreference.saveDouble("lon", lon);
         fetchPrayerTimes();
         resolveCity(lat, lon);
     }
@@ -79,14 +81,8 @@ public class PrayerViewModel extends AndroidViewModel {
                     StringBuilder result = new StringBuilder();
                     android.location.Address address = addresses.get(0);
                     String city = address.getLocality();
-//                    result.append(address.getSubLocality()); //Village
+
                     result.append(city);
-//                    result.append(", ").append(address.getSubAdminArea());
-//                    result.append(", ").append(address.getAdminArea());
-//                    if (city != null) {
-//                        String country = address.getCountryName();
-//                        if (country != null) result.append(", ").append(country);
-//                    }
                     appPreference.saveString("city", result.toString());
                     cityName.postValue(result.toString());
                 }

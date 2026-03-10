@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.mosleemapp.app.databinding.FragmentHomeBinding;
 import com.mosleemapp.app.ui.activities.DetailActivity;
@@ -28,7 +27,7 @@ import android.icu.util.Calendar;
 import android.icu.util.ULocale;
 
 import com.mosleemapp.app.R;
-import android.view.View;
+
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -45,7 +44,7 @@ import java.util.List;
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
-    private PrayerViewModel viewModel;
+    private PrayerViewModel prayerViewModel;
     AppPreference appPreference;
     @Nullable
     @Override
@@ -106,22 +105,18 @@ public class HomeFragment extends Fragment {
             }
 
         });
+
         int spanCount = 4;
-//        if (getResources().getConfiguration().screenWidthDp >= 600) {
-//            spanCount = 4;
-//        } else if (getResources().getConfiguration().screenWidthDp >= 360) {
-//            spanCount = 3;
-//        } else {
-//            spanCount = 2;
-//        }
+
         binding.rvHomeMenu.setLayoutManager(new GridLayoutManager(getContext(), spanCount));
         binding.rvHomeMenu.setAdapter(menuAdapter);
+
         if (!appPreference.getString("city","").isEmpty()){
             binding.tvCity.setText(appPreference.getString("city",""));
             binding.tvCity.setVisibility(View.VISIBLE);
         }
 
-        viewModel = new ViewModelProvider(requireActivity()).get(PrayerViewModel.class);
+        prayerViewModel = new ViewModelProvider(requireActivity()).get(PrayerViewModel.class);
         observeViewModel();
     }
         
@@ -131,6 +126,33 @@ public class HomeFragment extends Fragment {
         loadNativeAd();
         updateLastRead();
         setupGreetingAndDate();
+        logAllSharedPreferences();
+    }
+
+    private void logAllSharedPreferences() {
+        if (getContext() == null) return;
+        
+        android.util.Log.d("SharedPreferencesLog", "--- START PREFS LOG ---");
+        
+        android.util.Log.d("SharedPreferencesLog", "[config]");
+        android.content.SharedPreferences configPrefs = requireContext().getSharedPreferences("config", Context.MODE_PRIVATE);
+        for (java.util.Map.Entry<String, ?> entry : configPrefs.getAll().entrySet()) {
+            android.util.Log.d("SharedPreferencesLog", entry.getKey() + " = " + entry.getValue());
+        }
+
+        android.util.Log.d("SharedPreferencesLog", "[config]");
+        android.content.SharedPreferences moslemPrefs = requireContext().getSharedPreferences("config", Context.MODE_PRIVATE);
+        for (java.util.Map.Entry<String, ?> entry : moslemPrefs.getAll().entrySet()) {
+            android.util.Log.d("SharedPreferencesLog", entry.getKey() + " = " + entry.getValue());
+        }
+
+        android.util.Log.d("SharedPreferencesLog", "[settings]");
+        android.content.SharedPreferences settingsPrefs = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
+        for (java.util.Map.Entry<String, ?> entry : settingsPrefs.getAll().entrySet()) {
+            android.util.Log.d("SharedPreferencesLog", entry.getKey() + " = " + entry.getValue());
+        }
+        
+        android.util.Log.d("SharedPreferencesLog", "--- END PREFS LOG ---");
     }
 
     @SuppressLint("SetTextI18n")
@@ -163,7 +185,7 @@ public class HomeFragment extends Fragment {
 
     private void updateLastRead() {
         if (getContext() == null) return;
-        SharedPreferences prefs = requireContext().getSharedPreferences("MoslemAppPrefs", Context.MODE_PRIVATE);
+        SharedPreferences prefs = requireContext().getSharedPreferences("config", Context.MODE_PRIVATE);
         int lastReadSurahNumber = prefs.getInt("last_read_surah_number", -1);
         String lastReadSurahName = prefs.getString("last_read_surah_name", "");
         int lastReadAyahNumber = prefs.getInt("last_read_ayah_number", -1);
@@ -247,15 +269,15 @@ public class HomeFragment extends Fragment {
     }
 
     private void observeViewModel() {
-        viewModel.getNextPrayerName().observe(getViewLifecycleOwner(), name -> {
+        prayerViewModel.getNextPrayerName().observe(getViewLifecycleOwner(), name -> {
             binding.tvNextPrayerName.setText(name);
         });
 
-        viewModel.getNextPrayerTimeRemaining().observe(getViewLifecycleOwner(), time -> {
+        prayerViewModel.getNextPrayerTimeRemaining().observe(getViewLifecycleOwner(), time -> {
             binding.tvCountdown.setText(time);
         });
 
-        viewModel.getCityName().observe(getViewLifecycleOwner(), city -> {
+        prayerViewModel.getCityName().observe(getViewLifecycleOwner(), city -> {
             if (city != null) {
                 binding.tvCity.setText(city);
                 binding.tvCity.setVisibility(View.VISIBLE);

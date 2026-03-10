@@ -141,9 +141,6 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
                         new android.app.AlertDialog.Builder(requireContext())
                                 .setTitle("Permission Required")
                                 .setMessage("Notification permission is required to receive prayer reminders. If the system dialog does not appear, please enable it in Settings.")
-                                // .setPositiveButton("Request", (dialog, which) -> {
-                                //     requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
-                                // })
                                 .setPositiveButton("Settings", (dialog, which) -> {
                                     android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS);
                                     intent.putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, requireContext().getPackageName());
@@ -229,6 +226,7 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
             intent.putExtra("prayer_name", "Test Prayer");
             intent.putExtra("is_pre_reminder", false);
             requireContext().sendBroadcast(intent);
+            dismiss();
             android.widget.Toast.makeText(requireContext(), "Test notification requested", android.widget.Toast.LENGTH_SHORT).show();
         });
 

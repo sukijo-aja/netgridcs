@@ -62,7 +62,7 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
     }
 
     private void showPreReminderNotification(Context context, String prayerName) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "prayer_pre_reminder_channel")
                 .setSmallIcon(R.mipmap.ic_launcher_round) // Replace 
                 .setContentTitle("Upcoming Prayer")
                 .setContentText(prayerName + " is coming soon")
@@ -89,13 +89,22 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+        android.net.Uri soundUri = android.net.Uri.parse(android.content.ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/" + R.raw.adhan);
+        String channelId = "prayer_reminder_channel_adhan_4";
+
+        if ("Fajr".equalsIgnoreCase(prayerName) || "Subuh".equalsIgnoreCase(prayerName)) {
+            soundUri = android.net.Uri.parse(android.content.ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/" + R.raw.adhan_fajr);
+            channelId = "prayer_reminder_channel_fajr_1";
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.mipmap.ic_launcher_round) // Replace with valid icon
-                .setContentTitle("Prayer Time")
+                .setContentTitle(prayerName)
                 .setContentText("It's time for " + prayerName)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
-                .setFullScreenIntent(fullScreenPendingIntent, true)
+                .setSound(soundUri)
+                .setContentIntent(fullScreenPendingIntent)
                 .setAutoCancel(true);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -107,15 +116,42 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
     private void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID,
+                    "prayer_reminder_channel_adhan_4",
                     CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_HIGH // Crucial for FullScreenIntent
             );
             channel.setDescription("Channel for Prayer Time Reminders");
             
+            android.media.AudioAttributes audioAttributes = new android.media.AudioAttributes.Builder()
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                    .build();
+            android.net.Uri soundUri = android.net.Uri.parse(android.content.ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/" + R.raw.adhan);
+            channel.setSound(soundUri, audioAttributes);
+            
+            // Fajr reminder channel - Specific Adhan sound attached
+            NotificationChannel fajrChannel = new NotificationChannel(
+                    "prayer_reminder_channel_fajr_1",
+                    "Fajr Reminders",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            fajrChannel.setDescription("Channel for Fajr Prayer Time Reminders");
+            android.net.Uri fajrSoundUri = android.net.Uri.parse(android.content.ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/" + R.raw.adhan_fajr);
+            fajrChannel.setSound(fajrSoundUri, audioAttributes);
+            
+            // Pre-reminder channel - Default sound
+            NotificationChannel preChannel = new NotificationChannel(
+                    "prayer_pre_reminder_channel",
+                    "Pre-Prayer Reminders",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            preChannel.setDescription("Channel for prior notifications");
+            
             NotificationManager manager = context.getSystemService(NotificationManager.class);
             if (manager != null) {
                 manager.createNotificationChannel(channel);
+                manager.createNotificationChannel(fajrChannel);
+                manager.createNotificationChannel(preChannel);
             }
         }
     }

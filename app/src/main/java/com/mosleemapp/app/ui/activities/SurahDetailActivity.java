@@ -190,7 +190,7 @@ public class SurahDetailActivity extends AppCompatActivity {
                 spinnerAyahs.setAdapter(spinnerAdapter);
                 
                 // Scroll to last read Ayah if applicable
-                SharedPreferences prefs = getSharedPreferences("MoslemAppPrefs", MODE_PRIVATE);
+                com.mosleemapp.app.utils.AppPreference prefs = new com.mosleemapp.app.utils.AppPreference(SurahDetailActivity.this);
                 int savedSurah = prefs.getInt("last_read_surah_number", -1);
                 int savedAyah = prefs.getInt("last_read_ayah_number", -1);
                 
@@ -231,11 +231,9 @@ public class SurahDetailActivity extends AppCompatActivity {
         }
         int ayahNumber = firstVisibleItemPosition + 1; // Ayah numbers are 1-based
 
-        SharedPreferences prefs = getSharedPreferences("MoslemAppPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt("last_read_surah_number", surahNumber);
-        editor.putString("last_read_surah_name", getIntent().getStringExtra(EXTRA_SURAH_NAME));
-        editor.putInt("last_read_ayah_number", ayahNumber);
-        editor.apply();
+        com.mosleemapp.app.utils.AppPreference prefs = new com.mosleemapp.app.utils.AppPreference(SurahDetailActivity.this);
+        prefs.saveInt("last_read_surah_number", surahNumber);
+        prefs.saveString("last_read_surah_name", getIntent().getStringExtra(EXTRA_SURAH_NAME));
+        prefs.saveInt("last_read_ayah_number", ayahNumber);
     }
 }

@@ -6,7 +6,7 @@ import com.google.firebase.installations.FirebaseInstallations;
 
 
 public class SettingsManager {
-    private static final String PREF_NAME = "MoslemAppPrefs";
+    private static final String PREF_NAME = "config";
     private static final String KEY_ARABIC_FONT_SIZE = "label_font_size";
     private static final float DEFAULT_FONT_SIZE = 24f; // Default matches XML
 

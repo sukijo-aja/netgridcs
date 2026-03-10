@@ -62,6 +62,16 @@ public class AppPreference {
         return sharedPreferences.getLong(key, defaultValue);
     }
 
+    public void saveDouble(String key, double value) {
+        editor.putLong(key, Double.doubleToRawLongBits(value));
+        editor.apply();
+    }
+
+    public double getDouble(String key, double defaultValue) {
+        if (!sharedPreferences.contains(key)) return defaultValue;
+        return Double.longBitsToDouble(sharedPreferences.getLong(key, Double.doubleToRawLongBits(defaultValue)));
+    }
+
     public void remove(String key) {
         editor.remove(key);
         editor.apply();

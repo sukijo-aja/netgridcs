@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -21,7 +20,6 @@ import com.mosleemapp.app.ui.fragments.QuranFragment;
 import com.mosleemapp.app.ui.fragments.SettingsFragment;
 import com.mosleemapp.app.ui.viewmodel.PrayerViewModel;
 import com.mosleemapp.app.utils.LocationManagerHelper;
-import com.google.android.material.navigation.NavigationBarView;
 
 import com.mosleemapp.app.utils.AdMobUtil;
 import com.mosleemapp.app.utils.LocaleHelper;
@@ -36,7 +34,7 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
     }
 
     private ActivityMainBinding binding;
-    private PrayerViewModel viewModel;
+    private PrayerViewModel prayerViewModel;
     private LocationManagerHelper locationManagerHelper;
 
     private final ActivityResultLauncher<String[]> requestPermissionLauncher =
@@ -46,11 +44,11 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
                 if (fineLocationGranted != null && fineLocationGranted || coarseLocationGranted != null && coarseLocationGranted) {
                     locationManagerHelper.getLocation();
                     // Also trigger fetch immediately with default/last known to populate UI
-                    viewModel.fetchPrayerTimes();
+                    prayerViewModel.fetchPrayerTimes();
                 } else {
                     Toast.makeText(this, R.string.location_permission_required, Toast.LENGTH_SHORT).show();
                     // Fallback to default (ViewModel has default Jakarta coords)
-                    viewModel.fetchPrayerTimes();
+                    prayerViewModel.fetchPrayerTimes();
                 }
 
                 // Check and request exact alarm permission if on Android 12+
@@ -73,7 +71,7 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
         setContentView(binding.getRoot());
 
         // Setup ViewModel (Scoped to Activity so Fragments can access if needed)
-        viewModel = new ViewModelProvider(this).get(PrayerViewModel.class);
+        prayerViewModel = new ViewModelProvider(this).get(PrayerViewModel.class);
         
         // Initialize AdMob
         AdMobUtil.initialize(this);
@@ -140,7 +138,7 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
 
     private void checkPermissions() {
         // Trigger initial fetch with default/cached location so UI isn't empty
-        viewModel.fetchPrayerTimes();
+        prayerViewModel.fetchPrayerTimes();
 
         java.util.List<String> permissionsToRequest = new java.util.ArrayList<>();
 
@@ -174,8 +172,8 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
 
     @Override
     public void onLocationReceived(double latitude, double longitude) {
-        viewModel.updateLocation(latitude, longitude);
+        prayerViewModel.updateLocation(latitude, longitude);
         Toast.makeText(this, R.string.location_updated, Toast.LENGTH_SHORT).show();
-        Log.d("Locationxx", "Latitude: " + latitude + ", Longitude: " + longitude);
+        Log.d("MainActivity", "Latitude: " + latitude + ", Longitude: " + longitude);
     }
 }

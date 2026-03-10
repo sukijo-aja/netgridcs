@@ -150,6 +150,7 @@ public class SettingsFragment extends Fragment {
         updateLanguageButtonText(btnLanguage);
         btnLanguage.setOnClickListener(v -> showLanguageDialog());
         
+
         mAuth = FirebaseAuth.getInstance();
         tvUserId = view.findViewById(R.id.tvUserId);
         btnLogin = view.findViewById(R.id.btnLogin);
@@ -301,7 +302,7 @@ public class SettingsFragment extends Fragment {
             db.quranDao().deleteAllSurahs();
             
             // Clear last read prefs
-            android.content.SharedPreferences prefs = requireContext().getSharedPreferences("MoslemAppPrefs", android.content.Context.MODE_PRIVATE);
+            android.content.SharedPreferences prefs = requireContext().getSharedPreferences("config", android.content.Context.MODE_PRIVATE);
             prefs.edit().remove("last_read_surah_number").remove("last_read_surah_name").apply();
 
             requireActivity().runOnUiThread(() -> {
