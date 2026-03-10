@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Overlapping squares -->
+    <path
+        android:fillColor="#1A8B5E3C"
+        android:pathData="M 100 20 L 180 100 L 100 180 L 20 100 Z" />
+    <path
+        android:fillColor="#1A8B5E3C"
+        android:pathData="M 43.4 43.4 L 156.6 43.4 L 156.6 156.6 L 43.4 156.6 Z" />
+        
+    <!-- Borders -->
+    <path
+        android:strokeColor="#8B5E3C"
+        android:strokeWidth="4"
+        android:strokeLineJoin="round"
+        android:pathData="M 100 20 L 180 100 L 100 180 L 20 100 Z" />
+    <path
+        android:strokeColor="#8B5E3C"
+        android:strokeWidth="4"
+        android:strokeLineJoin="round"
+        android:pathData="M 43.4 43.4 L 156.6 43.4 L 156.6 156.6 L 43.4 156.6 Z" />
+
+    <!-- Center Circle -->
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M 100 100 m -50 0 a 50 50 0 1 0 100 0 a 50 50 0 1 0 -100 0" />
+        
+    <path
+        android:strokeColor="#8B5E3C"
+        android:strokeWidth="3"
+        android:pathData="M 100 100 m -50 0 a 50 50 0 1 0 100 0 a 50 50 0 1 0 -100 0" />
+
+</vector>

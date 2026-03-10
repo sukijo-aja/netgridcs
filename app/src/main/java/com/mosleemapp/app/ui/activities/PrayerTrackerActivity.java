@@ -8,60 +8,53 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.mosleemapp.app.R;
-import com.mosleemapp.app.data.local.AppDatabase;
+import com.mosleemapp.app.data.local.entity.CustomHabitEntity;
+import com.mosleemapp.app.data.local.entity.CustomHabitLogEntity;
 import com.mosleemapp.app.data.local.entity.PrayerTrackerEntity;
+import com.mosleemapp.app.ui.viewmodel.PrayerTrackerViewModel;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class PrayerTrackerActivity extends AppCompatActivity {
 
     private CheckBox cbFajr, cbDhuhr, cbAsr, cbMaghrib, cbIsha;
+    private CheckBox cbTilawah, cbTahajud, cbDuha, cbFast;
     private TextView tvDate, tvProgress;
     private ImageButton btnPrevDay, btnNextDay;
+
+    private PrayerTrackerViewModel viewModel;
     
-    private Calendar currentCalendar;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    private SimpleDateFormat displayFormat = new SimpleDateFormat("EEEE, dd MMM yyyy", Locale.getDefault());
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    private final SimpleDateFormat displayFormat = new SimpleDateFormat("EEEE, dd MMM yyyy", Locale.getDefault());
     
-    private AppDatabase db;
+    private String currentDateString;
     private PrayerTrackerEntity currentEntity;
     private boolean isUpdating = false;
+
+    // --- Custom Habits Section ---
+    private android.widget.LinearLayout llCustomHabitsContainer;
+    private TextView tvNoHabits;
+    private List<CustomHabitEntity> allHabits = new java.util.ArrayList<>();
+    private List<CustomHabitLogEntity> currentLogs = new java.util.ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prayer_tracker);
         
-        db = AppDatabase.getDatabase(this);
-        currentCalendar = Calendar.getInstance();
+        viewModel = new ViewModelProvider(this).get(PrayerTrackerViewModel.class);
         
         initViews();
-//        setupListeners();
-        loadDataForDate(currentCalendar.getTime());
+        setupListeners();
+        observeViewModel();
     }
-
-    private void updateProgress() {
-        int count = 0;
-        if (cbFajr.isChecked()) count++;
-        if (cbDhuhr.isChecked()) count++;
-        if (cbAsr.isChecked()) count++;
-        if (cbMaghrib.isChecked()) count++;
-        if (cbIsha.isChecked()) count++;
-        
-        tvProgress.setText(count + "/5 Prayers Completed");
-    }
-
-    // --- Custom Habits Section ---
-
-    private android.widget.LinearLayout llCustomHabitsContainer;
-    private TextView tvNoHabits;
-    private java.util.List<com.mosleemapp.app.data.local.entity.CustomHabitEntity> allHabits = new java.util.ArrayList<>();
-    private java.util.List<com.mosleemapp.app.data.local.entity.CustomHabitLogEntity> currentLogs = new java.util.ArrayList<>();
 
     private void initViews() {
         cbFajr = findViewById(R.id.cbFajr);
@@ -69,6 +62,11 @@ public class PrayerTrackerActivity extends AppCompatActivity {
         cbAsr = findViewById(R.id.cbAsr);
         cbMaghrib = findViewById(R.id.cbMaghrib);
         cbIsha = findViewById(R.id.cbIsha);
+        
+        cbTilawah = findViewById(R.id.cbTilawah);
+        cbTahajud = findViewById(R.id.cbTahajud);
+        cbDuha = findViewById(R.id.cbDuha);
+        cbFast = findViewById(R.id.cbFast);
         
         tvDate = findViewById(R.id.tvDate);
         tvProgress = findViewById(R.id.tvProgress);
@@ -79,76 +77,125 @@ public class PrayerTrackerActivity extends AppCompatActivity {
         // Custom Habits
         llCustomHabitsContainer = findViewById(R.id.llCustomHabitsContainer);
         tvNoHabits = findViewById(R.id.tvNoHabits);
-        
-        findViewById(R.id.btnAddHabit).setOnClickListener(v -> showAddHabitDialog());
     }
 
-    private void loadDataForDate(Date date) {
-        String dateString = dateFormat.format(date);
-        tvDate.setText(displayFormat.format(date));
-        
-        // 1. Load Standard Prayers
-        db.prayerTrackerDao().getTrackerForDate(dateString).observe(this, entity -> {
+    private void setupListeners() {
+        btnPrevDay.setOnClickListener(v -> viewModel.changeDate(-1));
+        btnNextDay.setOnClickListener(v -> viewModel.changeDate(1));
+
+        android.widget.CompoundButton.OnCheckedChangeListener prayerListener = (buttonView, isChecked) -> {
+            if (isUpdating) return;
+            updateProgress();
+            
+            // Save state immediately
+            viewModel.updatePrayer(
+                    currentDateString, 
+                    currentEntity, 
+                    cbFajr.isChecked(), 
+                    cbDhuhr.isChecked(), 
+                    cbAsr.isChecked(), 
+                    cbMaghrib.isChecked(), 
+                    cbIsha.isChecked(),
+                    cbTilawah.isChecked(),
+                    cbTahajud.isChecked(),
+                    cbDuha.isChecked(),
+                    cbFast.isChecked()
+            );
+        };
+
+        cbFajr.setOnCheckedChangeListener(prayerListener);
+        cbDhuhr.setOnCheckedChangeListener(prayerListener);
+        cbAsr.setOnCheckedChangeListener(prayerListener);
+        cbMaghrib.setOnCheckedChangeListener(prayerListener);
+        cbIsha.setOnCheckedChangeListener(prayerListener);
+        cbTilawah.setOnCheckedChangeListener(prayerListener);
+        cbTahajud.setOnCheckedChangeListener(prayerListener);
+        cbDuha.setOnCheckedChangeListener(prayerListener);
+        cbFast.setOnCheckedChangeListener(prayerListener);
+    }
+
+    private void observeViewModel() {
+        viewModel.getSelectedDate().observe(this, date -> {
+            currentDateString = dateFormat.format(date);
+            tvDate.setText(displayFormat.format(date));
+        });
+
+        viewModel.getCurrentTrackerEntity().observe(this, entity -> {
             isUpdating = true;
+            currentEntity = entity;
             if (entity != null) {
-                currentEntity = entity;
                 cbFajr.setChecked(entity.fajr);
                 cbDhuhr.setChecked(entity.dhuhr);
                 cbAsr.setChecked(entity.asr);
                 cbMaghrib.setChecked(entity.maghrib);
                 cbIsha.setChecked(entity.isha);
+                
+                cbTilawah.setChecked(entity.tilawah);
+                cbTahajud.setChecked(entity.tahajud);
+                cbDuha.setChecked(entity.duha);
+                cbFast.setChecked(entity.fast);
             } else {
-                currentEntity = new PrayerTrackerEntity(dateString);
                 cbFajr.setChecked(false);
                 cbDhuhr.setChecked(false);
                 cbAsr.setChecked(false);
                 cbMaghrib.setChecked(false);
                 cbIsha.setChecked(false);
+                
+                cbTilawah.setChecked(false);
+                cbTahajud.setChecked(false);
+                cbDuha.setChecked(false);
+                cbFast.setChecked(false);
             }
-            isUpdating = false;
             updateProgress();
+            isUpdating = false;
         });
 
-        // 2. Load Custom Habits
-        loadCustomHabits(dateString);
-    }
-    
-    private void loadCustomHabits(String dateString) {
-        // Observe definition changes (Add/Remove habits)
-       db.customHabitDao().getAllHabits().observe(this, habits -> {
-           allHabits = habits;
-           
-           // Observe log changes for this date
-           db.customHabitDao().getLogsForDate(dateString).removeObservers(this); 
-           db.customHabitDao().getLogsForDate(dateString).observe(this, logs -> {
-               currentLogs = logs;
-               renderCustomHabits(dateString);
-           });
-       });
+        viewModel.getAllCustomHabits().observe(this, habits -> {
+            allHabits = habits;
+            renderCustomHabits();
+        });
+
+        viewModel.getCurrentCustomHabitLogs().observe(this, logs -> {
+            currentLogs = logs;
+            renderCustomHabits();
+        });
     }
 
-    private void renderCustomHabits(String dateString) {
+    private void updateProgress() {
+        int count = 0;
+        if (cbFajr.isChecked()) count++;
+        if (cbDhuhr.isChecked()) count++;
+        if (cbAsr.isChecked()) count++;
+        if (cbMaghrib.isChecked()) count++;
+        if (cbIsha.isChecked()) count++;
+        
+        if (cbTilawah.isChecked()) count++;
+        if (cbTahajud.isChecked()) count++;
+        if (cbDuha.isChecked()) count++;
+        if (cbFast.isChecked()) count++;
+        
+        tvProgress.setText(count + "/9 Tasks Completed");
+    }
+
+    private void renderCustomHabits() {
         llCustomHabitsContainer.removeAllViews();
         
-        if (allHabits.isEmpty()) {
+        if (allHabits == null || allHabits.isEmpty()) {
             llCustomHabitsContainer.addView(tvNoHabits);
             tvNoHabits.setVisibility(android.view.View.VISIBLE);
-        } else {
-             // tvNoHabits is effectively removed by removeAllViews, but we can keep it as a referenced view if needed
-            // Actually removeAllViews removes it from parent.
+            return;
         }
 
-        for (com.mosleemapp.app.data.local.entity.CustomHabitEntity habit : allHabits) {
+        for (CustomHabitEntity habit : allHabits) {
             android.view.View habitView = getLayoutInflater().inflate(R.layout.item_custom_habit_simple, llCustomHabitsContainer, false);
             CheckBox cb = habitView.findViewById(R.id.cbHabit);
-            ImageButton btnDelete = habitView.findViewById(R.id.btnDeleteHabit);
 
             cb.setText(habit.name);
             
             // Check state
             boolean isCompleted = false;
             if (currentLogs != null) {
-                for (com.mosleemapp.app.data.local.entity.CustomHabitLogEntity log : currentLogs) {
+                for (CustomHabitLogEntity log : currentLogs) {
                     if (log.habitId == habit.id) {
                         isCompleted = log.isCompleted;
                         break;
@@ -159,58 +206,11 @@ public class PrayerTrackerActivity extends AppCompatActivity {
             cb.setChecked(isCompleted);
 
             cb.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                saveCustomHabitLog(dateString, habit.id, isChecked);
+                viewModel.updateCustomHabitLog(currentDateString, habit.id, isChecked);
             });
-
-            btnDelete.setOnClickListener(v -> deleteHabit(habit));
 
             llCustomHabitsContainer.addView(habitView);
         }
     }
 
-    private void saveCustomHabitLog(String date, int habitId, boolean isCompleted) {
-        new Thread(() -> {
-            com.mosleemapp.app.data.local.entity.CustomHabitLogEntity log = 
-                new com.mosleemapp.app.data.local.entity.CustomHabitLogEntity(date, habitId, isCompleted);
-            db.customHabitDao().insertOrUpdateLog(log);
-        }).start();
-    }
-    
-    private void showAddHabitDialog() {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Add New Habit");
-
-        final android.widget.EditText input = new android.widget.EditText(this);
-        input.setHint("e.g. Read Quran, Fasting");
-        builder.setView(input);
-
-        builder.setPositiveButton("Add", (dialog, which) -> {
-            String name = input.getText().toString().trim();
-            if (!name.isEmpty()) {
-                addHabit(name);
-            }
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-
-        builder.show();
-    }
-
-    private void addHabit(String name) {
-        new Thread(() -> {
-            db.customHabitDao().insertHabit(new com.mosleemapp.app.data.local.entity.CustomHabitEntity(name, System.currentTimeMillis()));
-        }).start();
-    }
-    
-    private void deleteHabit(com.mosleemapp.app.data.local.entity.CustomHabitEntity habit) {
-        new android.app.AlertDialog.Builder(this)
-            .setTitle("Delete Habit")
-            .setMessage("Are you sure you want to delete '" + habit.name + "'? This will delete all history for this habit.")
-            .setPositiveButton("Delete", (dialog, which) -> {
-                 new Thread(() -> {
-                    db.customHabitDao().deleteHabit(habit);
-                }).start();
-            })
-            .setNegativeButton("Cancel", null)
-            .show();
-    }
 }

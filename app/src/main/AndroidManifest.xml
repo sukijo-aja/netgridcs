@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -33,6 +34,8 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".ui.activities.SurahDetailActivity" />
         <activity android:name=".ui.activities.HadithDetailActivity" />
+        <activity android:name=".ui.activities.LoginActivity"
+            android:theme="@style/Theme.MoslemApp" />
         <activity 
             android:name=".ui.activities.ReminderActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" 
@@ -40,7 +43,13 @@
             android:showOnLockScreen="true"
             android:launchMode="singleInstance" />
 
-        <receiver android:name=".receivers.PrayerAlarmReceiver" />
+        <receiver android:name=".receivers.PrayerAlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
         <activity android:name=".ui.activities.TasbihActivity" />
         <activity android:name=".ui.activities.DetailActivity" />
         <activity android:name=".ui.activities.DuaActivity" />

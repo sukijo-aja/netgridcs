@@ -31,6 +31,14 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
             return;
         }
 
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+            SettingsManager sm = SettingsManager.getInstance(context);
+            if (sm.isReminderEnabled()) {
+                AlarmScheduler.schedulePrayerAlarms(context, null);
+            }
+            return;
+        }
+
         String prayerName = intent.getStringExtra("prayer_name");
         boolean isPreReminder = intent.getBooleanExtra("is_pre_reminder", false);
         

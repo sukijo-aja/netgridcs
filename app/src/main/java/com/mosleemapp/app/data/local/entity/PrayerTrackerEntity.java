@@ -15,6 +15,11 @@ public class PrayerTrackerEntity {
     public boolean asr;
     public boolean maghrib;
     public boolean isha;
+    
+    public boolean tilawah;
+    public boolean tahajud;
+    public boolean duha;
+    public boolean fast;
 
     public PrayerTrackerEntity(@NonNull String date) {
         this.date = date;

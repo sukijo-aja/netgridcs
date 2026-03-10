@@ -63,7 +63,14 @@ public class SurahAdapter extends RecyclerView.Adapter<SurahAdapter.SurahViewHol
         public void bind(SurahResponse.Surah surah) {
             binding.tvNumber.setText(String.valueOf(surah.number));
             binding.tvEnglishName.setText(surah.englishName);
-            binding.tvEnglishNameTranslation.setText(surah.englishNameTranslation);
+            
+            String currentLang = com.mosleemapp.app.utils.LocaleHelper.getLanguage(itemView.getContext());
+            if ("in".equals(currentLang)) {
+                binding.tvEnglishNameTranslation.setText(com.mosleemapp.app.utils.SurahTranslationHelper.getIndonesianTranslation(surah.number));
+            } else {
+                binding.tvEnglishNameTranslation.setText(surah.englishNameTranslation);
+            }
+            
             // Remove "سورة" prefix (with or without diacritical marks/harakat)
             String arabicName = surah.name != null
                     ? surah.name.replaceAll("س[\\u0610-\\u065F\\u0670\\u06D6-\\u06ED]*و[\\u0610-\\u065F\\u0670\\u06D6-\\u06ED]*ر[\\u0610-\\u065F\\u0670\\u06D6-\\u06ED]*ة[\\u0610-\\u065F\\u0670\\u06D6-\\u06ED]*\\s*", "").trim()

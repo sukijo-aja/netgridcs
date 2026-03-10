@@ -16,10 +16,43 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Manage Prayer Alarms"
+        android:text="@string/manage_prayer_alarms"
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp" />
+
+    <!-- Main Reminder Switch -->
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/bsSwitchReminder"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:text="@string/enable_prayer_alarms"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+    <!-- Pre-Reminder SeekBar -->
+    <TextView
+        android:id="@+id/bsTvPreReminderLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/reminder_before_adhan_minutes"
+        android:textSize="12sp"
+        android:layout_marginBottom="4dp" />
+
+    <SeekBar
+        android:id="@+id/bsSeekBarPreReminder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="30"
+        android:progress="0"
+        android:layout_marginBottom="16dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="12dp" />
 
     <!-- Fajr -->
     <LinearLayout

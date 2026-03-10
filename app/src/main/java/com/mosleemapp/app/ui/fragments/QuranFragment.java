@@ -65,6 +65,7 @@ public class QuranFragment extends Fragment {
             Intent intent = new Intent(getContext(), SurahDetailActivity.class);
             intent.putExtra(SurahDetailActivity.EXTRA_SURAH_NUMBER, surah.number);
             intent.putExtra(SurahDetailActivity.EXTRA_SURAH_NAME, surah.englishName);
+            intent.putExtra(SurahDetailActivity.EXTRA_SURAH, surah.name);
             startActivity(intent);
         });
         binding.rvQuran.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -85,27 +86,9 @@ public class QuranFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        updateLastRead();
     }
 
-    private void updateLastRead() {
-        SharedPreferences prefs = requireContext().getSharedPreferences("MoslemAppPrefs", Context.MODE_PRIVATE);
-        int lastReadSurahNumber = prefs.getInt("last_read_surah_number", -1);
-        String lastReadSurahName = prefs.getString("last_read_surah_name", "");
 
-        if (lastReadSurahNumber != -1) {
-            binding.cardLastRead.setVisibility(View.VISIBLE);
-            binding.tvLastReadSurah.setText(lastReadSurahName);
-            binding.cardLastRead.setOnClickListener(v -> {
-                Intent intent = new Intent(getContext(), SurahDetailActivity.class);
-                intent.putExtra(SurahDetailActivity.EXTRA_SURAH_NUMBER, lastReadSurahNumber);
-                intent.putExtra(SurahDetailActivity.EXTRA_SURAH_NAME, lastReadSurahName);
-                startActivity(intent);
-            });
-        } else {
-            binding.cardLastRead.setVisibility(View.GONE);
-        }
-    }
 
     private void fetchSurahs() {
         quranRepository.getSurahs(new QuranRepository.Callback<List<SurahResponse.Surah>>() {

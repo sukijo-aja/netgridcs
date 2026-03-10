@@ -30,6 +30,52 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
 
         SettingsManager settingsManager = SettingsManager.getInstance(requireContext());
 
+        com.google.android.material.switchmaterial.SwitchMaterial switchReminder = view.findViewById(R.id.bsSwitchReminder);
+        switchReminder.setChecked(settingsManager.isReminderEnabled());
+        switchReminder.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    android.app.AlarmManager alarmManager = (android.app.AlarmManager) requireContext().getSystemService(android.content.Context.ALARM_SERVICE);
+                    if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
+                        android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                        intent.setData(android.net.Uri.parse("package:" + requireContext().getPackageName()));
+                        startActivity(intent);
+                        switchReminder.setChecked(false);
+                        android.widget.Toast.makeText(requireContext(), "Please grant exact alarm permission first", android.widget.Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                }
+            }
+
+            settingsManager.setReminderEnabled(isChecked);
+            if (isChecked) {
+                com.mosleemapp.app.utils.AlarmScheduler.schedulePrayerAlarms(requireContext(), null);
+                android.widget.Toast.makeText(requireContext(), R.string.reminders_enabled, android.widget.Toast.LENGTH_SHORT).show();
+            } else {
+                com.mosleemapp.app.utils.AlarmScheduler.cancelAlarms(requireContext());
+                android.widget.Toast.makeText(requireContext(), R.string.reminders_disabled, android.widget.Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        android.widget.SeekBar seekBarPreReminder = view.findViewById(R.id.bsSeekBarPreReminder);
+        android.widget.TextView tvPreReminderLabel = view.findViewById(R.id.bsTvPreReminderLabel);
+        
+        int currentPreReminder = settingsManager.getPrePrayerReminderMinutes();
+        seekBarPreReminder.setProgress(currentPreReminder);
+        tvPreReminderLabel.setText(getString(R.string.reminder_before_adhan_minutes, currentPreReminder));
+
+        seekBarPreReminder.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
+                tvPreReminderLabel.setText(getString(R.string.reminder_before_adhan_minutes, progress));
+                settingsManager.setPrePrayerReminderMinutes(progress);
+            }
+            @Override
+            public void onStartTrackingTouch(android.widget.SeekBar seekBar) {}
+            @Override
+            public void onStopTrackingTouch(android.widget.SeekBar seekBar) {}
+        });
+
         setupSwitch(view, R.id.bsSwitchFajr, "Fajr", settingsManager);
         setupSwitch(view, R.id.bsSwitchDhuhr, "Dhuhr", settingsManager);
         setupSwitch(view, R.id.bsSwitchAsr, "Asr", settingsManager);
@@ -56,13 +102,25 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
         });
     }
 
+    private String getLocalizedPrayerName(String prayerName) {
+        switch (prayerName) {
+            case "Fajr": return getString(R.string.fajr);
+            case "Dhuhr": return getString(R.string.dhuhr);
+            case "Asr": return getString(R.string.asr);
+            case "Maghrib": return getString(R.string.maghrib);
+            case "Isha": return getString(R.string.isha);
+            default: return prayerName;
+        }
+    }
+
     private void updateSwitchText(View view, int id, String name, String time) {
         SwitchMaterial sw = view.findViewById(id);
+        String localizedName = getLocalizedPrayerName(name);
          if (time != null) {
             String cleanTime = time.split(" ")[0];
-            sw.setText(name + " (" + cleanTime + ")");
+            sw.setText(localizedName + " (" + cleanTime + ")");
          } else {
-             sw.setText(name + " 00:00");
+             sw.setText(localizedName + " 00:00");
          }
     }
 
@@ -71,7 +129,8 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
         sw.setChecked(sm.isPrayerAlarmEnabled(prayerName));
         sw.setOnCheckedChangeListener((buttonView, isChecked) -> {
             sm.setPrayerAlarmEnabled(prayerName, isChecked);
-            String msg = getString(isChecked ? R.string.reminder_for_prayer_enabled : R.string.reminder_for_prayer_disabled, prayerName);
+            String localizedName = getLocalizedPrayerName(prayerName);
+            String msg = getString(isChecked ? R.string.reminder_for_prayer_enabled : R.string.reminder_for_prayer_disabled, localizedName);
             android.widget.Toast.makeText(requireContext(), msg, android.widget.Toast.LENGTH_SHORT).show();
         });
 
@@ -86,9 +145,10 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
     private void showOffsetDialog(String prayerName, SettingsManager sm, android.widget.TextView tvOffset) {
         final String[] options = {"On Time", "5 min before", "10 min before", "15 min before", "30 min before"};
         final int[] values = {0, 5, 10, 15, 30};
+        String localizedName = getLocalizedPrayerName(prayerName);
 
         new android.app.AlertDialog.Builder(requireContext())
-                .setTitle("Remind before " + prayerName)
+                .setTitle("Remind before " + localizedName)
                 .setItems(options, (dialog, which) -> {
                     int selectedOffset = values[which];
                     sm.setPrayerAlarmOffset(prayerName, selectedOffset);

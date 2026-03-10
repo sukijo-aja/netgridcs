@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="8dp"
     android:background="@color/background_light">
 
     <TextView
@@ -52,7 +52,7 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_margin="2dp"
         android:elevation="4dp">
         
         <LinearLayout
@@ -65,7 +65,7 @@
                 android:id="@+id/cbFajr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Fajr"
+                android:text="Fajr (Subuh - الفجر)"
                 android:textSize="16sp"
                 android:padding="8dp"/>
             
@@ -78,7 +78,7 @@
                 android:id="@+id/cbDhuhr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Dhuhr"
+                android:text="Dhuhr (Dzuhur - الظهر)"
                 android:textSize="16sp"
                 android:padding="8dp"/>
 
@@ -91,7 +91,7 @@
                 android:id="@+id/cbAsr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Asr"
+                android:text="Asr (Ashar - العصر)"
                 android:textSize="16sp"
                 android:padding="8dp"/>
 
@@ -104,7 +104,7 @@
                 android:id="@+id/cbMaghrib"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Maghrib"
+                android:text="Maghrib (Magrib - المغرب)"
                 android:textSize="16sp"
                 android:padding="8dp"/>
 
@@ -117,7 +117,59 @@
                 android:id="@+id/cbIsha"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Isha"
+                android:text="Isha (Isya - العشاء)"
+                android:textSize="16sp"
+                android:padding="8dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
+
+            <CheckBox
+                android:id="@+id/cbTilawah"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tilawah (Tilawah - تلاوة)"
+                android:textSize="16sp"
+                android:padding="8dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
+
+            <CheckBox
+                android:id="@+id/cbTahajud"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tahajud (Tahajud - تهجد)"
+                android:textSize="16sp"
+                android:padding="8dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
+
+            <CheckBox
+                android:id="@+id/cbDuha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Duha (Dhuha - ضحى)"
+                android:textSize="16sp"
+                android:padding="8dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"/>
+
+            <CheckBox
+                android:id="@+id/cbFast"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fasting (Puasa - صيام)"
                 android:textSize="16sp"
                 android:padding="8dp"/>
 
@@ -130,14 +182,14 @@
         android:layout_height="wrap_content"
         android:text="0/5 Prayers Completed"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:textColor="@color/primary_green"/>
         
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#E0E0E0"
-        android:layout_marginVertical="24dp"/>
+        android:layout_marginVertical="8dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -151,23 +203,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Custom Habits"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"/>
-
-        <ImageButton
-            android:id="@+id/btnAddHabit"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@android:drawable/ic_input_add"
-            android:background="@drawable/rounded_bottom_sheet_bg"
-            android:tooltipText="Add Habit"/>
     </LinearLayout>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_margin="4dp"
         android:elevation="4dp">
 
         <LinearLayout

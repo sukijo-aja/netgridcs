@@ -1,5 +1,6 @@
 package com.mosleemapp.app.ui.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +16,16 @@ import com.mosleemapp.app.ui.activities.DetailActivity;
 import com.mosleemapp.app.ui.activities.DuaActivity;
 import com.mosleemapp.app.ui.activities.QiblaActivity;
 import com.mosleemapp.app.ui.activities.TasbihActivity;
+import com.mosleemapp.app.ui.activities.SurahDetailActivity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import com.mosleemapp.app.ui.adapters.HomeMenuAdapter;
 import com.mosleemapp.app.ui.viewmodel.PrayerViewModel;
+
+import android.icu.text.DateFormat;
+import android.icu.util.Calendar;
+import android.icu.util.ULocale;
 
 import com.mosleemapp.app.R;
 import android.view.View;
@@ -26,6 +35,8 @@ import android.widget.TextView;
 import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.ads.nativead.NativeAdView;
 import com.mosleemapp.app.utils.AdMobUtil;
+import com.mosleemapp.app.utils.AppPreference;
+
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import java.util.ArrayList;
@@ -35,7 +46,7 @@ public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
     private PrayerViewModel viewModel;
-
+    AppPreference appPreference;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -47,6 +58,8 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        appPreference = new com.mosleemapp.app.utils.AppPreference(getContext());
+
         // Setup Home Menu
         List<HomeMenuAdapter.HomeMenuItem> menuItems = new ArrayList<>();
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Prayer", R.drawable.ic_history));
@@ -55,7 +68,7 @@ public class HomeFragment extends Fragment {
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Dua", R.drawable.dua));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Tracker", R.drawable.ic_history));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Qibla", R.drawable.ic_kaaba));
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Premium", R.drawable.ic_premium));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Remove Ads", R.drawable.ic_premium));
 //        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Favorites", R.drawable.ic_favorite));
 
         HomeMenuAdapter menuAdapter = new HomeMenuAdapter(menuItems, item -> {
@@ -74,8 +87,14 @@ public class HomeFragment extends Fragment {
                 startActivity(new android.content.Intent(getContext(), TasbihActivity.class));
             } else if (item.getTitle().equals("Dua")) {
                 startActivity(new android.content.Intent(getContext(), DuaActivity.class));
-            } else if (item.getTitle().equals("Premium")) {
-               startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.PurchaseActivity.class));
+            } else if (item.getTitle().equals("Remove Ads")) {
+                com.mosleemapp.app.utils.AppPreference appPreference = new com.mosleemapp.app.utils.AppPreference(getContext());
+                if (appPreference.getString("UID", "").isEmpty()) {
+                    android.widget.Toast.makeText(getContext(), "Please login to continue", android.widget.Toast.LENGTH_SHORT).show();
+                    startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.LoginActivity.class));
+                } else {
+                    startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.PurchaseActivity.class));
+                }
             } else if (item.getTitle().equals("Tracker")) {
                 startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.PrayerTrackerActivity.class));
             } else if (item.getTitle().equals("Qibla")) {
@@ -97,6 +116,10 @@ public class HomeFragment extends Fragment {
 //        }
         binding.rvHomeMenu.setLayoutManager(new GridLayoutManager(getContext(), spanCount));
         binding.rvHomeMenu.setAdapter(menuAdapter);
+        if (!appPreference.getString("city","").isEmpty()){
+            binding.tvCity.setText(appPreference.getString("city",""));
+            binding.tvCity.setVisibility(View.VISIBLE);
+        }
 
         viewModel = new ViewModelProvider(requireActivity()).get(PrayerViewModel.class);
         observeViewModel();
@@ -106,6 +129,63 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         loadNativeAd();
+        updateLastRead();
+        setupGreetingAndDate();
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void setupGreetingAndDate() {
+        if (binding == null) return;
+        
+        binding.tvGreeting.setText(R.string.assalamu_alaikum);
+        binding.tvUserName.setText("Mosleem");
+        
+        try {
+            ULocale locale = new ULocale("en@calendar=islamic");
+            Calendar calendar = Calendar.getInstance(locale);
+            DateFormat df = DateFormat.getDateInstance(DateFormat.LONG, locale);
+            String formattedDate = df.format(calendar.getTime());
+            binding.tvHijriDate.setText(formattedDate);
+            
+            java.text.SimpleDateFormat masehiFormat = new java.text.SimpleDateFormat("dd MMMM yyyy", java.util.Locale.getDefault());
+            binding.tvMasehiDate.setText(masehiFormat.format(new java.util.Date()));
+
+            if (!appPreference.getString("USER_NAME", "").isEmpty()) {
+                binding.tvUserName.setText(appPreference.getString("USER_NAME", ""));
+                binding.tvUserName.setVisibility(View.VISIBLE);
+            }
+
+        } catch (Exception e) {
+            binding.tvHijriDate.setText("");
+            binding.tvMasehiDate.setText("");
+        }
+    }
+
+    private void updateLastRead() {
+        if (getContext() == null) return;
+        SharedPreferences prefs = requireContext().getSharedPreferences("MoslemAppPrefs", Context.MODE_PRIVATE);
+        int lastReadSurahNumber = prefs.getInt("last_read_surah_number", -1);
+        String lastReadSurahName = prefs.getString("last_read_surah_name", "");
+        int lastReadAyahNumber = prefs.getInt("last_read_ayah_number", -1);
+
+        if (lastReadSurahNumber != -1) {
+            binding.cardLastRead.setVisibility(View.VISIBLE);
+
+            String displayText = lastReadSurahName;
+            if (lastReadAyahNumber > 0) {
+                displayText += " - Ayah " + lastReadAyahNumber;
+            }
+            binding.tvLastReadSurah.setText(displayText);
+            
+            binding.cardLastRead.setOnClickListener(v -> {
+                Intent intent = new Intent(getContext(), SurahDetailActivity.class);
+                intent.putExtra(SurahDetailActivity.EXTRA_SURAH_NUMBER, lastReadSurahNumber);
+                intent.putExtra(SurahDetailActivity.EXTRA_SURAH_NAME, lastReadSurahName);
+                startActivity(intent);
+            });
+        } else {
+            binding.cardLastRead.setVisibility(View.GONE);
+        }
     }
 
     private void loadNativeAd() {
@@ -119,15 +199,9 @@ public class HomeFragment extends Fragment {
 
         AdMobUtil.loadNativeAd(requireContext(), nativeAd -> {
             if (binding == null) return; // Fragment destroyed
-            
-            // Re-check premium status in case it changed while ad was loading
-            if (settingsManager.isPremium()) {
-                return;
-            }
+            if (settingsManager.isPremium()) return;
 
-            // Inflate Native Ad Layout
             NativeAdView adView = (NativeAdView) getLayoutInflater().inflate(R.layout.ad_native, null);
-                
             populateNativeAdView(nativeAd, adView);
             
             binding.flAdPlaceholder.removeAllViews();
@@ -145,12 +219,9 @@ public class HomeFragment extends Fragment {
         adView.setCallToActionView(adView.findViewById(R.id.ad_call_to_action));
         adView.setIconView(adView.findViewById(R.id.ad_icon));
 
-        // The headline and mediaContent are guaranteed to be in every NativeAd.
         ((TextView) adView.getHeadlineView()).setText(nativeAd.getHeadline());
         adView.getMediaView().setMediaContent(nativeAd.getMediaContent());
 
-        // These assets aren't guaranteed to be in every NativeAd, so it's important to
-        // check before trying to display them.
         if (nativeAd.getBody() == null) {
             adView.getBodyView().setVisibility(View.INVISIBLE);
         } else {
@@ -172,9 +243,6 @@ public class HomeFragment extends Fragment {
                     nativeAd.getIcon().getDrawable());
             adView.getIconView().setVisibility(View.VISIBLE);
         }
-
-        // This method tells the Google Mobile Ads SDK that you have finished populating your
-        // native ad view with this native ad.
         adView.setNativeAd(nativeAd);
     }
 
@@ -190,6 +258,7 @@ public class HomeFragment extends Fragment {
         viewModel.getCityName().observe(getViewLifecycleOwner(), city -> {
             if (city != null) {
                 binding.tvCity.setText(city);
+                binding.tvCity.setVisibility(View.VISIBLE);
             }
         });
     }

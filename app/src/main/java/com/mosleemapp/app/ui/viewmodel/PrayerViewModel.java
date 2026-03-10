@@ -1,5 +1,6 @@
 package com.mosleemapp.app.ui.viewmodel;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,8 +14,10 @@ import androidx.lifecycle.MutableLiveData;
 import com.mosleemapp.app.R;
 import com.mosleemapp.app.data.local.PrayerTimeEntity;
 import com.mosleemapp.app.data.repository.PrayerRepository;
+import com.mosleemapp.app.utils.AppPreference;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +28,7 @@ public class PrayerViewModel extends AndroidViewModel {
     private final MutableLiveData<String> nextPrayerName = new MutableLiveData<>();
     private final MutableLiveData<String> nextPrayerTimeRemaining = new MutableLiveData<>();
     private final MutableLiveData<String> cityName = new MutableLiveData<>();
+    private AppPreference appPreference;
     
     // Default location (Jakarta)
     private double currentLat = -6.2088;
@@ -36,6 +40,7 @@ public class PrayerViewModel extends AndroidViewModel {
     public PrayerViewModel(@NonNull Application application) {
         super(application);
         repository = new PrayerRepository(application);
+        appPreference = new AppPreference(application.getApplicationContext());
     }
 
     public void updateLocation(double lat, double lon) {
@@ -74,14 +79,15 @@ public class PrayerViewModel extends AndroidViewModel {
                     StringBuilder result = new StringBuilder();
                     android.location.Address address = addresses.get(0);
                     String city = address.getLocality();
-                    result.append(address.getSubLocality());
-                    result.append(", ").append(city);
-                    result.append(", ").append(address.getSubAdminArea());
+//                    result.append(address.getSubLocality()); //Village
+                    result.append(city);
+//                    result.append(", ").append(address.getSubAdminArea());
 //                    result.append(", ").append(address.getAdminArea());
 //                    if (city != null) {
 //                        String country = address.getCountryName();
 //                        if (country != null) result.append(", ").append(country);
 //                    }
+                    appPreference.saveString("city", result.toString());
                     cityName.postValue(result.toString());
                 }
             } catch (Exception e) {
@@ -96,11 +102,73 @@ public class PrayerViewModel extends AndroidViewModel {
         timerRunnable = new Runnable() {
             @Override
             public void run() {
-                // Mock calculation for MVP
-                // In real app: parse entity.fajr, entity.dhuhr... find next.
-                // For now, static countdown.
-                nextPrayerName.postValue("Dzuhur");
-                nextPrayerTimeRemaining.postValue("-00:45:00"); 
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                    Calendar now = Calendar.getInstance();
+                    
+                    String[] prayerNames = {"Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"};
+                    String[] prayerTimes = {entity.fajr, entity.dhuhr, entity.asr, entity.maghrib, entity.isha};
+                    
+                    String nextName = "Fajr (Tomorrow)";
+                    long minDiff = Long.MAX_VALUE;
+                    
+                    for (int i = 0; i < prayerTimes.length; i++) {
+                        if (prayerTimes[i] == null) continue;
+                        String cleanTime = prayerTimes[i].split(" ")[0];
+                        Date date = sdf.parse(cleanTime);
+                        if (date != null) {
+                            Calendar pTime = Calendar.getInstance();
+                            pTime.set(Calendar.HOUR_OF_DAY, date.getHours());
+                            pTime.set(Calendar.MINUTE, date.getMinutes());
+                            pTime.set(Calendar.SECOND, 0);
+                            
+                            long diff = pTime.getTimeInMillis() - now.getTimeInMillis();
+                            if (diff > 0 && diff < minDiff) {
+                                minDiff = diff;
+                                nextName = prayerNames[i];
+                            }
+                        }
+                    }
+                    
+                    if (minDiff == Long.MAX_VALUE) {
+                        // All prayers today have passed, calculate Fajr for tomorrow
+                        if (prayerTimes[0] != null) {
+                            String cleanTime = prayerTimes[0].split(" ")[0];
+                            Date date = sdf.parse(cleanTime);
+                            if (date != null) {
+                                Calendar pTime = Calendar.getInstance();
+                                pTime.add(Calendar.DAY_OF_YEAR, 1);
+                                pTime.set(Calendar.HOUR_OF_DAY, date.getHours());
+                                pTime.set(Calendar.MINUTE, date.getMinutes());
+                                pTime.set(Calendar.SECOND, 0);
+                                minDiff = pTime.getTimeInMillis() - now.getTimeInMillis();
+                                nextName = "Fajr";
+                            }
+                        }
+                    }
+                    
+                    if (minDiff != Long.MAX_VALUE) {
+                        long secondsInMilli = 1000;
+                        long minutesInMilli = secondsInMilli * 60;
+                        long hoursInMilli = minutesInMilli * 60;
+
+                        long elapsedHours = minDiff / hoursInMilli;
+                        minDiff = minDiff % hoursInMilli;
+
+                        long elapsedMinutes = minDiff / minutesInMilli;
+                        minDiff = minDiff % minutesInMilli;
+
+                        long elapsedSeconds = minDiff / secondsInMilli;
+                        
+                        @SuppressLint("DefaultLocale") String timeRemaining = String.format("-%02d:%02d:%02d", elapsedHours, elapsedMinutes, elapsedSeconds);
+                        
+                        nextPrayerName.postValue(nextName);
+                        nextPrayerTimeRemaining.postValue(timeRemaining);
+                    }
+                } catch (Exception e) {
+                    Log.e("PrayerViewModel", "Error calculating next prayer", e);
+                }
+                
                 timerHandler.postDelayed(this, 1000);
             }
         };

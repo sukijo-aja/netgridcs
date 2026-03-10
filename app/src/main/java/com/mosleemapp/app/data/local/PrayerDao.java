@@ -15,6 +15,9 @@ public interface PrayerDao {
     @Query("SELECT * FROM prayer_times WHERE date = :date LIMIT 1")
     PrayerTimeEntity getPrayerTime(String date);
 
+    @Query("SELECT * FROM prayer_times")
+    List<PrayerTimeEntity> getAllPrayerTimes();
+
     @Query("DELETE FROM prayer_times")
     void clearAll();
 }

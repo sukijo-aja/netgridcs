@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.mosleemapp.app.R;
 import com.mosleemapp.app.ui.dialogs.PrayerSettingsBottomSheet;
@@ -21,12 +22,23 @@ import com.mosleemapp.app.utils.AdMobUtil;
 import com.mosleemapp.app.utils.AlarmScheduler;
 import com.mosleemapp.app.utils.LocaleHelper;
 import com.mosleemapp.app.utils.SettingsManager;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import androidx.lifecycle.ViewModelProvider;
+import com.mosleemapp.app.ui.viewmodel.PrayerTrackerViewModel;
+import com.mosleemapp.app.data.local.entity.CustomHabitEntity;
+import android.widget.LinearLayout;
+import android.widget.ImageButton;
 
 public class SettingsFragment extends Fragment {
 
     private SeekBar seekBarFontSize;
     private TextView tvPreview;
     private TextView tvLabelFontSize;
+    private Button btnLogin;
+    private TextView tvUserId;
+    private FirebaseAuth mAuth;
 
     @Nullable
     @Override
@@ -41,6 +53,18 @@ public class SettingsFragment extends Fragment {
         seekBarFontSize = view.findViewById(R.id.seekBarFontSize);
         tvPreview = view.findViewById(R.id.tvPreview);
         tvLabelFontSize = view.findViewById(R.id.labelFontSize);
+
+        MaterialToolbar toolbar = view.findViewById(R.id.toolbarSettings);
+        toolbar.setNavigationIcon(androidx.appcompat.R.drawable.abc_ic_ab_back_material);
+        toolbar.setNavigationOnClickListener(v -> {
+            com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = 
+                requireActivity().findViewById(R.id.bottom_navigation);
+            if (bottomNav != null) {
+                bottomNav.setSelectedItemId(R.id.nav_home);
+            } else {
+                requireActivity().onBackPressed();
+            }
+        });
 
         SettingsManager settingsManager = SettingsManager.getInstance(requireContext());
 
@@ -72,18 +96,6 @@ public class SettingsFragment extends Fragment {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        SwitchMaterial switchReminder = view.findViewById(R.id.switchReminder);
-        switchReminder.setChecked(settingsManager.isReminderEnabled());
-        switchReminder.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            settingsManager.setReminderEnabled(isChecked);
-            if (isChecked) {
-                AlarmScheduler.schedulePrayerAlarms(requireContext(), null); // Need entity ideally
-                Toast.makeText(requireContext(), R.string.reminders_enabled, Toast.LENGTH_SHORT).show();
-            } else {
-                AlarmScheduler.cancelAlarms(requireContext());
-                Toast.makeText(requireContext(), R.string.reminders_disabled, Toast.LENGTH_SHORT).show();
-            }
-        });
 
         SwitchMaterial switchPremium = view.findViewById(R.id.switchPremium);
         switchPremium.setChecked(settingsManager.isPremium());
@@ -95,39 +107,87 @@ public class SettingsFragment extends Fragment {
                 Toast.LENGTH_SHORT).show();
         });
 
-        SeekBar seekBarPreReminder = view.findViewById(R.id.seekBarPreReminder);
-        TextView tvPreReminderLabel = view.findViewById(R.id.tvPreReminderLabel);
-        
-        int currentPreReminder = settingsManager.getPrePrayerReminderMinutes();
-        seekBarPreReminder.setProgress(currentPreReminder);
-        tvPreReminderLabel.setText("Reminder before Adhan: " + currentPreReminder + " min");
-
-        seekBarPreReminder.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                tvPreReminderLabel.setText("Reminder before Adhan: " + progress + " min");
-                settingsManager.setPrePrayerReminderMinutes(progress);
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-
         // Launch Bottom Sheet for Individual Prayers
         view.findViewById(R.id.btnManagePrayers).setOnClickListener(v -> {
             PrayerSettingsBottomSheet bottomSheet = new PrayerSettingsBottomSheet();
             bottomSheet.show(getParentFragmentManager(), PrayerSettingsBottomSheet.TAG);
         });
 
+        // Manage Custom Habits
+        LinearLayout llSettingsCustomHabits = view.findViewById(R.id.llSettingsCustomHabits);
+        view.findViewById(R.id.btnSettingsAddHabit).setOnClickListener(v -> showAddHabitDialog());
+
+        PrayerTrackerViewModel prayerTrackerViewModel = new ViewModelProvider(requireActivity()).get(PrayerTrackerViewModel.class);
+        prayerTrackerViewModel.getAllCustomHabits().observe(getViewLifecycleOwner(), habits -> {
+            llSettingsCustomHabits.removeAllViews();
+            if (habits == null || habits.isEmpty()) {
+                TextView tvEmpty = new TextView(requireContext());
+                tvEmpty.setText("No custom habits yet. Click + to add one.");
+                tvEmpty.setPadding(32, 32, 32, 32);
+                tvEmpty.setGravity(android.view.Gravity.CENTER);
+                llSettingsCustomHabits.addView(tvEmpty);
+                return;
+            }
+            for (CustomHabitEntity habit : habits) {
+                View habitView = getLayoutInflater().inflate(R.layout.item_manage_custom_habit, llSettingsCustomHabits, false);
+                TextView tvName = habitView.findViewById(R.id.tvHabitName);
+                ImageButton btnDelete = habitView.findViewById(R.id.btnDeleteHabit);
+                
+                tvName.setText(habit.name);
+                btnDelete.setOnClickListener(v -> {
+                    new AlertDialog.Builder(requireContext())
+                        .setTitle("Delete Habit")
+                        .setMessage("Are you sure you want to delete '" + habit.name + "'? This will delete all history for this habit.")
+                        .setPositiveButton("Delete", (dialog, which) -> prayerTrackerViewModel.deleteCustomHabit(habit))
+                        .setNegativeButton("Cancel", null)
+                        .show();
+                });
+                llSettingsCustomHabits.addView(habitView);
+            }
+        });
+
         Button btnLanguage = view.findViewById(R.id.btnLanguage);
         updateLanguageButtonText(btnLanguage);
         btnLanguage.setOnClickListener(v -> showLanguageDialog());
         
-        // Show User ID
-        final TextView tvUserId = view.findViewById(R.id.tvUserId);
+        mAuth = FirebaseAuth.getInstance();
+        tvUserId = view.findViewById(R.id.tvUserId);
+        btnLogin = view.findViewById(R.id.btnLogin);
         
-        // Initial check
+        updateLoginUI();
+        
+        btnLogin.setOnClickListener(v -> {
+            if (mAuth.getCurrentUser() != null) {
+                // Logout
+                mAuth.signOut();
+                
+                androidx.credentials.CredentialManager credentialManager = androidx.credentials.CredentialManager.create(requireContext());
+                credentialManager.clearCredentialStateAsync(
+                    new androidx.credentials.ClearCredentialStateRequest(), 
+                    null, 
+                    androidx.core.content.ContextCompat.getMainExecutor(requireContext()), 
+                    new androidx.credentials.CredentialManagerCallback<Void, androidx.credentials.exceptions.ClearCredentialException>() {
+                        @Override
+                        public void onResult(Void result) {}
+                        @Override
+                        public void onError(androidx.credentials.exceptions.ClearCredentialException e) {}
+                    }
+                );
+
+                com.mosleemapp.app.utils.AppPreference appPreference = new com.mosleemapp.app.utils.AppPreference(requireContext());
+                appPreference.remove("UID");
+                appPreference.remove("USER_EMAIL");
+                appPreference.remove("USER_NAME");
+
+                Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                updateLoginUI();
+            } else {
+                // Login
+                startActivity(new android.content.Intent(requireContext(), com.mosleemapp.app.ui.activities.LoginActivity.class));
+            }
+        });
+
+        // Initial check for unique ID if not logged in
         String currentId = settingsManager.getUserId();
         tvUserId.setText("User ID: " + currentId);
 
@@ -176,6 +236,35 @@ public class SettingsFragment extends Fragment {
                     .setNegativeButton("Cancel", null)
                     .show();
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mAuth != null) {
+            updateLoginUI();
+        }
+    }
+
+    private void updateLoginUI() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            btnLogin.setText("Logout");
+            btnLogin.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+            String displayName = user.getDisplayName();
+            String email = user.getEmail();
+            if (displayName != null && !displayName.isEmpty()) {
+                tvUserId.setText("Logged in as: " + displayName);
+            } else if (email != null && !email.isEmpty()) {
+                tvUserId.setText("Logged in as: " + email);
+            } else {
+                tvUserId.setText("Logged in as: " + user.getUid());
+            }
+        } else {
+            btnLogin.setText("Login");
+            SettingsManager settingsManager = SettingsManager.getInstance(requireContext());
+            tvUserId.setText("User ID: " + settingsManager.getUserId());
+        }
     }
 
     private void startDownloadAll() {
@@ -248,5 +337,25 @@ public class SettingsFragment extends Fragment {
                 })
                 .setNegativeButton(android.R.string.cancel, null)
                 .show();
+    }
+
+    private void showAddHabitDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Add New Habit");
+
+        final android.widget.EditText input = new android.widget.EditText(requireContext());
+        input.setHint("e.g. Read Quran, Fasting");
+        builder.setView(input);
+
+        builder.setPositiveButton("Add", (dialog, which) -> {
+            String name = input.getText().toString().trim();
+            if (!name.isEmpty()) {
+                PrayerTrackerViewModel vm = new ViewModelProvider(requireActivity()).get(PrayerTrackerViewModel.class);
+                vm.addCustomHabit(name);
+            }
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
     }
 }
