@@ -42,6 +42,7 @@ public class QuranRepository {
         executorService = Executors.newSingleThreadExecutor();
         
         okhttp3.OkHttpClient client = new okhttp3.OkHttpClient.Builder()
+                .dns(com.mosleemapp.app.data.remote.DnsHelper.createGoogleDns())
                 .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
                 .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
                 .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
