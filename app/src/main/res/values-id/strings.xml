@@ -62,4 +62,5 @@
     <string name="last_read">Terakhir Dibaca</string>
     <string name="next_prayer">Sholat Berikutnya</string>
     <string name="reminder_before_adhan_minutes">Pengingat Sebelum Adzan : %1$s menit</string>
+    <string name="show_tajweed_colored_quran">Tampilkan Tajwid (Al-Qur\'an Berwarna)</string>
 </resources>

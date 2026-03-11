@@ -36,6 +36,14 @@ public class SettingsManager {
         appPreference.saveFloat(KEY_ARABIC_FONT_SIZE, size);
     }
 
+    public boolean isTajweedEnabled() {
+        return appPreference.getBoolean("show_tajweed", false);
+    }
+
+    public void setTajweedEnabled(boolean enabled) {
+        appPreference.saveBoolean("show_tajweed", enabled);
+    }
+
     public boolean isReminderEnabled() {
         return appPreference.getBoolean("prayer_reminder_enabled", false);
     }

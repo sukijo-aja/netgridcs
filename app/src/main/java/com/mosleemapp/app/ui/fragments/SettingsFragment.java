@@ -96,6 +96,15 @@ public class SettingsFragment extends Fragment {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
+        SwitchMaterial switchTajweed = view.findViewById(R.id.switchTajweed);
+        switchTajweed.setChecked(settingsManager.isTajweedEnabled());
+        switchTajweed.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            settingsManager.setTajweedEnabled(isChecked);
+            Toast.makeText(requireContext(), 
+                isChecked ? "Tajweed Enabled. Reopen Surah to see changes." : "Tajweed Disabled.", 
+                Toast.LENGTH_SHORT).show();
+        });
+
 
         SwitchMaterial switchPremium = view.findViewById(R.id.switchPremium);
         switchPremium.setChecked(settingsManager.isPremium());

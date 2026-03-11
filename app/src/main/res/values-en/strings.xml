@@ -62,4 +62,5 @@
     <string name="last_read">Last Read</string>
     <string name="next_prayer">Next Prayer</string>
     <string name="reminder_before_adhan_minutes">Reminder Before Adhan : %1$s minutes</string>
+    <string name="show_tajweed_colored_quran">Show Tajweed (Colored Quran)</string>
 </resources>

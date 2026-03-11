@@ -23,6 +23,7 @@ public class AyahResponse {
     public static class Ayah {
         public int number;
         public String text;
+        public String textTajweed;
         public int numberInSurah;
         public int juz;
         public int manzil;

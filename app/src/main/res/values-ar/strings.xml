@@ -62,4 +62,5 @@
     <string name="last_read">القراءة الأخيرة</string>
     <string name="next_prayer">الصلاة القادمة</string>
     <string name="reminder_before_adhan_minutes">التذكير قبل الأذان : %1$s دقيقة</string>
+    <string name="show_tajweed_colored_quran">إظهار التجويد (قرآن ملون)</string>
 </resources>

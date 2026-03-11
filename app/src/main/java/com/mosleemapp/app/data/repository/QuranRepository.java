@@ -115,7 +115,7 @@ public class QuranRepository {
     }
 
     private void fetchAyahsFromApi(int surahNumber, Callback<List<AyahResponse.Ayah>> callback) {
-        String editions = "quran-uthmani,en.sahih,id.indonesian";
+        String editions = "quran-uthmani,en.sahih,id.indonesian,quran-tajweed";
 
         apiService.getSurahDetail(surahNumber, editions).enqueue(new retrofit2.Callback<AyahResponse>() {
             @Override
@@ -123,26 +123,14 @@ public class QuranRepository {
                 if (response.isSuccessful() && response.body() != null && response.body().data != null && !response.body().data.isEmpty()) {
                     List<AyahResponse.SurahDetail> data = response.body().data;
                     
-                    // Assuming API returns in order of editions requested: 0=Arabic, 1=English, 2=Indonesian
-                    // Ideally we should check edition field inside response but for now we rely on index if consistent
                     List<AyahResponse.Ayah> arabicAyahs = data.get(0).ayahs;
                     List<AyahResponse.Ayah> englishAyahs = (data.size() > 1) ? data.get(1).ayahs : null;
                     List<AyahResponse.Ayah> indoAyahs = (data.size() > 2) ? data.get(2).ayahs : null;
-                    
-                    
+                    List<AyahResponse.Ayah> tajweedAyahs = (data.size() > 3) ? data.get(3).ayahs : null;
                     
                     executorService.execute(() -> {
-                         // We map everything to entities first to save
-                         quranDao.insertAyahs(mapAyahsToEntities(arabicAyahs, englishAyahs, indoAyahs, surahNumber));
+                         quranDao.insertAyahs(mapAyahsToEntities(arabicAyahs, englishAyahs, indoAyahs, tajweedAyahs, surahNumber));
                     });
-                    
-                    // For callback, we return a list where 'translation' field is populated based on current locale?
-                    // OR we return a modified object.
-                    // Actually, let's map back from the entities we just created (or mapped objects)
-                    // But we are on background thread, so let's reuse api response for speed but we need to populate translation field for the UI to show *something* immediately?
-                    // Better yet: return the objects with BOTH translations if possible, orlet adapter decide?
-                    // The Adapter expects AyahResponse.Ayah which has 'translation' field.
-                    // We should probably populate 'translation' with the current app language preference here for immediate display
                     
                     String currentLang = getLanguageCode();
                     for (int i = 0; i < arabicAyahs.size(); i++) {
@@ -150,6 +138,9 @@ public class QuranRepository {
                             arabicAyahs.get(i).translation = indoAyahs.get(i).text;
                         } else if (englishAyahs != null && i < englishAyahs.size()) {
                             arabicAyahs.get(i).translation = englishAyahs.get(i).text;
+                        }
+                        if (tajweedAyahs != null && i < tajweedAyahs.size()) {
+                            arabicAyahs.get(i).textTajweed = tajweedAyahs.get(i).text;
                         }
                     }
 
@@ -204,7 +195,7 @@ public class QuranRepository {
         return surahs;
     }
 
-    private List<AyahEntity> mapAyahsToEntities(List<AyahResponse.Ayah> arabicAyahs, List<AyahResponse.Ayah> enAyahs, List<AyahResponse.Ayah> idAyahs, int surahId) {
+    private List<AyahEntity> mapAyahsToEntities(List<AyahResponse.Ayah> arabicAyahs, List<AyahResponse.Ayah> enAyahs, List<AyahResponse.Ayah> idAyahs, List<AyahResponse.Ayah> tajweedAyahs, int surahId) {
         List<AyahEntity> entities = new ArrayList<>();
         for (int i = 0; i < arabicAyahs.size(); i++) {
              AyahResponse.Ayah ayah = arabicAyahs.get(i);
@@ -218,6 +209,9 @@ public class QuranRepository {
             }
              if (idAyahs != null && i < idAyahs.size()) {
                 entity.translationId = idAyahs.get(i).text;
+            }
+             if (tajweedAyahs != null && i < tajweedAyahs.size()) {
+                entity.textTajweed = tajweedAyahs.get(i).text;
             }
             
             entity.numberInSurah = ayah.numberInSurah;
@@ -244,6 +238,7 @@ public class QuranRepository {
             AyahResponse.Ayah ayah = new AyahResponse.Ayah();
             ayah.number = entity.number;
             ayah.text = entity.text;
+            ayah.textTajweed = entity.textTajweed;
             
             if (currentLang.equals("id")) {
                 ayah.translation = entity.translationId;
@@ -279,9 +274,13 @@ public class QuranRepository {
                 // 3. Fetch Indonesian (id.indonesian)
                 Response<com.mosleemapp.app.data.models.CompleteQuranResponse> idResponse = apiService.getCompleteQuran("id.indonesian").execute();
 
+                // 4. Fetch Tajweed (quran-tajweed)
+                Response<com.mosleemapp.app.data.models.CompleteQuranResponse> tjResponse = apiService.getCompleteQuran("quran-tajweed").execute();
+
                 List<com.mosleemapp.app.data.models.CompleteQuranResponse.Surah> arSurahs = arResponse.body().data.surahs;
                 List<com.mosleemapp.app.data.models.CompleteQuranResponse.Surah> enSurahs = (enResponse.isSuccessful() && enResponse.body() != null) ? enResponse.body().data.surahs : null;
                 List<com.mosleemapp.app.data.models.CompleteQuranResponse.Surah> idSurahs = (idResponse.isSuccessful() && idResponse.body() != null) ? idResponse.body().data.surahs : null;
+                List<com.mosleemapp.app.data.models.CompleteQuranResponse.Surah> tjSurahs = (tjResponse.isSuccessful() && tjResponse.body() != null) ? tjResponse.body().data.surahs : null;
 
                 // Prepare Entities
                 List<SurahEntity> surahEntities = new ArrayList<>();
@@ -331,6 +330,13 @@ public class QuranRepository {
                              com.mosleemapp.app.data.models.CompleteQuranResponse.Surah idSurah = idSurahs.get(i);
                              if (j < idSurah.ayahs.size()) {
                                  ayahEntity.translationId = idSurah.ayahs.get(j).text;
+                             }
+                        }
+
+                        if (tjSurahs != null && i < tjSurahs.size()) {
+                             com.mosleemapp.app.data.models.CompleteQuranResponse.Surah tjSurah = tjSurahs.get(i);
+                             if (j < tjSurah.ayahs.size()) {
+                                 ayahEntity.textTajweed = tjSurah.ayahs.get(j).text;
                              }
                         }
 
