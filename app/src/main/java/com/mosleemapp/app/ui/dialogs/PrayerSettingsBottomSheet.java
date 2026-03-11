@@ -60,7 +60,6 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
             }
         }
         
-        // Both permissions are granted, we can enable it now
         if (switchReminder != null && !switchReminder.isChecked()) {
             switchReminder.setChecked(true); // This will re-trigger the listener but permissions are now granted
         }
@@ -129,6 +128,8 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         SettingsManager settingsManager = SettingsManager.getInstance(requireContext());
+        androidx.lifecycle.ViewModelProvider provider = new androidx.lifecycle.ViewModelProvider(requireActivity());
+        com.mosleemapp.app.ui.viewmodel.PrayerViewModel prayerViewModel = provider.get(com.mosleemapp.app.ui.viewmodel.PrayerViewModel.class);
 
         switchReminder = view.findViewById(R.id.bsSwitchReminder);
         switchReminder.setChecked(settingsManager.isReminderEnabled());
@@ -223,20 +224,23 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
             }
             
             android.content.Intent intent = new android.content.Intent(requireContext(), com.mosleemapp.app.receivers.PrayerAlarmReceiver.class);
-            intent.putExtra("prayer_name", "Test Prayer");
+
+            String nextName = prayerViewModel.getNextPrayerName().getValue();
+            if (nextName != null) {
+                intent.putExtra("prayer_name", nextName.replace(" (Tomorrow)", ""));
+            } else {
+                intent.putExtra("prayer_name", "Test Prayer");
+            }
+
             intent.putExtra("is_pre_reminder", false);
             requireContext().sendBroadcast(intent);
             dismiss();
-            android.widget.Toast.makeText(requireContext(), "Test notification requested", android.widget.Toast.LENGTH_SHORT).show();
         });
 
         // Auto Silent Mode
         setupAutoSilent(view, settingsManager);
 
-        androidx.lifecycle.ViewModelProvider provider = new androidx.lifecycle.ViewModelProvider(requireActivity());
-        com.mosleemapp.app.ui.viewmodel.PrayerViewModel viewModel = provider.get(com.mosleemapp.app.ui.viewmodel.PrayerViewModel.class);
-        
-        viewModel.getPrayerTimes().observe(getViewLifecycleOwner(), entity -> {
+        prayerViewModel.getPrayerTimes().observe(getViewLifecycleOwner(), entity -> {
             if (entity != null) {
                 updateSwitchText(view, R.id.bsSwitchFajr, "Fajr", entity.fajr);
                 updateSwitchText(view, R.id.bsSwitchDhuhr, "Dhuhr", entity.dhuhr);

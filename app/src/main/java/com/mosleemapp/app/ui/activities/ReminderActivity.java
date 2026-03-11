@@ -36,13 +36,16 @@ public class ReminderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_reminder);
 
         String prayerName = getIntent().getStringExtra("prayer_name");
+        String localizedPrayerName = getIntent().getStringExtra("localized_prayer_name");
         TextView tvPrayerName = findViewById(R.id.tvPrayerName);
         Button btnDismiss = findViewById(R.id.btnDismiss);
 
-        if (prayerName != null) {
+        if (localizedPrayerName != null) {
+            tvPrayerName.setText(localizedPrayerName);
+        } else if (prayerName != null) {
             tvPrayerName.setText(prayerName);
         } else {
-            tvPrayerName.setText("It's Prayer Time");
+            tvPrayerName.setText(getString(R.string.prayer));
         }
 
         btnDismiss.setOnClickListener(v -> finish());

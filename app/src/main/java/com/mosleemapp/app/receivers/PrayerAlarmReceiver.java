@@ -23,6 +23,30 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
 
     public static final String ACTION_RESTORE_RINGER = "com.mosleemapp.app.ACTION_RESTORE_RINGER";
 
+    private String getLocalizedPrayerName(Context context, String prayerName) {
+        if (prayerName == null) return "Prayer";
+        switch (prayerName.toLowerCase()) {
+            case "fajr": return context.getString(R.string.fajr);
+            case "dhuhr": return context.getString(R.string.dhuhr);
+            case "asr": return context.getString(R.string.asr);
+            case "maghrib": return context.getString(R.string.maghrib);
+            case "isha": return context.getString(R.string.isha);
+            default: return prayerName;
+        }
+    }
+
+    private String getNextFromCurrent(String current) {
+        if (current == null) return "Unknown";
+        switch (current.toLowerCase()) {
+            case "fajr": return "Dhuhr";
+            case "dhuhr": return "Asr";
+            case "asr": return "Maghrib";
+            case "maghrib": return "Isha";
+            case "isha": return "Fajr";
+            default: return "Unknown";
+        }
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         // Handle restore-ringer alarm
@@ -44,12 +68,14 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
         
         if (prayerName == null) prayerName = "Prayer";
 
+        String localizedPrayerName = getLocalizedPrayerName(context, prayerName);
+
         createNotificationChannel(context);
         
         if (isPreReminder) {
-            showPreReminderNotification(context, prayerName);
+            showPreReminderNotification(context, prayerName, localizedPrayerName);
         } else {
-            showNotification(context, prayerName);
+            showNotification(context, prayerName, localizedPrayerName);
 
             // Auto-silent mode: activate silent and schedule restore
             SettingsManager sm = SettingsManager.getInstance(context);
@@ -61,11 +87,11 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
         }
     }
 
-    private void showPreReminderNotification(Context context, String prayerName) {
+    private void showPreReminderNotification(Context context, String prayerName, String localizedPrayerName) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "prayer_pre_reminder_channel")
                 .setSmallIcon(R.mipmap.ic_launcher_round) // Replace 
-                .setContentTitle("Upcoming Prayer")
-                .setContentText(prayerName + " is coming soon")
+                .setContentTitle(context.getString(R.string.upcoming_prayer, localizedPrayerName))
+                .setContentText(localizedPrayerName + " " + context.getString(R.string.is_coming_soon))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true);
 
@@ -76,10 +102,11 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
         }
     }
 
-    private void showNotification(Context context, String prayerName) {
+    private void showNotification(Context context, String prayerName, String localizedPrayerName) {
         // Intent for the Full-Screen Activity
         Intent fullScreenIntent = new Intent(context, ReminderActivity.class);
         fullScreenIntent.putExtra("prayer_name", prayerName);
+        fullScreenIntent.putExtra("localized_prayer_name", localizedPrayerName);
         fullScreenIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
         PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
@@ -97,10 +124,13 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
             channelId = "prayer_reminder_channel_fajr_1";
         }
 
+        String nextName = getNextFromCurrent(prayerName);
+        String localizedNextName = getLocalizedPrayerName(context, nextName);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
-                .setSmallIcon(R.mipmap.ic_launcher_round) // Replace with valid icon
-                .setContentTitle(prayerName)
-                .setContentText("It's time for " + prayerName)
+                .setSmallIcon(R.mipmap.ic_launcher_round)
+                .setContentTitle(localizedPrayerName)
+                .setContentText(context.getString(R.string.next_prayer) + " " + localizedNextName)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setSound(soundUri)

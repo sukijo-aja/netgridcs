@@ -26,6 +26,7 @@ public class PrayerViewModel extends AndroidViewModel {
     private PrayerRepository repository;
     private final MutableLiveData<PrayerTimeEntity> prayerData = new MutableLiveData<>();
     private final MutableLiveData<String> nextPrayerName = new MutableLiveData<>();
+    private final MutableLiveData<String> currentPrayerName = new MutableLiveData<>();
     private final MutableLiveData<String> nextPrayerTimeRemaining = new MutableLiveData<>();
     private final MutableLiveData<String> cityName = new MutableLiveData<>();
     private AppPreference appPreference;
@@ -68,6 +69,7 @@ public class PrayerViewModel extends AndroidViewModel {
     }
     
     public LiveData<String> getNextPrayerName() { return nextPrayerName; }
+    public LiveData<String> getCurrentPrayerName() { return currentPrayerName; }
     public LiveData<String> getNextPrayerTimeRemaining() { return nextPrayerTimeRemaining; }
     public LiveData<String> getCityName() { return cityName; }
 
@@ -158,6 +160,7 @@ public class PrayerViewModel extends AndroidViewModel {
                         @SuppressLint("DefaultLocale") String timeRemaining = String.format("-%02d:%02d:%02d", elapsedHours, elapsedMinutes, elapsedSeconds);
                         
                         nextPrayerName.postValue(nextName);
+                        currentPrayerName.postValue(calculateCurrentPrayer(nextName));
                         nextPrayerTimeRemaining.postValue(timeRemaining);
                     }
                 } catch (Exception e) {
@@ -170,6 +173,18 @@ public class PrayerViewModel extends AndroidViewModel {
         timerHandler.post(timerRunnable);
     }
     
+    private String calculateCurrentPrayer(String next) {
+        if (next == null) return "Unknown";
+        if (next.contains("Fajr")) return "Isha";
+        switch (next) {
+            case "Dhuhr": return "Fajr";
+            case "Asr": return "Dhuhr";
+            case "Maghrib": return "Asr";
+            case "Isha": return "Maghrib";
+            default: return "Unknown";
+        }
+    }
+
     @Override
     protected void onCleared() {
         super.onCleared();
