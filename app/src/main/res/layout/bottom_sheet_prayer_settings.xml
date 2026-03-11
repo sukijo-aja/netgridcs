@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:padding="24dp"
     android:background="@drawable/rounded_bottom_sheet_bg"> <!-- Background can be just color if drawable doesn't exist, but standard material handles it -->
@@ -54,175 +56,13 @@
         android:background="#E0E0E0"
         android:layout_marginBottom="12dp" />
 
-    <!-- Fajr -->
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvPrayerSettings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="8dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/bsSwitchFajr"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Fajr" />
-
-            <TextView
-                android:id="@+id/tvOffsetFajr"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="On Time"
-                android:textColor="@color/primary_green"
-                android:textStyle="bold"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"/>
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Dhuhr -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="8dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/bsSwitchDhuhr"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Dhuhr" />
-
-            <TextView
-                android:id="@+id/tvOffsetDhuhr"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="On Time"
-                android:textColor="@color/primary_green"
-                android:textStyle="bold"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"/>
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Asr -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="8dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/bsSwitchAsr"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Asr" />
-
-            <TextView
-                android:id="@+id/tvOffsetAsr"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="On Time"
-                android:textColor="@color/primary_green"
-                android:textStyle="bold"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"/>
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Maghrib -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="8dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/bsSwitchMaghrib"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Maghrib" />
-
-            <TextView
-                android:id="@+id/tvOffsetMaghrib"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="On Time"
-                android:textColor="@color/primary_green"
-                android:textStyle="bold"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"/>
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Isha -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="16dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <com.google.android.material.switchmaterial.SwitchMaterial
-                android:id="@+id/bsSwitchIsha"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Isha" />
-
-            <TextView
-                android:id="@+id/tvOffsetIsha"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="On Time"
-                android:textColor="@color/primary_green"
-                android:textStyle="bold"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"/>
-        </LinearLayout>
-    </LinearLayout>
+        android:layout_marginBottom="16dp"
+        tools:listitem="@layout/item_prayer_setting"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     <!-- Auto Silent Mode Section -->
     <View

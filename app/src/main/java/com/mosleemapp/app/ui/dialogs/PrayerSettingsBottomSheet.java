@@ -9,10 +9,16 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.mosleemapp.app.R;
+import com.mosleemapp.app.ui.adapters.PrayerSettingAdapter;
 import com.mosleemapp.app.utils.SettingsManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
 
@@ -193,11 +199,21 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
             public void onStopTrackingTouch(android.widget.SeekBar seekBar) {}
         });
 
-        setupSwitch(view, R.id.bsSwitchFajr, "Fajr", settingsManager);
-        setupSwitch(view, R.id.bsSwitchDhuhr, "Dhuhr", settingsManager);
-        setupSwitch(view, R.id.bsSwitchAsr, "Asr", settingsManager);
-        setupSwitch(view, R.id.bsSwitchMaghrib, "Maghrib", settingsManager);
-        setupSwitch(view, R.id.bsSwitchIsha, "Isha", settingsManager);
+        RecyclerView rvSettings = view.findViewById(R.id.rvPrayerSettings);
+        PrayerSettingAdapter adapter = new PrayerSettingAdapter(new PrayerSettingAdapter.OnPrayerSettingInteractionListener() {
+            @Override
+            public void onSwitchToggled(PrayerSettingAdapter.PrayerSettingItem item, boolean isChecked) {
+                settingsManager.setPrayerAlarmEnabled(item.prayerName, isChecked);
+                String msg = getString(isChecked ? R.string.reminder_for_prayer_enabled : R.string.reminder_for_prayer_disabled, item.localizedName);
+                android.widget.Toast.makeText(requireContext(), msg, android.widget.Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onOffsetClicked(PrayerSettingAdapter.PrayerSettingItem item, android.widget.TextView tvOffset) {
+                showOffsetDialog(item.prayerName, settingsManager, tvOffset);
+            }
+        });
+        rvSettings.setAdapter(adapter);
 
         Button btnClose = view.findViewById(R.id.btnCloseSheet);
         btnClose.setOnClickListener(v -> dismiss());
@@ -242,11 +258,13 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
 
         prayerViewModel.getPrayerTimes().observe(getViewLifecycleOwner(), entity -> {
             if (entity != null) {
-                updateSwitchText(view, R.id.bsSwitchFajr, "Fajr", entity.fajr);
-                updateSwitchText(view, R.id.bsSwitchDhuhr, "Dhuhr", entity.dhuhr);
-                updateSwitchText(view, R.id.bsSwitchAsr, "Asr", entity.asr);
-                updateSwitchText(view, R.id.bsSwitchMaghrib, "Maghrib", entity.maghrib);
-                updateSwitchText(view, R.id.bsSwitchIsha, "Isha", entity.isha);
+                List<PrayerSettingAdapter.PrayerSettingItem> list = new ArrayList<>();
+                list.add(new PrayerSettingAdapter.PrayerSettingItem("Fajr", getLocalizedPrayerName("Fajr"), entity.fajr, settingsManager.isPrayerAlarmEnabled("Fajr"), settingsManager.getPrayerAlarmOffset("Fajr")));
+                list.add(new PrayerSettingAdapter.PrayerSettingItem("Dhuhr", getLocalizedPrayerName("Dhuhr"), entity.dhuhr, settingsManager.isPrayerAlarmEnabled("Dhuhr"), settingsManager.getPrayerAlarmOffset("Dhuhr")));
+                list.add(new PrayerSettingAdapter.PrayerSettingItem("Asr", getLocalizedPrayerName("Asr"), entity.asr, settingsManager.isPrayerAlarmEnabled("Asr"), settingsManager.getPrayerAlarmOffset("Asr")));
+                list.add(new PrayerSettingAdapter.PrayerSettingItem("Maghrib", getLocalizedPrayerName("Maghrib"), entity.maghrib, settingsManager.isPrayerAlarmEnabled("Maghrib"), settingsManager.getPrayerAlarmOffset("Maghrib")));
+                list.add(new PrayerSettingAdapter.PrayerSettingItem("Isha", getLocalizedPrayerName("Isha"), entity.isha, settingsManager.isPrayerAlarmEnabled("Isha"), settingsManager.getPrayerAlarmOffset("Isha")));
+                adapter.submitList(list);
             }
         });
     }
@@ -262,34 +280,7 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
         }
     }
 
-    private void updateSwitchText(View view, int id, String name, String time) {
-        SwitchMaterial sw = view.findViewById(id);
-        String localizedName = getLocalizedPrayerName(name);
-         if (time != null) {
-            String cleanTime = time.split(" ")[0];
-            sw.setText(localizedName + " (" + cleanTime + ")");
-         } else {
-             sw.setText(localizedName + " 00:00");
-         }
-    }
 
-    private void setupSwitch(View view, int id, String prayerName, SettingsManager sm) {
-        SwitchMaterial sw = view.findViewById(id);
-        sw.setChecked(sm.isPrayerAlarmEnabled(prayerName));
-        sw.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            sm.setPrayerAlarmEnabled(prayerName, isChecked);
-            String localizedName = getLocalizedPrayerName(prayerName);
-            String msg = getString(isChecked ? R.string.reminder_for_prayer_enabled : R.string.reminder_for_prayer_disabled, localizedName);
-            android.widget.Toast.makeText(requireContext(), msg, android.widget.Toast.LENGTH_SHORT).show();
-        });
-
-        // Offset Setup
-        int offsetId = getOffsetId(prayerName);
-        android.widget.TextView tvOffset = view.findViewById(offsetId);
-        updateOffsetUI(tvOffset, sm.getPrayerAlarmOffset(prayerName));
-
-        tvOffset.setOnClickListener(v -> showOffsetDialog(prayerName, sm, tvOffset));
-    }
 
     private void showOffsetDialog(String prayerName, SettingsManager sm, android.widget.TextView tvOffset) {
         final String[] options = {"On Time", "5 min before", "10 min before", "15 min before", "30 min before"};
@@ -315,16 +306,7 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
         }
     }
 
-    private int getOffsetId(String prayerName) {
-        switch (prayerName) {
-            case "Fajr": return R.id.tvOffsetFajr;
-            case "Dhuhr": return R.id.tvOffsetDhuhr;
-            case "Asr": return R.id.tvOffsetAsr;
-            case "Maghrib": return R.id.tvOffsetMaghrib;
-            case "Isha": return R.id.tvOffsetIsha;
-            default: return 0;
-        }
-    }
+
 
     private void setupAutoSilent(View view, SettingsManager sm) {
         SwitchMaterial swAutoSilent = view.findViewById(R.id.bsSwitchAutoSilent);
