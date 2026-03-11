@@ -253,6 +253,13 @@ public class PrayerSettingsBottomSheet extends BottomSheetDialogFragment {
             dismiss();
         });
 
+//        Button btnTestWorker = view.findViewById(R.id.btnTestWorker);
+//        btnTestWorker.setOnClickListener(v -> {
+//            androidx.work.OneTimeWorkRequest testRequest = new androidx.work.OneTimeWorkRequest.Builder(com.mosleemapp.app.workers.PrayerUpdateWorker.class).build();
+//            androidx.work.WorkManager.getInstance(requireContext()).enqueue(testRequest);
+//            android.widget.Toast.makeText(requireContext(), "Test Worker Queued", android.widget.Toast.LENGTH_SHORT).show();
+//        });
+//
         // Auto Silent Mode
         setupAutoSilent(view, settingsManager);
 

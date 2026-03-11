@@ -24,7 +24,7 @@ import com.mosleemapp.app.data.local.dao.CustomHabitDao;
 import com.mosleemapp.app.data.local.entity.CustomHabitEntity;
 import com.mosleemapp.app.data.local.entity.CustomHabitLogEntity;
 
-@Database(entities = { PrayerTimeEntity.class, SurahEntity.class, AyahEntity.class, HadithBookEntity.class, HadithEntity.class, DuaEntity.class, PrayerTrackerEntity.class, CustomHabitEntity.class, CustomHabitLogEntity.class }, version = 11, exportSchema = false)
+@Database(entities = { PrayerTimeEntity.class, SurahEntity.class, AyahEntity.class, HadithBookEntity.class, HadithEntity.class, DuaEntity.class, PrayerTrackerEntity.class, CustomHabitEntity.class, CustomHabitLogEntity.class }, version = 12, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract PrayerDao prayerDao();

@@ -101,6 +101,18 @@ public class QuranRepository {
         });
     }
 
+    public void getSajdaAyahs(Callback<List<AyahResponse.Ayah>> callback) {
+        executorService.execute(() -> {
+            List<AyahEntity> localAyahs = quranDao.getAyahsWithSajda();
+            if (localAyahs != null && !localAyahs.isEmpty()) {
+                List<AyahResponse.Ayah> mappedAyahs = mapEntitiesToAyahs(localAyahs);
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> callback.onSuccess(mappedAyahs));
+            } else {
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> callback.onError("No Sajda Ayahs found locally. Please download complete Quran data first."));
+            }
+        });
+    }
+
     private void fetchAyahsFromApi(int surahNumber, Callback<List<AyahResponse.Ayah>> callback) {
         String editions = "quran-uthmani,en.sahih,id.indonesian";
 

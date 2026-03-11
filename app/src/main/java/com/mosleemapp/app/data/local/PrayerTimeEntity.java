@@ -1,9 +1,10 @@
 package com.mosleemapp.app.data.local;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "prayer_times")
+@Entity(tableName = "prayer_times", indices = {@Index(value = {"date"}, unique = true)})
 public class PrayerTimeEntity {
     @PrimaryKey(autoGenerate = true)
     public int id;

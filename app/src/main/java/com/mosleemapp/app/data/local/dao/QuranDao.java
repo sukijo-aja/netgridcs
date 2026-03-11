@@ -24,6 +24,9 @@ public interface QuranDao {
     @Query("SELECT * FROM ayahs WHERE surahId = :surahId ORDER BY numberInSurah ASC")
     List<AyahEntity> getAyahsBySurahId(int surahId);
     
+    @Query("SELECT * FROM ayahs WHERE sajda = 1 ORDER BY number ASC")
+    List<AyahEntity> getAyahsWithSajda();
+    
     @Query("SELECT COUNT(*) FROM surahs")
     int getSurahCount();
     
