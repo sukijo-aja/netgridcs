@@ -149,7 +149,6 @@ public class SettingsFragment extends Fragment {
         Button btnLanguage = view.findViewById(R.id.btnLanguage);
         updateLanguageButtonText(btnLanguage);
         btnLanguage.setOnClickListener(v -> showLanguageDialog());
-        
 
         mAuth = FirebaseAuth.getInstance();
         tvUserId = view.findViewById(R.id.tvUserId);
@@ -302,8 +301,9 @@ public class SettingsFragment extends Fragment {
             db.quranDao().deleteAllSurahs();
             
             // Clear last read prefs
-            android.content.SharedPreferences prefs = requireContext().getSharedPreferences("config", android.content.Context.MODE_PRIVATE);
-            prefs.edit().remove("last_read_surah_number").remove("last_read_surah_name").apply();
+            com.mosleemapp.app.utils.AppPreference prefs = new com.mosleemapp.app.utils.AppPreference(requireContext());
+            prefs.remove("last_read_surah_number");
+            prefs.remove("last_read_surah_name");
 
             requireActivity().runOnUiThread(() -> {
                 Toast.makeText(requireContext(), "Data reset. Restart app or go to Home to re-fetch.", Toast.LENGTH_LONG).show();

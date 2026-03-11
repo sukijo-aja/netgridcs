@@ -2,7 +2,7 @@ package com.mosleemapp.app.utils;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.SharedPreferences;
+
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
@@ -45,17 +45,17 @@ public class LocaleHelper {
     }
 
     private static String getPersistedData(Context context, String defaultLanguage) {
-        SharedPreferences preferences = SettingsManager.getInstance(context).getSharedPreferences();
+        com.mosleemapp.app.utils.AppPreference preferences = SettingsManager.getInstance(context).getAppPreference();
         // Return null if not found, to detect if user has set a preference
-        if (!preferences.contains(SELECTED_LANGUAGE)) {
+        if (!preferences.checkKey(SELECTED_LANGUAGE)) {
             return defaultLanguage;
         }
         return preferences.getString(SELECTED_LANGUAGE, defaultLanguage);
     }
 
     private static void persist(Context context, String language) {
-        SharedPreferences preferences = SettingsManager.getInstance(context).getSharedPreferences();
-        preferences.edit().putString(SELECTED_LANGUAGE, language).apply();
+        com.mosleemapp.app.utils.AppPreference preferences = SettingsManager.getInstance(context).getAppPreference();
+        preferences.saveString(SELECTED_LANGUAGE, language);
     }
 
     @TargetApi(Build.VERSION_CODES.N)

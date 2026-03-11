@@ -32,16 +32,14 @@ public class SilentModeManager {
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         if (audioManager == null) return;
 
-        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        com.mosleemapp.app.utils.AppPreference prefs = new com.mosleemapp.app.utils.AppPreference(context, PREF_NAME);
 
         // Only save previous mode if we haven't already silenced (avoid overwriting stored mode)
         boolean alreadySilenced = prefs.getBoolean(KEY_IS_SILENCED_BY_APP, false);
         if (!alreadySilenced) {
             int currentMode = audioManager.getRingerMode();
-            prefs.edit()
-                    .putInt(KEY_PREVIOUS_RINGER_MODE, currentMode)
-                    .putBoolean(KEY_IS_SILENCED_BY_APP, true)
-                    .apply();
+            prefs.saveInt(KEY_PREVIOUS_RINGER_MODE, currentMode);
+            prefs.saveBoolean(KEY_IS_SILENCED_BY_APP, true);
             Log.d(TAG, "Saved previous ringer mode: " + currentMode);
         }
 
@@ -62,15 +60,13 @@ public class SilentModeManager {
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         if (audioManager == null) return;
 
-        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        com.mosleemapp.app.utils.AppPreference prefs = new com.mosleemapp.app.utils.AppPreference(context, PREF_NAME);
         boolean wasSilencedByApp = prefs.getBoolean(KEY_IS_SILENCED_BY_APP, false);
 
         if (wasSilencedByApp) {
             int previousMode = prefs.getInt(KEY_PREVIOUS_RINGER_MODE, AudioManager.RINGER_MODE_NORMAL);
             audioManager.setRingerMode(previousMode);
-            prefs.edit()
-                    .putBoolean(KEY_IS_SILENCED_BY_APP, false)
-                    .apply();
+            prefs.saveBoolean(KEY_IS_SILENCED_BY_APP, false);
             Log.d(TAG, "Ringer mode restored to: " + previousMode);
         } else {
             Log.d(TAG, "Ringer was not silenced by app, no restore needed");

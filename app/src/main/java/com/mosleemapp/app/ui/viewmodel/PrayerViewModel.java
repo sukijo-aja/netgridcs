@@ -74,8 +74,7 @@ public class PrayerViewModel extends AndroidViewModel {
     private void resolveCity(double lat, double lon) {
         new Thread(() -> {
             try {
-                android.location.Geocoder geocoder = new android.location.Geocoder(
-                        getApplication(), Locale.getDefault());
+                android.location.Geocoder geocoder = new android.location.Geocoder(getApplication(), Locale.getDefault());
                 List<android.location.Address> addresses = geocoder.getFromLocation(lat, lon, 1);
                 if (addresses != null && !addresses.isEmpty()) {
                     StringBuilder result = new StringBuilder();

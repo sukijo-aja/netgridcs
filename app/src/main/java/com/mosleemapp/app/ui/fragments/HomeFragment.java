@@ -135,23 +135,11 @@ public class HomeFragment extends Fragment {
         android.util.Log.d("SharedPreferencesLog", "--- START PREFS LOG ---");
         
         android.util.Log.d("SharedPreferencesLog", "[config]");
-        android.content.SharedPreferences configPrefs = requireContext().getSharedPreferences("config", Context.MODE_PRIVATE);
+        com.mosleemapp.app.utils.AppPreference configPrefs = new com.mosleemapp.app.utils.AppPreference(requireContext());
         for (java.util.Map.Entry<String, ?> entry : configPrefs.getAll().entrySet()) {
             android.util.Log.d("SharedPreferencesLog", entry.getKey() + " = " + entry.getValue());
         }
 
-        android.util.Log.d("SharedPreferencesLog", "[config]");
-        android.content.SharedPreferences moslemPrefs = requireContext().getSharedPreferences("config", Context.MODE_PRIVATE);
-        for (java.util.Map.Entry<String, ?> entry : moslemPrefs.getAll().entrySet()) {
-            android.util.Log.d("SharedPreferencesLog", entry.getKey() + " = " + entry.getValue());
-        }
-
-        android.util.Log.d("SharedPreferencesLog", "[settings]");
-        android.content.SharedPreferences settingsPrefs = requireContext().getSharedPreferences("settings", Context.MODE_PRIVATE);
-        for (java.util.Map.Entry<String, ?> entry : settingsPrefs.getAll().entrySet()) {
-            android.util.Log.d("SharedPreferencesLog", entry.getKey() + " = " + entry.getValue());
-        }
-        
         android.util.Log.d("SharedPreferencesLog", "--- END PREFS LOG ---");
     }
 
@@ -160,8 +148,7 @@ public class HomeFragment extends Fragment {
         if (binding == null) return;
         
         binding.tvGreeting.setText(R.string.assalamu_alaikum);
-        binding.tvUserName.setText("Mosleem");
-        
+
         try {
             ULocale locale = new ULocale("en@calendar=islamic");
             Calendar calendar = Calendar.getInstance(locale);
@@ -185,7 +172,7 @@ public class HomeFragment extends Fragment {
 
     private void updateLastRead() {
         if (getContext() == null) return;
-        SharedPreferences prefs = requireContext().getSharedPreferences("config", Context.MODE_PRIVATE);
+        com.mosleemapp.app.utils.AppPreference prefs = new com.mosleemapp.app.utils.AppPreference(requireContext());
         int lastReadSurahNumber = prefs.getInt("last_read_surah_number", -1);
         String lastReadSurahName = prefs.getString("last_read_surah_name", "");
         int lastReadAyahNumber = prefs.getInt("last_read_ayah_number", -1);

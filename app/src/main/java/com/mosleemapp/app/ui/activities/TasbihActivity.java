@@ -28,7 +28,7 @@ public class TasbihActivity extends BaseActivity {
     private static final String PREFS_NAME = "TasbihPrefs";
     private TasbihAdapter adapter;
     private List<TasbihItem> tasbihList;
-    private SharedPreferences prefs;
+    private com.mosleemapp.app.utils.AppPreference prefs;
     
     // Main UI Elements
     private TextView tvActiveName;
@@ -51,7 +51,7 @@ public class TasbihActivity extends BaseActivity {
 
         // OdometerCounterView handles its own view factory/animations internally
 
-        prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs = new com.mosleemapp.app.utils.AppPreference(this, PREFS_NAME);
 
         // Initialize Data
         initializeData();
@@ -62,7 +62,7 @@ public class TasbihActivity extends BaseActivity {
         
         btnSound.setOnClickListener(v -> {
             boolean isSoundEnabled = prefs.getBoolean("sound_enabled", true);
-            prefs.edit().putBoolean("sound_enabled", !isSoundEnabled).apply();
+            prefs.saveBoolean("sound_enabled", !isSoundEnabled);
             updateSoundIcon(btnSound);
         });
 
@@ -232,7 +232,7 @@ public class TasbihActivity extends BaseActivity {
     }
 
     private void saveCount(TasbihItem item) {
-        prefs.edit().putInt("count_" + item.getId(), item.getCount()).apply();
+        prefs.saveInt("count_" + item.getId(), item.getCount());
     }
     
     // Animation Logic

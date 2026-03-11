@@ -26,6 +26,14 @@ import com.mosleemapp.app.utils.LocaleHelper;
 
 import com.mosleemapp.app.ui.activities.BaseActivity;
 
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+import com.mosleemapp.app.workers.PrayerUpdateWorker;
+import java.util.concurrent.TimeUnit;
+
 public class MainActivity extends BaseActivity implements LocationManagerHelper.LocationListener {
 
     @Override
@@ -87,6 +95,21 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
         if (savedInstanceState == null) {
             loadFragment(new HomeFragment());
         }
+
+        // Schedule Background Prayer Update
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+                
+        PeriodicWorkRequest updateRequest = new PeriodicWorkRequest.Builder(
+                PrayerUpdateWorker.class, 24, TimeUnit.HOURS)
+                .setConstraints(constraints)
+                .build();
+                
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+                "PrayerUpdateWork",
+                ExistingPeriodicWorkPolicy.KEEP,
+                updateRequest);
 
         // Double back to exit
         getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
@@ -174,6 +197,5 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
     public void onLocationReceived(double latitude, double longitude) {
         prayerViewModel.updateLocation(latitude, longitude);
         Toast.makeText(this, R.string.location_updated, Toast.LENGTH_SHORT).show();
-        Log.d("MainActivity", "Latitude: " + latitude + ", Longitude: " + longitude);
     }
 }

@@ -38,19 +38,12 @@ public class PrayerRepository {
             if (localData != null) {
                 data.postValue(localData);
             } else {
-                // Return default data immediately so UI is not empty
                 PrayerTimeEntity defaultEntity = DefaultPrayerData.getDefault(date);
-                
-                // Persist it so it exists in the DB (resolves "prayer time not exist" issue)
                 prayerDao.insertPrayerTimes(Collections.singletonList(defaultEntity));
-                
                 data.postValue(defaultEntity);
-                
-                // Fetch from network
                 fetchFromNetwork(latitude, longitude, method, date, data);
             }
         });
-
         return data;
     }
 

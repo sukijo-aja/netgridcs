@@ -86,4 +86,8 @@ public class AppPreference {
     {
         return sharedPreferences.contains(key);
     }
+
+    public java.util.Map<String, ?> getAll() {
+        return sharedPreferences.getAll();
+    }
 }
