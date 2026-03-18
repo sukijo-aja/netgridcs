@@ -63,4 +63,8 @@
     <string name="next_prayer">Sholat Berikutnya</string>
     <string name="reminder_before_adhan_minutes">Pengingat Sebelum Adzan : %1$s menit</string>
     <string name="show_tajweed_colored_quran">Tampilkan Tajwid (Al-Qur\'an Berwarna)</string>
+    <string name="download_hadith">Unduh Semua Hadis (Offline)</string>
+    <string name="upcoming_prayer">Mendatang %1$s</string>
+    <string name="is_coming_soon">segera tiba</string>
+    <string name="its_time_for">Waktunya</string>
 </resources>

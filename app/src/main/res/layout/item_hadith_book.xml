@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:background="@color/teal_700"
+        android:background="@drawable/bg_card_green"
         >
         <TextView
             android:id="@+id/tvBookName"
@@ -22,7 +22,7 @@
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             />
 
         <TextView
@@ -34,7 +34,7 @@
             android:layout_marginTop="4dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvBookName"
-            android:textColor="@color/white"
+            android:textColor="@color/black"
             />
 
         <ImageView
@@ -44,7 +44,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:tint="@color/white"
+            app:tint="@color/black"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

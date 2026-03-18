@@ -1,7 +1,6 @@
 package com.mosleemapp.app.ui.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,18 +12,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.mosleemapp.app.R;
-import com.mosleemapp.app.data.models.HadithBookResponse;
-import com.mosleemapp.app.data.remote.HadithApiService;
+import com.mosleemapp.app.data.remote.Responses.HadithBookResponse;
 import com.mosleemapp.app.databinding.FragmentHadithBinding;
 import com.mosleemapp.app.ui.activities.HadithDetailActivity;
 import com.mosleemapp.app.ui.adapters.HadithBookAdapter;
 import android.content.Intent;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import androidx.appcompat.widget.SearchView;
 import java.util.ArrayList;

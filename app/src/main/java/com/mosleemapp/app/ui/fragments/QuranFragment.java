@@ -1,7 +1,6 @@
 package com.mosleemapp.app.ui.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,20 +14,11 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.mosleemapp.app.R;
-import com.mosleemapp.app.data.models.SurahResponse;
-import com.mosleemapp.app.data.remote.QuranApiService;
+import com.mosleemapp.app.data.remote.Responses.SurahResponse;
 import com.mosleemapp.app.databinding.FragmentQuranBinding;
 import com.mosleemapp.app.ui.activities.SurahDetailActivity;
 import com.mosleemapp.app.ui.adapters.SurahAdapter;
 import android.content.Intent;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import android.content.Context;
-import android.content.SharedPreferences;
 
 import androidx.appcompat.widget.SearchView;
 import java.util.ArrayList;
@@ -80,7 +70,7 @@ public class QuranFragment extends Fragment {
         // Fetch Data
         fetchSurahs();
         
-        loadNativeAd();
+        loadAd();
     }
 
     @Override
@@ -146,7 +136,7 @@ public class QuranFragment extends Fragment {
         binding = null;
     }
 
-    private void loadNativeAd() {
+    private void loadAd() {
         AdMobUtil.initialize(getContext());
         AdMobUtil.loadBanner(binding.adView);
     }

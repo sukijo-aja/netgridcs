@@ -74,9 +74,7 @@ public class HomeFragment extends Fragment {
             com.google.android.material.bottomnavigation.BottomNavigationView bottomNav =
                     requireActivity().findViewById(R.id.bottom_navigation);
 
-            if (item.getTitle().equals("Prayer")) {
-                bottomNav.setSelectedItemId(R.id.nav_prayer);
-            } else if (item.getTitle().equals("Quran")) {
+            if (item.getTitle().equals("Quran")) {
                 bottomNav.setSelectedItemId(R.id.nav_quran);
             } else if (item.getTitle().equals("Settings")) {
                 bottomNav.setSelectedItemId(R.id.nav_settings);
@@ -126,7 +124,7 @@ public class HomeFragment extends Fragment {
         loadNativeAd();
         updateLastRead();
         setupGreetingAndDate();
-        logAllSharedPreferences();
+       logAllSharedPreferences();
     }
 
     private void logAllSharedPreferences() {
@@ -137,7 +135,12 @@ public class HomeFragment extends Fragment {
         android.util.Log.d("SharedPreferencesLog", "[config]");
         com.mosleemapp.app.utils.AppPreference configPrefs = new com.mosleemapp.app.utils.AppPreference(requireContext());
         for (java.util.Map.Entry<String, ?> entry : configPrefs.getAll().entrySet()) {
-            android.util.Log.d("SharedPreferencesLog", entry.getKey() + " = " + entry.getValue());
+            if (entry.getKey().equals("lat") || entry.getKey().equals("lon")) {
+                android.util.Log.d("SharedPreferencesLog", entry.getKey() + " = " + Double.longBitsToDouble((long) entry.getValue()));
+            } else {
+                android.util.Log.d("SharedPreferencesLog", entry.getKey() + " = " + entry.getValue());
+            }
+
         }
 
         android.util.Log.d("SharedPreferencesLog", "--- END PREFS LOG ---");
@@ -221,7 +224,6 @@ public class HomeFragment extends Fragment {
     private void populateNativeAdView(NativeAd nativeAd, NativeAdView adView) {
         // Set the media view.
         adView.setMediaView(adView.findViewById(R.id.ad_media));
-
         // Set other ad assets.
         adView.setHeadlineView(adView.findViewById(R.id.ad_headline));
         adView.setBodyView(adView.findViewById(R.id.ad_body));

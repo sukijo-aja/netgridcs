@@ -12,13 +12,14 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.mosleemapp.app.databinding.ActivityMainBinding;
 import com.mosleemapp.app.ui.fragments.HadithFragment;
 import com.mosleemapp.app.ui.fragments.HomeFragment;
-import com.mosleemapp.app.ui.fragments.PrayerFragment;
 import com.mosleemapp.app.ui.fragments.QuranFragment;
 import com.mosleemapp.app.ui.fragments.SettingsFragment;
 import com.mosleemapp.app.ui.viewmodel.PrayerViewModel;
+import com.mosleemapp.app.utils.AppPreference;
 import com.mosleemapp.app.utils.LocationManagerHelper;
 
 import com.mosleemapp.app.utils.AdMobUtil;
@@ -32,10 +33,15 @@ import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import com.mosleemapp.app.workers.PrayerUpdateWorker;
+import com.mosleemapp.app.data.local.AppDatabase;
+import com.mosleemapp.app.data.repository.HadithRepository;
+import com.mosleemapp.app.data.repository.QuranRepository;
+
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends BaseActivity implements LocationManagerHelper.LocationListener {
 
+    private String TAG = "MainActivityy";
     @Override
     protected void attachBaseContext(android.content.Context newBase) {
         super.attachBaseContext(LocaleHelper.onAttach(newBase));
@@ -111,6 +117,36 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
                 ExistingPeriodicWorkPolicy.KEEP,
                 updateRequest);
 
+        // Try to download Quran & Hadith if not already available
+        tryDownloadAllResources();
+
+        // Initialize FCM Token in background
+        new Thread(() -> {
+            AppPreference appPref = new AppPreference(MainActivity.this);
+            String existingToken = appPref.getString("fcm_token", null);
+            Log.d(TAG, "Background Thread: Current saved FCM Token: " + (existingToken != null ? existingToken : "null"));
+
+            if (existingToken == null) {
+                Log.d(TAG, "Background Thread: Requesting new FCM Token...");
+                try {
+                    FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            String newToken = task.getResult();
+                            appPref.saveString("fcm_token", newToken);
+                            Log.d(TAG, "FCM Token successfully initialized: " + newToken);
+                        } else {
+                            Log.e(TAG, "FCM Token retrieval failed", task.getException());
+                        }
+                    });
+                } catch (Exception e) {
+                    Log.e(TAG, "Error during FirebaseMessaging.getInstance().getToken()", e);
+                }
+            }
+        }).start();
+
+
+
+
         // Double back to exit
         getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
             @Override
@@ -119,10 +155,8 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
                     finish();
                     return;
                 }
-
                 doubleBackToExitPressedOnce = true;
                 Toast.makeText(MainActivity.this, R.string.double_back_to_exit, Toast.LENGTH_SHORT).show();
-
                 new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
             }
         });
@@ -135,8 +169,6 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
             
             if (itemId == R.id.nav_home) {
                 selectedFragment = new HomeFragment();
-            } else if (itemId == R.id.nav_prayer) {
-                selectedFragment = new PrayerFragment();
             } else if (itemId == R.id.nav_quran) {
                 selectedFragment = new QuranFragment();
             } else if (itemId == R.id.nav_settings) {
@@ -152,6 +184,7 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
             return false;
         });
     }
+
 
     private void loadFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
@@ -197,5 +230,59 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
     public void onLocationReceived(double latitude, double longitude) {
         prayerViewModel.updateLocation(latitude, longitude);
         Toast.makeText(this, R.string.location_updated, Toast.LENGTH_SHORT).show();
+        AppPreference appPreference = new AppPreference(this);
+        appPreference.saveLong("lat", Double.doubleToRawLongBits(latitude));
+        appPreference.saveLong("lon", Double.doubleToRawLongBits(longitude));
+    }
+
+    private void tryDownloadAllResources() {
+        java.util.concurrent.ExecutorService executor = java.util.concurrent.Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            AppDatabase db = AppDatabase.getDatabase(this);
+
+            // Quran complete = 114 surahs
+            int surahCount = db.quranDao().getSurahCount();
+            boolean quranComplete = surahCount >= 114;
+
+            // Hadith complete = books exist AND hadiths exist
+            int bookCount = db.hadithDao().getBookCount();
+            int hadithCount = db.hadithDao().getTotalHadithCount();
+            boolean hadithComplete = bookCount > 0 && hadithCount > 0;
+
+            if (quranComplete && hadithComplete) {
+                Log.d(TAG, "Quran (" + surahCount + " surahs) and Hadith (" + hadithCount + " hadiths) are complete. Skipping download.");
+                return;
+            }
+
+            if (!quranComplete) {
+                Log.d(TAG, "Quran incomplete (" + surahCount + "/114 surahs). Starting download...");
+                QuranRepository quranRepo = new QuranRepository(this);
+                quranRepo.downloadAllData(new QuranRepository.Callback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean data) {
+                        Log.d(TAG, "Quran download complete.");
+                    }
+                    @Override
+                    public void onError(String message) {
+                        Log.w(TAG, "Quran download failed: " + message);
+                    }
+                });
+            }
+
+            if (!hadithComplete) {
+                Log.d(TAG, "Hadith incomplete (books=" + bookCount + ", hadiths=" + hadithCount + "). Starting download...");
+                HadithRepository hadithRepo = new HadithRepository(this);
+                hadithRepo.downloadAllData(new QuranRepository.Callback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean data) {
+                        Log.d(TAG, "Hadith download complete.");
+                    }
+                    @Override
+                    public void onError(String message) {
+                        Log.w(TAG, "Hadith download failed: " + message);
+                    }
+                });
+            }
+        });
     }
 }

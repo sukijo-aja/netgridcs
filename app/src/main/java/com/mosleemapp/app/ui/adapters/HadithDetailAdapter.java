@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mosleemapp.app.R;
-import com.mosleemapp.app.data.models.HadithDetailResponse;
+import com.mosleemapp.app.data.remote.Responses.HadithDetailResponse;
 import com.mosleemapp.app.utils.ShareUtil;
 
 import java.util.ArrayList;

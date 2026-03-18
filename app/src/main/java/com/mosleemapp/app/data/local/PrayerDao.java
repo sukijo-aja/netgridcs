@@ -20,4 +20,8 @@ public interface PrayerDao {
 
     @Query("DELETE FROM prayer_times")
     void clearAll();
+
+    @Query("DELETE FROM prayer_times")
+    void deleteAllPrayerTimes();
 }
+

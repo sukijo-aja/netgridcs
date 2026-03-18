@@ -17,17 +17,23 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.mosleemapp.app.R;
+import com.mosleemapp.app.data.local.AppDatabase;
+import com.mosleemapp.app.data.local.entity.CustomHabitEntity;
+import com.mosleemapp.app.data.repository.HadithRepository;
+import com.mosleemapp.app.data.repository.QuranRepository;
+import com.mosleemapp.app.ui.activities.LoginActivity;
 import com.mosleemapp.app.ui.dialogs.PrayerSettingsBottomSheet;
+import com.mosleemapp.app.ui.viewmodel.PrayerTrackerViewModel;
+import com.mosleemapp.app.ui.viewmodel.PrayerViewModel;
 import com.mosleemapp.app.utils.AdMobUtil;
-import com.mosleemapp.app.utils.AlarmScheduler;
+import com.mosleemapp.app.utils.AppPreference;
+import com.mosleemapp.app.utils.FirebaseUtil;
 import com.mosleemapp.app.utils.LocaleHelper;
 import com.mosleemapp.app.utils.SettingsManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import androidx.lifecycle.ViewModelProvider;
-import com.mosleemapp.app.ui.viewmodel.PrayerTrackerViewModel;
-import com.mosleemapp.app.data.local.entity.CustomHabitEntity;
 import android.widget.LinearLayout;
 import android.widget.ImageButton;
 
@@ -165,7 +171,12 @@ public class SettingsFragment extends Fragment {
         
         updateLoginUI();
         
+        Button btnCalculationMethod = view.findViewById(R.id.btnCalculationMethod);
+        updateCalculationMethodButtonText(btnCalculationMethod);
+        btnCalculationMethod.setOnClickListener(v -> showCalculationMethodDialog(btnCalculationMethod));
+
         btnLogin.setOnClickListener(v -> {
+
             if (mAuth.getCurrentUser() != null) {
                 // Logout
                 mAuth.signOut();
@@ -183,7 +194,7 @@ public class SettingsFragment extends Fragment {
                     }
                 );
 
-                com.mosleemapp.app.utils.AppPreference appPreference = new com.mosleemapp.app.utils.AppPreference(requireContext());
+                AppPreference appPreference = new AppPreference(requireContext());
                 appPreference.remove("UID");
                 appPreference.remove("USER_EMAIL");
                 appPreference.remove("USER_NAME");
@@ -192,7 +203,7 @@ public class SettingsFragment extends Fragment {
                 updateLoginUI();
             } else {
                 // Login
-                startActivity(new android.content.Intent(requireContext(), com.mosleemapp.app.ui.activities.LoginActivity.class));
+                startActivity(new android.content.Intent(requireContext(), LoginActivity.class));
             }
         });
 
@@ -201,7 +212,7 @@ public class SettingsFragment extends Fragment {
         tvUserId.setText("User ID: " + currentId);
 
         if ("Fetching...".equals(currentId)) {
-            com.mosleemapp.app.utils.FirebaseUtil.getInstance(requireContext()).getInstallationId(id -> {
+            FirebaseUtil.getInstance(requireContext()).getInstallationId(id -> {
                 if (isAdded()) {
                     if (id != null) {
                         tvUserId.setText("User ID: " + id);
@@ -245,6 +256,16 @@ public class SettingsFragment extends Fragment {
                     .setNegativeButton("Cancel", null)
                     .show();
         });
+
+//        Button btnDownloadHadith = view.findViewById(R.id.btnDownloadHadith);
+//        btnDownloadHadith.setOnClickListener(v -> {
+//            new AlertDialog.Builder(requireContext())
+//                    .setTitle(getString(R.string.download_hadith))
+//                    .setMessage("This will download all Hadith books for offline use. This may take several minutes.")
+//                    .setPositiveButton("Download", (dialog, which) -> startDownloadHadith())
+//                    .setNegativeButton("Cancel", null)
+//                    .show();
+//        });
     }
 
     @Override
@@ -276,14 +297,40 @@ public class SettingsFragment extends Fragment {
         }
     }
 
+    private void startDownloadHadith() {
+        android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(requireContext());
+        progressDialog.setMessage("Downloading Hadith Data... Please wait.");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        HadithRepository repository = new HadithRepository(requireContext());
+        repository.downloadAllData(new QuranRepository.Callback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean data) {
+                if (isAdded()) {
+                    progressDialog.dismiss();
+                    Toast.makeText(requireContext(), "Hadith Download Complete! You can now use Hadith offline.", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onError(String message) {
+                if (isAdded()) {
+                    progressDialog.dismiss();
+                    Toast.makeText(requireContext(), "Hadith Download Failed: " + message, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
     private void startDownloadAll() {
         android.app.ProgressDialog progressDialog = new android.app.ProgressDialog(requireContext());
         progressDialog.setMessage("Downloading Quran Data... Please wait.");
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        com.mosleemapp.app.data.repository.QuranRepository repository = new com.mosleemapp.app.data.repository.QuranRepository(requireContext());
-        repository.downloadAllData(new com.mosleemapp.app.data.repository.QuranRepository.Callback<Boolean>() {
+        QuranRepository repository = new QuranRepository(requireContext());
+        repository.downloadAllData(new QuranRepository.Callback<Boolean>() {
             @Override
             public void onSuccess(Boolean data) {
                  if (isAdded()) {
@@ -300,17 +347,18 @@ public class SettingsFragment extends Fragment {
                 }
             }
         });
+        startDownloadHadith();
     }
 
     private void resetData() {
         java.util.concurrent.ExecutorService executor = java.util.concurrent.Executors.newSingleThreadExecutor();
         executor.execute(() -> {
-            com.mosleemapp.app.data.local.AppDatabase db = com.mosleemapp.app.data.local.AppDatabase.getDatabase(requireContext());
+            AppDatabase db = AppDatabase.getDatabase(requireContext());
             db.quranDao().deleteAllAyahs();
             db.quranDao().deleteAllSurahs();
             
             // Clear last read prefs
-            com.mosleemapp.app.utils.AppPreference prefs = new com.mosleemapp.app.utils.AppPreference(requireContext());
+            AppPreference prefs = new AppPreference(requireContext());
             prefs.remove("last_read_surah_number");
             prefs.remove("last_read_surah_name");
 
@@ -368,4 +416,86 @@ public class SettingsFragment extends Fragment {
 
         builder.show();
     }
+
+    private void updateCalculationMethodButtonText(Button button) {
+        int method = SettingsManager.getInstance(requireContext()).getCalculationMethod();
+        String methodName = getMethodName(method);
+        button.setText("Calculation Method: " + methodName);
+    }
+
+    private String getMethodName(int method) {
+        switch (method) {
+            case 1: return "Univ. Islamic Sciences, Karachi";
+            case 2: return "ISNA (North America)";
+            case 3: return "Muslim World League (MWL)";
+            case 4: return "Umm Al-Qura, Makkah";
+            case 5: return "Egyptian General Authority";
+            case 7: return "Tehran";
+            case 8: return "Gulf Region";
+            case 9: return "Kuwait";
+            case 10: return "Qatar";
+            case 11: return "MUIS Singapore";
+            case 12: return "UOIF (France)";
+            case 13: return "Diyanet İşleri Başkanlığı (Turkey)";
+            case 14: return "Russia";
+            case 15: return "MWL (Worldwide)";
+            case 20: return "Kemenag Indonesia";
+            default: return "Method " + method;
+        }
+    }
+
+    private void showCalculationMethodDialog(Button button) {
+        final String[] methods = {
+            "Univ. Islamic Sciences, Karachi (1)",
+            "ISNA (North America) (2)",
+            "Muslim World League (MWL) (3)",
+            "Umm Al-Qura, Makkah (4)",
+            "Egyptian General Authority (5)",
+            "Tehran (7)",
+            "Gulf Region (8)",
+            "Kuwait (9)",
+            "Qatar (10)",
+            "MUIS Singapore (11)",
+            "UOIF (France) (12)",
+            "Diyanet İşleri Başkanlığı (Turkey) (13)",
+            "Russia (14)",
+            "MWL (Worldwide) (15)",
+            "Kemenag Indonesia (20)"
+        };
+        final int[] ids = {1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20};
+
+        int currentMethod = SettingsManager.getInstance(requireContext()).getCalculationMethod();
+        int checkedItem = -1;
+        for (int i = 0; i < ids.length; i++) {
+            if (ids[i] == currentMethod) {
+                checkedItem = i;
+                break;
+            }
+        }
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Select Calculation Method")
+                .setSingleChoiceItems(methods, checkedItem, (dialog, which) -> {
+                    int selectedId = ids[which];
+                    SettingsManager.getInstance(requireContext()).setCalculationMethod(selectedId);
+                    updateCalculationMethodButtonText(button);
+                    
+                    // Clear prayer cache to force re-fetch
+                    new Thread(() -> {
+                        AppDatabase.getDatabase(requireContext()).prayerDao().deleteAllPrayerTimes();
+                        // Trigger re-fetch in ViewModel
+                        requireActivity().runOnUiThread(() -> {
+                            PrayerViewModel prayerViewModel = new androidx.lifecycle.ViewModelProvider(requireActivity()).get(PrayerViewModel.class);
+                            prayerViewModel.fetchPrayerTimes();
+                        });
+                    }).start();
+                    
+                    Toast.makeText(requireContext(), "Method updated. Times refreshed.", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
 }
+

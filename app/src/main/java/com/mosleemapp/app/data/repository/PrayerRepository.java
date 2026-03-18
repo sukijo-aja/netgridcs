@@ -9,9 +9,9 @@ import com.mosleemapp.app.data.local.AppDatabase;
 import com.mosleemapp.app.data.local.PrayerDao;
 import com.mosleemapp.app.data.local.PrayerTimeEntity;
 import com.mosleemapp.app.data.local.DefaultPrayerData;
-import com.mosleemapp.app.data.remote.AladhanApiService;
+import com.mosleemapp.app.data.remote.services.AladhanApiService;
 import com.mosleemapp.app.data.remote.RetrofitClient;
-import com.mosleemapp.app.data.remote.model.PrayerResponse;
+import com.mosleemapp.app.data.remote.Responses.PrayerResponse;
 
 import java.util.Collections;
 

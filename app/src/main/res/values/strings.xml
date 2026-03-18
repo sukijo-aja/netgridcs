@@ -76,10 +76,11 @@
     <string name="last_read">Last Read</string>
     <string name="next_prayer">Next Prayer</string>
     <string name="reminder_before_adhan_minutes">Reminder Before Adhan : %1$s minutes</string>
+    <string name="show_tajweed_colored_quran">Show Tajweed (Colored Quran)</string>
+    <string name="download_hadith">Download All Hadith (Offline)</string>
 
 
     <!-- Google Sign-In Web Client ID -->
     <!-- Replace this with your actual Web Client ID from Firebase Console (Authentication -> Sign-in method -> Google -> Web SDK configuration) -->
     <string name="default_web_client_id" translatable="false">918294205518-r8nalp68nh18id7n8dgbn7l6hs65fr6c.apps.googleusercontent.com</string>
-    <string name="show_tajweed_colored_quran">Show Tajweed (Colored Quran)</string>
 </resources>

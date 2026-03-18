@@ -1,36 +1,35 @@
-package com.mosleemapp.app.data.models;
+package com.mosleemapp.app.data.remote.Responses;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
-public class AyahResponse {
+public class CompleteQuranResponse {
     @SerializedName("data")
-    public List<SurahDetail> data;
+    public Data data;
 
-    public static class SurahDetail {
+    public static class Data {
+        @SerializedName("surahs")
+        public List<Surah> surahs;
+    }
+
+    public static class Surah {
         public int number;
         public String name;
-        @SerializedName("englishName")
         public String englishName;
-        @SerializedName("englishNameTranslation")
         public String englishNameTranslation;
-        public int numberOfAyahs;
         public String revelationType;
-        @SerializedName("ayahs")
         public List<Ayah> ayahs;
     }
 
     public static class Ayah {
         public int number;
         public String text;
-        public String textTajweed;
         public int numberInSurah;
         public int juz;
         public int manzil;
         public int page;
         public int ruku;
         public int hizbQuarter;
-        public Object sajda;
-        public String translation;
+        public Object sajda; // Handle boolean/object polymorphism
     }
 }

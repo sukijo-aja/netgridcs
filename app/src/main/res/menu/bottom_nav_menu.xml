@@ -5,10 +5,6 @@
         android:title="@string/home"
         android:icon="@drawable/ic_home" />
     <item
-        android:id="@+id/nav_prayer"
-        android:title="@string/prayer"
-        android:icon="@drawable/ic_history" />
-    <item
         android:id="@+id/nav_quran"
         android:title="@string/al_quran"
         android:icon="@drawable/ic_quran" />

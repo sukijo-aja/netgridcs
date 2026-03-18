@@ -1,14 +1,15 @@
 package com.mosleemapp.app.data.repository;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.mosleemapp.app.data.local.AppDatabase;
 import com.mosleemapp.app.data.local.dao.HadithDao;
 import com.mosleemapp.app.data.local.entity.HadithBookEntity;
 import com.mosleemapp.app.data.local.entity.HadithEntity;
-import com.mosleemapp.app.data.models.HadithBookResponse;
-import com.mosleemapp.app.data.models.HadithDetailResponse;
-import com.mosleemapp.app.data.remote.HadithApiService;
+import com.mosleemapp.app.data.remote.Responses.HadithBookResponse;
+import com.mosleemapp.app.data.remote.Responses.HadithDetailResponse;
+import com.mosleemapp.app.data.remote.services.HadithApiService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,5 +157,59 @@ public class HadithRepository {
             hadiths.add(hadith);
         }
         return hadiths;
+    }
+
+    public void downloadAllData(QuranRepository.Callback<Boolean> callback) {
+        executorService.execute(() -> {
+            // Guard: skip if Hadith is already complete (books and hadiths exist)
+            int bookCount = hadithDao.getBookCount();
+            int hadithCount = hadithDao.getTotalHadithCount();
+            if (bookCount > 0 && hadithCount > 0) {
+                Log.d("HadithRepository", "Hadith already complete (books=" + bookCount + ", hadiths=" + hadithCount + "). Skipping download.");
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> callback.onSuccess(true));
+                return;
+            }
+
+            try {
+                // Step 1: Fetch book list
+                Response<HadithBookResponse> booksResponse = apiService.getBooks().execute();
+                if (!booksResponse.isSuccessful() || booksResponse.body() == null) {
+                    new android.os.Handler(android.os.Looper.getMainLooper()).post(
+                        () -> callback.onError("Failed to fetch Hadith book list"));
+                    return;
+                }
+
+                List<HadithBookResponse.HadithBook> books = booksResponse.body().data;
+                hadithDao.insertBooks(mapBooksToEntities(books));
+
+                // Step 2: For each book, fetch all hadiths
+                for (HadithBookResponse.HadithBook book : books) {
+                    try {
+                        // Skip this book if hadiths already exist
+                        int existing = hadithDao.getHadithCountByBookId(book.id);
+                        if (existing > 0) {
+                            Log.d("HadithRepository", "Book " + book.id + " already has " + existing + " hadiths. Skipping.");
+                            continue;
+                        }
+
+                        Response<HadithDetailResponse> detailResponse = apiService.getHadithByBook(book.id).execute();
+                        if (detailResponse.isSuccessful() && detailResponse.body() != null
+                                && detailResponse.body().data != null) {
+                            List<HadithDetailResponse.Hadith> hadiths = detailResponse.body().data.hadiths;
+                            hadithDao.insertHadiths(mapHadithsToEntities(hadiths, book.id));
+                        }
+                    } catch (Exception e) {
+                        // Skip this book on failure, continue with others
+                        e.printStackTrace();
+                    }
+                }
+
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> callback.onSuccess(true));
+            } catch (Exception e) {
+                e.printStackTrace();
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(
+                    () -> callback.onError("Error downloading Hadith: " + e.getMessage()));
+            }
+        });
     }
 }

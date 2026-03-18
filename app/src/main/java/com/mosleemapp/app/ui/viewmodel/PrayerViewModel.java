@@ -15,6 +15,7 @@ import com.mosleemapp.app.R;
 import com.mosleemapp.app.data.local.PrayerTimeEntity;
 import com.mosleemapp.app.data.repository.PrayerRepository;
 import com.mosleemapp.app.utils.AppPreference;
+import com.mosleemapp.app.utils.SettingsManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -55,9 +56,11 @@ public class PrayerViewModel extends AndroidViewModel {
 
     public void fetchPrayerTimes() {
         String date = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-        repository.getPrayerTimes(currentLat, currentLon, 11, date).observeForever(entity -> {
+        int method = SettingsManager.getInstance(getApplication()).getCalculationMethod();
+        repository.getPrayerTimes(currentLat, currentLon, method, date).observeForever(entity -> {
             prayerData.postValue(entity);
             if (entity != null) {
+
                 startCountdown(entity);
                 com.mosleemapp.app.utils.AlarmScheduler.schedulePrayerAlarms(getApplication(), entity);
             }

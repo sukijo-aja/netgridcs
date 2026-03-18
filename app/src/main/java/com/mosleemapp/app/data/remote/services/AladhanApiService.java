@@ -1,6 +1,6 @@
-package com.mosleemapp.app.data.remote;
+package com.mosleemapp.app.data.remote.services;
 
-import com.mosleemapp.app.data.remote.model.PrayerResponse;
+import com.mosleemapp.app.data.remote.Responses.PrayerResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;

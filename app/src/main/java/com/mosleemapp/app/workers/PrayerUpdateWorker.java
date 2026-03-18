@@ -9,9 +9,9 @@ import androidx.work.WorkerParameters;
 
 import com.mosleemapp.app.data.local.AppDatabase;
 import com.mosleemapp.app.data.local.PrayerTimeEntity;
-import com.mosleemapp.app.data.remote.AladhanApiService;
+import com.mosleemapp.app.data.remote.services.AladhanApiService;
 import com.mosleemapp.app.data.remote.RetrofitClient;
-import com.mosleemapp.app.data.remote.model.PrayerResponse;
+import com.mosleemapp.app.data.remote.Responses.PrayerResponse;
 import com.mosleemapp.app.utils.AlarmScheduler;
 import com.mosleemapp.app.utils.AppPreference;
 
@@ -36,8 +36,8 @@ public class PrayerUpdateWorker extends Worker {
         Log.d(TAG, "Starting periodic prayer time update");
         
         AppPreference prefs = new AppPreference(getApplicationContext());
-        double lat = prefs.getDouble("lat", 0.0);
-        double lon = prefs.getDouble("lon", 0.0);
+        double lat = Double.longBitsToDouble(prefs.getLong("lat",0L ));
+        double lon = Double.longBitsToDouble(prefs.getLong("lon",0L ));
 
         if (lat == 0.0 && lon == 0.0) {
             Log.w(TAG, "Coordinates not set. Cannot update prayer times.");
@@ -47,9 +47,11 @@ public class PrayerUpdateWorker extends Worker {
         String date = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
 
         try {
+            int method = com.mosleemapp.app.utils.SettingsManager.getInstance(getApplicationContext()).getCalculationMethod();
             AladhanApiService apiService = RetrofitClient.getRetrofitInstance().create(AladhanApiService.class);
-            // Defaulting method to 11 (MUIS), matching standard repo usage
-            Response<PrayerResponse> response = apiService.getPrayerTimes(date, lat, lon, 11).execute();
+            // Dynamic method selection
+            Response<PrayerResponse> response = apiService.getPrayerTimes(date, lat, lon, method).execute();
+
 
             if (response.isSuccessful() && response.body() != null && response.body().data != null) {
                 PrayerResponse.Timings timings = response.body().data.timings;

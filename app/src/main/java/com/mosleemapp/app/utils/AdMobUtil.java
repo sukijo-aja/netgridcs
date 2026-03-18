@@ -3,25 +3,22 @@ package com.mosleemapp.app.utils;
 import android.app.Activity;
 import android.content.Context;
 import androidx.annotation.NonNull;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.OnUserEarnedRewardListener;
+import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.appopen.AppOpenAd;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
-
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.OnUserEarnedRewardListener;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
-
-import com.google.android.gms.ads.AdLoader;
-import com.google.android.gms.ads.appopen.AppOpenAd;
-import com.google.android.gms.ads.nativead.NativeAd;
-import android.view.View;
-import com.google.android.gms.ads.AdListener;
 import com.mosleemapp.app.R;
+import android.view.View;
 
 public class AdMobUtil {
 
@@ -35,8 +32,21 @@ public class AdMobUtil {
         isPremiumUser = SettingsManager.getInstance(context).isPremium();
         if (isPremiumUser) return;
 
-        MobileAds.initialize(context, initializationStatus -> {
-        });
+        // Register test devices to suppress the native ad validator dialog.
+        // To add a physical device: run the app, check Logcat for:
+        // "Use RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("XXXXXX"))"
+        // then add that hash to the list below.
+        RequestConfiguration config = new RequestConfiguration.Builder()
+                .setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED)
+                .setTestDeviceIds(java.util.Arrays.asList(
+                        AdRequest.DEVICE_ID_EMULATOR,  // Emulator
+                        "fffb0c3c9eb6620d4", // Physical device
+                        "F202CD6826DBC7A6787AAC0C4C479683"
+                    ))
+                .build();
+        MobileAds.setRequestConfiguration(config);
+
+        MobileAds.initialize(context, initializationStatus -> {});
     }
     
     public static void setPremium(boolean isPremium) {
@@ -140,16 +150,16 @@ public class AdMobUtil {
         }
     }
 
-    public static void loadNativeAd(Context context, NativeAd.OnNativeAdLoadedListener listener) {
+    public static void loadNativeAd(Context context, com.google.android.gms.ads.nativead.NativeAd.OnNativeAdLoadedListener listener) {
         if (isPremiumUser) return;
-        
-        AdLoader adLoader = new AdLoader.Builder(context,
+
+        com.google.android.gms.ads.AdLoader adLoader = new com.google.android.gms.ads.AdLoader.Builder(context,
                 context.getString(R.string.admob_native_id))
                 .forNativeAd(listener)
                 .withAdListener(new AdListener() {
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                        // Handle failure
+                        // Handle failure silently
                     }
                 })
                 .build();

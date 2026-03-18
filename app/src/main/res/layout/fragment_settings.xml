@@ -81,6 +81,19 @@
             android:background="@drawable/bg_card_green"
             />
 
+        <Button
+            android:id="@+id/btnCalculationMethod"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Calculation Method"
+            android:textColor="@android:color/white"
+            android:drawableEnd="@android:drawable/ic_menu_info_details"
+            android:drawableTint="@android:color/white"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_card_green"
+            />
+
+
         <TextView
             android:id="@+id/labelFontSize"
             android:layout_width="wrap_content"
@@ -208,6 +221,19 @@
             android:drawableEnd="@android:drawable/stat_sys_download"
             android:drawableTint="@android:color/white"
             android:background="@drawable/bg_card_green"
+            android:layout_marginBottom="6dp"
+            />
+
+        <Button
+            android:id="@+id/btnDownloadHadith"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/download_hadith"
+            android:textColor="@android:color/white"
+            android:drawableEnd="@android:drawable/stat_sys_download"
+            android:drawableTint="@android:color/white"
+            android:background="@drawable/bg_card_green"
+            android:visibility="gone"
             />
 
 

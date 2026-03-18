@@ -21,13 +21,13 @@
         android:text="@string/manage_prayer_alarms"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="4dp" />
 
     <!-- Main Reminder Switch -->
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/bsSwitchReminder"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
+        android:layout_height="30dp"
         android:text="@string/enable_prayer_alarms"
         android:textSize="14sp"
         android:textStyle="bold"
@@ -54,12 +54,12 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#E0E0E0"
-        android:layout_marginBottom="12dp" />
+        android:layout_marginBottom="8dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPrayerSettings"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="220dp"
         android:layout_marginBottom="8dp"
         tools:listitem="@layout/item_prayer_setting"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />

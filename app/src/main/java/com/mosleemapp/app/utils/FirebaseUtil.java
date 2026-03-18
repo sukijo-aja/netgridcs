@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.installations.FirebaseInstallations;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 
@@ -92,7 +93,25 @@ public class FirebaseUtil {
             });
     }
     
+    /**
+     * Get Firebase Cloud Messaging Token
+     */
+    public void getFcmToken(TokenCallback callback) {
+        FirebaseMessaging.getInstance().getToken()
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    callback.onTokenReceived(task.getResult());
+                } else {
+                    callback.onTokenReceived(null);
+                }
+            });
+    }
+
     public interface InstallationIdCallback {
         void onIdReceived(String id);
+    }
+
+    public interface TokenCallback {
+        void onTokenReceived(String token);
     }
 }

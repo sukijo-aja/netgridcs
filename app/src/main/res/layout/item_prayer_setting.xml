@@ -14,7 +14,7 @@
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switchPrayer"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:layout_weight="1"
             android:text="Prayer Name"
             />

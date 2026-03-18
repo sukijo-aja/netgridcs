@@ -1,4 +1,4 @@
-package com.mosleemapp.app.data.models;
+package com.mosleemapp.app.data.remote.Responses;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.List;

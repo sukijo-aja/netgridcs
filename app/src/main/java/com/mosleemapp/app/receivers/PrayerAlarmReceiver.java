@@ -55,7 +55,10 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
             return;
         }
 
-        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
+        if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())||
+                Intent.ACTION_TIME_CHANGED.equals(intent.getAction()) ||
+                Intent.ACTION_TIMEZONE_CHANGED.equals(intent.getAction()) ||
+                Intent.ACTION_PACKAGE_REPLACED.equals(intent.getAction())) {
             SettingsManager sm = SettingsManager.getInstance(context);
             if (sm.isReminderEnabled()) {
                 AlarmScheduler.schedulePrayerAlarms(context, null);

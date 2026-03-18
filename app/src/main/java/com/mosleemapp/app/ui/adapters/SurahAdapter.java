@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mosleemapp.app.R;
-import com.mosleemapp.app.data.models.SurahResponse;
+import com.mosleemapp.app.data.remote.Responses.SurahResponse;
 import com.mosleemapp.app.databinding.ItemSurahBinding;
 import java.util.ArrayList;
 import java.util.List;

@@ -3,6 +3,8 @@ package com.mosleemapp.app.ui.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
+
 import androidx.appcompat.app.AppCompatActivity;
 import com.mosleemapp.app.MainActivity;
 import com.mosleemapp.app.R;
@@ -18,6 +20,7 @@ public class SplashActivity extends AppCompatActivity {
 
         new Handler().postDelayed(() -> {
             Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
             startActivity(intent);
             finish();
         }, SPLASH_DELAY);

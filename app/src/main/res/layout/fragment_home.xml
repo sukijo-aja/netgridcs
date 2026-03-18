@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_home_gradient">
+    android:background="@drawable/bg_gradient_home">
 
     <TextView
         android:id="@+id/tvTitle"
@@ -122,8 +122,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="12dp"
+            android:background="@drawable/bg_gradient_left_to_right"
             android:gravity="center">
-            
+
             <TextView
                 android:text="Next Prayer"
                 android:textColor="#FFFFFF"
@@ -145,7 +146,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="-00:45:00"
-                android:textColor="#FFD54F"
+                android:textColor="@color/accent_gold"
                 android:textSize="16sp"
                 android:layout_marginTop="8dp"/>
         </LinearLayout>

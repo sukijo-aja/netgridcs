@@ -27,6 +27,9 @@ public interface HadithDao {
     @Query("SELECT COUNT(*) FROM hadith_books")
     int getBookCount();
     
+    @Query("SELECT COUNT(*) FROM hadiths")
+    int getTotalHadithCount();
+    
     @Query("SELECT COUNT(*) FROM hadiths WHERE bookId = :bookId")
     int getHadithCountByBookId(String bookId);
 }

@@ -10,8 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mosleemapp.app.R;
-import com.mosleemapp.app.data.models.AyahResponse;
+import com.mosleemapp.app.data.remote.Responses.AyahResponse;
+import com.mosleemapp.app.utils.SettingsManager;
 import com.mosleemapp.app.utils.ShareUtil;
+import com.mosleemapp.app.utils.TajweedHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,16 +62,16 @@ public class AyahAdapter extends RecyclerView.Adapter<AyahAdapter.AyahViewHolder
         public void bind(AyahResponse.Ayah ayah) {
             tvAyahNumber.setText(String.valueOf(ayah.numberInSurah));
             
-            boolean isTajweed = com.mosleemapp.app.utils.SettingsManager.getInstance(itemView.getContext()).isTajweedEnabled();
+            boolean isTajweed = SettingsManager.getInstance(itemView.getContext()).isTajweedEnabled();
             if (isTajweed && ayah.textTajweed != null) {
-                tvAyahText.setText(com.mosleemapp.app.utils.TajweedHelper.parseTajweed(ayah.textTajweed));
+                tvAyahText.setText(TajweedHelper.parseTajweed(ayah.textTajweed));
             } else {
                 tvAyahText.setText(ayah.text);
             }
             
             tvAyahTranslation.setText(ayah.translation);
 
-            float fontSize = com.mosleemapp.app.utils.SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
+            float fontSize = SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
             tvAyahText.setTextSize(fontSize);
 
             btnShare.setOnClickListener(v -> {

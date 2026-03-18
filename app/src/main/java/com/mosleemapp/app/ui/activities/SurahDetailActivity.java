@@ -1,8 +1,6 @@
 package com.mosleemapp.app.ui.activities;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -20,15 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mosleemapp.app.R;
-import com.mosleemapp.app.data.models.AyahResponse;
-import com.mosleemapp.app.data.models.SurahResponse;
-import com.mosleemapp.app.data.remote.QuranApiService;
-import com.mosleemapp.app.data.remote.RetrofitClient;
+import com.mosleemapp.app.data.remote.Responses.AyahResponse;
+import com.mosleemapp.app.data.remote.Responses.SurahResponse;
 import com.mosleemapp.app.ui.adapters.AyahAdapter;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import com.mosleemapp.app.data.repository.QuranRepository;
 
@@ -65,13 +57,25 @@ public class SurahDetailActivity extends AppCompatActivity {
         surahNumber = getIntent().getIntExtra(EXTRA_SURAH_NUMBER, 1);
         surahName = getIntent().getStringExtra(EXTRA_SURAH_NAME);
 
+
         loadAllSurahs();
         updateHeader();
         setupRecyclerView();
         setupListeners();
         fetchAyahs(surahNumber);
     }
-    
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadAd();
+    }
+
+    private void loadAd() {
+        com.google.android.gms.ads.AdView adView = findViewById(R.id.adView);
+        com.mosleemapp.app.utils.AdMobUtil.loadBanner(adView);
+    }
+
     private void updateHeader() {
         if (surahName != null) {
             tvSurahNameTitle.setText(surahName);

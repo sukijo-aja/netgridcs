@@ -3,17 +3,15 @@ package com.mosleemapp.app.data.repository;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
 import com.mosleemapp.app.data.local.AppDatabase;
 import com.mosleemapp.app.data.local.dao.QuranDao;
 import com.mosleemapp.app.data.local.entity.AyahEntity;
 import com.mosleemapp.app.data.local.entity.SurahEntity;
-import com.mosleemapp.app.data.models.AyahResponse;
-import com.mosleemapp.app.data.models.SurahResponse;
-import com.mosleemapp.app.data.remote.QuranApiService;
-import com.mosleemapp.app.data.remote.RetrofitClient;
+import com.mosleemapp.app.data.remote.Responses.AyahResponse;
+import com.mosleemapp.app.data.remote.Responses.SurahResponse;
+import com.mosleemapp.app.data.remote.services.QuranApiService;
+import com.mosleemapp.app.data.remote.Responses.CompleteQuranResponse;
+import com.mosleemapp.app.utils.DnsHelper;
 import com.mosleemapp.app.utils.LocaleHelper;
 
 import java.util.ArrayList;
@@ -22,7 +20,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -42,7 +39,7 @@ public class QuranRepository {
         executorService = Executors.newSingleThreadExecutor();
         
         okhttp3.OkHttpClient client = new okhttp3.OkHttpClient.Builder()
-                .dns(com.mosleemapp.app.data.remote.DnsHelper.createGoogleDns())
+                .dns(DnsHelper.createGoogleDns())
                 .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
                 .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
                 .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
@@ -260,35 +257,43 @@ public class QuranRepository {
 
     public void downloadAllData(Callback<Boolean> callback) {
         executorService.execute(() -> {
+            // Guard: skip if Quran is already complete (114 surahs)
+            int surahCount = quranDao.getSurahCount();
+            if (surahCount >= 114) {
+                Log.d("QuranRepository", "Quran already complete (" + surahCount + " surahs). Skipping download.");
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> callback.onSuccess(true));
+                return;
+            }
+
             try {
                 // 1. Fetch Arabic (quran-uthmani) - BASE
-                Response<com.mosleemapp.app.data.models.CompleteQuranResponse> arResponse = apiService.getCompleteQuran("quran-uthmani").execute();
+                Response<CompleteQuranResponse> arResponse = apiService.getCompleteQuran("quran-uthmani").execute();
                 if (!arResponse.isSuccessful() || arResponse.body() == null) {
                     new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> callback.onError("Failed to fetch Arabic data"));
                     return;
                 }
 
                 // 2. Fetch English (en.sahih)
-                Response<com.mosleemapp.app.data.models.CompleteQuranResponse> enResponse = apiService.getCompleteQuran("en.sahih").execute();
+                Response<CompleteQuranResponse> enResponse = apiService.getCompleteQuran("en.sahih").execute();
                 
                 // 3. Fetch Indonesian (id.indonesian)
-                Response<com.mosleemapp.app.data.models.CompleteQuranResponse> idResponse = apiService.getCompleteQuran("id.indonesian").execute();
+                Response<CompleteQuranResponse> idResponse = apiService.getCompleteQuran("id.indonesian").execute();
 
                 // 4. Fetch Tajweed (quran-tajweed)
-                Response<com.mosleemapp.app.data.models.CompleteQuranResponse> tjResponse = apiService.getCompleteQuran("quran-tajweed").execute();
+                Response<CompleteQuranResponse> tjResponse = apiService.getCompleteQuran("quran-tajweed").execute();
 
-                List<com.mosleemapp.app.data.models.CompleteQuranResponse.Surah> arSurahs = arResponse.body().data.surahs;
-                List<com.mosleemapp.app.data.models.CompleteQuranResponse.Surah> enSurahs = (enResponse.isSuccessful() && enResponse.body() != null) ? enResponse.body().data.surahs : null;
-                List<com.mosleemapp.app.data.models.CompleteQuranResponse.Surah> idSurahs = (idResponse.isSuccessful() && idResponse.body() != null) ? idResponse.body().data.surahs : null;
-                List<com.mosleemapp.app.data.models.CompleteQuranResponse.Surah> tjSurahs = (tjResponse.isSuccessful() && tjResponse.body() != null) ? tjResponse.body().data.surahs : null;
+                List<CompleteQuranResponse.Surah> arSurahs = arResponse.body().data.surahs;
+                List<CompleteQuranResponse.Surah> enSurahs = (enResponse.isSuccessful() && enResponse.body() != null) ? enResponse.body().data.surahs : null;
+                List<CompleteQuranResponse.Surah> idSurahs = (idResponse.isSuccessful() && idResponse.body() != null) ? idResponse.body().data.surahs : null;
+                List<CompleteQuranResponse.Surah> tjSurahs = (tjResponse.isSuccessful() && tjResponse.body() != null) ? tjResponse.body().data.surahs : null;
 
                 // Prepare Entities
                 List<SurahEntity> surahEntities = new ArrayList<>();
                 List<AyahEntity> ayahEntities = new ArrayList<>();
 
                 for (int i = 0; i < arSurahs.size(); i++) {
-                    com.mosleemapp.app.data.models.CompleteQuranResponse.Surah arSurah = arSurahs.get(i);
-                    com.mosleemapp.app.data.models.CompleteQuranResponse.Surah enSurah = (enSurahs != null && i < enSurahs.size()) ? enSurahs.get(i) : null;
+                    CompleteQuranResponse.Surah arSurah = arSurahs.get(i);
+                    CompleteQuranResponse.Surah enSurah = (enSurahs != null && i < enSurahs.size()) ? enSurahs.get(i) : null;
                     
                     // Map Surah
                     SurahEntity surahEntity = new SurahEntity();
@@ -300,9 +305,18 @@ public class QuranRepository {
                     surahEntity.revelationType = arSurah.revelationType;
                     surahEntities.add(surahEntity);
 
+                    // Skip this surah if ayahs are already complete
+                    int expectedAyahs = arSurah.ayahs.size();
+                    int existingAyahs = quranDao.getAyahCountBySurahId(arSurah.number);
+                    if (existingAyahs >= expectedAyahs) {
+                        Log.d("QuranRepository", "Surah " + arSurah.number + " already complete (" + existingAyahs + " ayahs). Skipping.");
+                        surahEntities.add(surahEntity); // still track surah entity
+                        continue;
+                    }
+
                     // Map Ayahs
                     for (int j = 0; j < arSurah.ayahs.size(); j++) {
-                        com.mosleemapp.app.data.models.CompleteQuranResponse.Ayah arAyah = arSurah.ayahs.get(j);
+                        CompleteQuranResponse.Ayah arAyah = arSurah.ayahs.get(j);
                         AyahEntity ayahEntity = new AyahEntity();
                         ayahEntity.surahId = arSurah.number;
                         ayahEntity.number = arAyah.number;
@@ -327,14 +341,14 @@ public class QuranRepository {
                         }
                         
                         if (idSurahs != null && i < idSurahs.size()) {
-                             com.mosleemapp.app.data.models.CompleteQuranResponse.Surah idSurah = idSurahs.get(i);
+                             CompleteQuranResponse.Surah idSurah = idSurahs.get(i);
                              if (j < idSurah.ayahs.size()) {
                                  ayahEntity.translationId = idSurah.ayahs.get(j).text;
                              }
                         }
 
                         if (tjSurahs != null && i < tjSurahs.size()) {
-                             com.mosleemapp.app.data.models.CompleteQuranResponse.Surah tjSurah = tjSurahs.get(i);
+                             CompleteQuranResponse.Surah tjSurah = tjSurahs.get(i);
                              if (j < tjSurah.ayahs.size()) {
                                  ayahEntity.textTajweed = tjSurah.ayahs.get(j).text;
                              }

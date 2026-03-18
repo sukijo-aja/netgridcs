@@ -1,6 +1,6 @@
-package com.mosleemapp.app.data.remote;
+package com.mosleemapp.app.data.remote.services;
 
-import com.mosleemapp.app.data.remote.model.DuaResponse;
+import com.mosleemapp.app.data.remote.Responses.DuaResponse;
 
 import java.util.List;
 

@@ -11,10 +11,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.mosleemapp.app.databinding.FragmentPrayerBinding;
-import com.mosleemapp.app.ui.PrayerAdapter;
+import com.mosleemapp.app.ui.adapters.PrayerAdapter;
 import com.mosleemapp.app.ui.viewmodel.PrayerViewModel;
 
-import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;

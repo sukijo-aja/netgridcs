@@ -1,7 +1,7 @@
-package com.mosleemapp.app.data.remote;
+package com.mosleemapp.app.data.remote.services;
 
-import com.mosleemapp.app.data.models.HadithBookResponse;
-import com.mosleemapp.app.data.models.HadithDetailResponse;
+import com.mosleemapp.app.data.remote.Responses.HadithBookResponse;
+import com.mosleemapp.app.data.remote.Responses.HadithDetailResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 

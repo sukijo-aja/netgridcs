@@ -1,7 +1,6 @@
 package com.mosleemapp.app.ui.activities;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -13,15 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mosleemapp.app.R;
-import com.mosleemapp.app.data.models.HadithDetailResponse;
-import com.mosleemapp.app.data.remote.HadithApiService;
+import com.mosleemapp.app.data.remote.Responses.HadithDetailResponse;
 import com.mosleemapp.app.ui.adapters.HadithDetailAdapter;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import com.mosleemapp.app.data.repository.HadithRepository;
 import com.mosleemapp.app.data.repository.QuranRepository;
@@ -93,4 +85,16 @@ public class HadithDetailActivity extends AppCompatActivity {
             rvHadithDetail.setVisibility(View.VISIBLE);
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadAd();
+    }
+
+    private void loadAd() {
+        com.google.android.gms.ads.AdView adView = findViewById(R.id.adView);
+        com.mosleemapp.app.utils.AdMobUtil.loadBanner(adView);
+    }
+
 }

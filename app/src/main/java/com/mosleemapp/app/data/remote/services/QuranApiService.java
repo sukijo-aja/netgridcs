@@ -1,7 +1,9 @@
-package com.mosleemapp.app.data.remote;
+package com.mosleemapp.app.data.remote.services;
 
-import com.mosleemapp.app.data.models.AyahResponse;
-import com.mosleemapp.app.data.models.SurahResponse;
+import com.mosleemapp.app.data.remote.Responses.AyahResponse;
+import com.mosleemapp.app.data.remote.Responses.SurahResponse;
+import com.mosleemapp.app.data.remote.Responses.CompleteQuranResponse;
+
 import retrofit2.Call;
 import retrofit2.http.GET;
 
@@ -13,5 +15,5 @@ public interface QuranApiService {
     Call<AyahResponse> getSurahDetail(@retrofit2.http.Path("number") int number, @retrofit2.http.Path("editions") String editions);
 
     @GET("quran/{edition}")
-    Call<com.mosleemapp.app.data.models.CompleteQuranResponse> getCompleteQuran(@retrofit2.http.Path("edition") String edition);
+    Call<CompleteQuranResponse> getCompleteQuran(@retrofit2.http.Path("edition") String edition);
 }

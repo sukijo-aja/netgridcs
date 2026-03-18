@@ -1,4 +1,4 @@
-package com.mosleemapp.app.data.remote;
+package com.mosleemapp.app.utils;
 
 import okhttp3.Dns;
 import okhttp3.HttpUrl;

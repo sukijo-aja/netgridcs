@@ -4,7 +4,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.mosleemapp.app.data.models.HadithBookResponse;
+import com.mosleemapp.app.data.remote.Responses.HadithBookResponse;
 import com.mosleemapp.app.databinding.ItemHadithBookBinding;
 import java.util.ArrayList;
 import java.util.List;

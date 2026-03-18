@@ -63,4 +63,8 @@
     <string name="next_prayer">الصلاة القادمة</string>
     <string name="reminder_before_adhan_minutes">التذكير قبل الأذان : %1$s دقيقة</string>
     <string name="show_tajweed_colored_quran">إظهار التجويد (قرآن ملون)</string>
+    <string name="download_hadith">تنزيل جميع الأحاديث (بدون إنترنت)</string>
+    <string name="upcoming_prayer">الصلاة القادمة %1$s</string>
+    <string name="is_coming_soon">ستأتي قريباً</string>
+    <string name="its_time_for">حان وقت</string>
 </resources>

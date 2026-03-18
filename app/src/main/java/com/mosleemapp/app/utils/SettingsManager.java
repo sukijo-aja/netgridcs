@@ -133,4 +133,13 @@ public class SettingsManager {
                 }
             });
     }
+
+    public int getCalculationMethod() {
+        return appPreference.getInt("calculation_method", 20); // Default to MUIS
+    }
+
+    public void setCalculationMethod(int method) {
+        appPreference.saveInt("calculation_method", method);
+    }
 }
+
