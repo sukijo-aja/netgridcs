@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mosleemapp.app.R;
+import com.mosleemapp.app.utils.app.SettingsManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ public class PrayerAdapter extends RecyclerView.Adapter<PrayerAdapter.PrayerView
     public void onBindViewHolder(@NonNull PrayerViewHolder holder, int position) {
         PrayerItem item = prayerList.get(position);
         
-        com.mosleemapp.app.utils.SettingsManager sm = com.mosleemapp.app.utils.SettingsManager.getInstance(holder.itemView.getContext());
+        SettingsManager sm = SettingsManager.getInstance(holder.itemView.getContext());
         
         // Calculate adjusted time
         int correction = sm.getPrayerTimeCorrection(item.name);

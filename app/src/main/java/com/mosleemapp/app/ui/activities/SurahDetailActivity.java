@@ -119,7 +119,7 @@ public class SurahDetailActivity extends AppCompatActivity {
 //                        // try indonesian
 //                        String currentLang = com.mosleemapp.app.utils.LocaleHelper.getLanguage(this);
 //                        if ("in".equals(currentLang)) {
-//                             surahName = com.mosleemapp.app.utils.SurahTranslationHelper.getIndonesianTranslation(surahNumber);
+//                             surahName = com.mosleemapp.app.utils.app.SurahTranslationHelper.getIndonesianTranslation(surahNumber);
 //                        } else {
                             surahName = s.englishName;
 //                        }

@@ -18,6 +18,8 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.mosleemapp.app.R;
+import com.mosleemapp.app.utils.app.SettingsManager;
+
 import android.view.View;
 
 public class AdMobUtil {

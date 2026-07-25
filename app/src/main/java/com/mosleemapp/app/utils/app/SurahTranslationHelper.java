@@ -1,4 +1,4 @@
-package com.mosleemapp.app.utils;
+package com.mosleemapp.app.utils.app;
 
 public class SurahTranslationHelper {
 

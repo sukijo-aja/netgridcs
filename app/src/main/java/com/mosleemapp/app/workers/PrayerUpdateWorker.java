@@ -14,6 +14,7 @@ import com.mosleemapp.app.data.remote.RetrofitClient;
 import com.mosleemapp.app.data.remote.Responses.PrayerResponse;
 import com.mosleemapp.app.utils.AlarmScheduler;
 import com.mosleemapp.app.utils.AppPreference;
+import com.mosleemapp.app.utils.app.SettingsManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -47,7 +48,7 @@ public class PrayerUpdateWorker extends Worker {
         String date = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
 
         try {
-            int method = com.mosleemapp.app.utils.SettingsManager.getInstance(getApplicationContext()).getCalculationMethod();
+            int method = SettingsManager.getInstance(getApplicationContext()).getCalculationMethod();
             AladhanApiService apiService = RetrofitClient.getRetrofitInstance().create(AladhanApiService.class);
             // Dynamic method selection
             Response<PrayerResponse> response = apiService.getPrayerTimes(date, lat, lon, method).execute();

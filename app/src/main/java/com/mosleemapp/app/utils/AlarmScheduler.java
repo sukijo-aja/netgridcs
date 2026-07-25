@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.mosleemapp.app.data.local.PrayerTimeEntity;
 import com.mosleemapp.app.receivers.PrayerAlarmReceiver;
+import com.mosleemapp.app.utils.app.SettingsManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

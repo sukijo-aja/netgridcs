@@ -1,8 +1,9 @@
-package com.mosleemapp.app.utils;
+package com.mosleemapp.app.utils.app;
 
 import android.content.Context;
 
 import com.google.firebase.installations.FirebaseInstallations;
+import com.mosleemapp.app.utils.AppPreference;
 
 
 public class SettingsManager {
@@ -42,6 +43,14 @@ public class SettingsManager {
 
     public void setTajweedEnabled(boolean enabled) {
         appPreference.saveBoolean("show_tajweed", enabled);
+    }
+
+    public boolean isShowTranslationEnabled() {
+        return appPreference.getBoolean("show_translation", true);
+    }
+
+    public void setShowTranslationEnabled(boolean enabled) {
+        appPreference.saveBoolean("show_translation", enabled);
     }
 
     public boolean isReminderEnabled() {

@@ -11,11 +11,10 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.mosleemapp.app.R;
 import com.mosleemapp.app.data.local.PrayerTimeEntity;
 import com.mosleemapp.app.data.repository.PrayerRepository;
 import com.mosleemapp.app.utils.AppPreference;
-import com.mosleemapp.app.utils.SettingsManager;
+import com.mosleemapp.app.utils.app.SettingsManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -27,6 +26,7 @@ public class PrayerViewModel extends AndroidViewModel {
     private PrayerRepository repository;
     private final MutableLiveData<PrayerTimeEntity> prayerData = new MutableLiveData<>();
     private final MutableLiveData<String> nextPrayerName = new MutableLiveData<>();
+    private final MutableLiveData<String> nextPrayerTime = new MutableLiveData<>();
     private final MutableLiveData<String> currentPrayerName = new MutableLiveData<>();
     private final MutableLiveData<String> nextPrayerTimeRemaining = new MutableLiveData<>();
     private final MutableLiveData<String> cityName = new MutableLiveData<>();
@@ -72,6 +72,7 @@ public class PrayerViewModel extends AndroidViewModel {
     }
     
     public LiveData<String> getNextPrayerName() { return nextPrayerName; }
+    public LiveData<String> getNextPrayerTime() { return nextPrayerTime; }
     public LiveData<String> getCurrentPrayerName() { return currentPrayerName; }
     public LiveData<String> getNextPrayerTimeRemaining() { return nextPrayerTimeRemaining; }
     public LiveData<String> getCityName() { return cityName; }
@@ -110,6 +111,7 @@ public class PrayerViewModel extends AndroidViewModel {
                     String[] prayerTimes = {entity.fajr, entity.dhuhr, entity.asr, entity.maghrib, entity.isha};
                     
                     String nextName = "Fajr (Tomorrow)";
+                    String nextTime = entity.fajr != null ? entity.fajr.split(" ")[0] : "";
                     long minDiff = Long.MAX_VALUE;
                     
                     for (int i = 0; i < prayerTimes.length; i++) {
@@ -126,6 +128,7 @@ public class PrayerViewModel extends AndroidViewModel {
                             if (diff > 0 && diff < minDiff) {
                                 minDiff = diff;
                                 nextName = prayerNames[i];
+                                nextTime = cleanTime;
                             }
                         }
                     }
@@ -143,6 +146,7 @@ public class PrayerViewModel extends AndroidViewModel {
                                 pTime.set(Calendar.SECOND, 0);
                                 minDiff = pTime.getTimeInMillis() - now.getTimeInMillis();
                                 nextName = "Fajr";
+                                nextTime = cleanTime;
                             }
                         }
                     }
@@ -163,6 +167,7 @@ public class PrayerViewModel extends AndroidViewModel {
                         @SuppressLint("DefaultLocale") String timeRemaining = String.format("-%02d:%02d:%02d", elapsedHours, elapsedMinutes, elapsedSeconds);
                         
                         nextPrayerName.postValue(nextName);
+                        nextPrayerTime.postValue(nextTime);
                         currentPrayerName.postValue(calculateCurrentPrayer(nextName));
                         nextPrayerTimeRemaining.postValue(timeRemaining);
                     }

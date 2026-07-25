@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.mosleemapp.app.R;
 import com.mosleemapp.app.data.remote.Responses.HadithDetailResponse;
 import com.mosleemapp.app.utils.ShareUtil;
+import com.mosleemapp.app.utils.app.SettingsManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class HadithDetailAdapter extends RecyclerView.Adapter<HadithDetailAdapte
             tvHadithArabic.setText(hadith.arab);
             tvHadithTranslation.setText(hadith.id);
 
-            float fontSize = com.mosleemapp.app.utils.SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
+            float fontSize = SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
             tvHadithArabic.setTextSize(fontSize);
 
             btnShare.setOnClickListener(v -> {

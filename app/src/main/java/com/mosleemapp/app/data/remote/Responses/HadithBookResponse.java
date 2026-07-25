@@ -1,18 +1,15 @@
 package com.mosleemapp.app.data.remote.Responses;
 
 import com.google.gson.annotations.SerializedName;
-import java.util.List;
 
 public class HadithBookResponse {
-    @SerializedName("data")
-    public List<HadithBook> data;
 
     public static class HadithBook {
-        @SerializedName("id")
+        @SerializedName("slug")
         public String id;
         @SerializedName("name")
         public String name;
-        @SerializedName("available")
+        @SerializedName("total")
         public int available;
     }
 }

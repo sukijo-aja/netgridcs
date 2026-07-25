@@ -13,7 +13,7 @@ import androidx.core.app.NotificationCompat;
 import com.mosleemapp.app.R;
 import com.mosleemapp.app.ui.activities.ReminderActivity;
 import com.mosleemapp.app.utils.AlarmScheduler;
-import com.mosleemapp.app.utils.SettingsManager;
+import com.mosleemapp.app.utils.app.SettingsManager;
 import com.mosleemapp.app.utils.SilentModeManager;
 
 public class PrayerAlarmReceiver extends BroadcastReceiver {

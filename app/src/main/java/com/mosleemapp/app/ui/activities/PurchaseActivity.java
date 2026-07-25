@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.card.MaterialCardView;
 import com.mosleemapp.app.R;
-import com.mosleemapp.app.utils.SettingsManager;
+import com.mosleemapp.app.utils.app.SettingsManager;
 
 public class PurchaseActivity extends AppCompatActivity {
 

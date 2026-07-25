@@ -15,7 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.mosleemapp.app.R;
 import com.mosleemapp.app.ui.adapters.PrayerSettingAdapter;
-import com.mosleemapp.app.utils.SettingsManager;
+import com.mosleemapp.app.utils.app.SettingsManager;
 
 import java.util.ArrayList;
 import java.util.List;

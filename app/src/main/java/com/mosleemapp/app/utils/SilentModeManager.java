@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import com.mosleemapp.app.utils.AppPreference;
 import android.media.AudioManager;
 import android.os.Build;
 import android.provider.Settings;
@@ -32,7 +33,7 @@ public class SilentModeManager {
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         if (audioManager == null) return;
 
-        com.mosleemapp.app.utils.AppPreference prefs = new com.mosleemapp.app.utils.AppPreference(context, PREF_NAME);
+        AppPreference prefs = new AppPreference(context, PREF_NAME);
 
         // Only save previous mode if we haven't already silenced (avoid overwriting stored mode)
         boolean alreadySilenced = prefs.getBoolean(KEY_IS_SILENCED_BY_APP, false);
@@ -60,7 +61,7 @@ public class SilentModeManager {
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         if (audioManager == null) return;
 
-        com.mosleemapp.app.utils.AppPreference prefs = new com.mosleemapp.app.utils.AppPreference(context, PREF_NAME);
+        AppPreference prefs = new AppPreference(context, PREF_NAME);
         boolean wasSilencedByApp = prefs.getBoolean(KEY_IS_SILENCED_BY_APP, false);
 
         if (wasSilencedByApp) {

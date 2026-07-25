@@ -8,6 +8,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.mosleemapp.app.R;
 import com.mosleemapp.app.data.remote.Responses.SurahResponse;
 import com.mosleemapp.app.databinding.ItemSurahBinding;
+import com.mosleemapp.app.utils.app.SettingsManager;
+import com.mosleemapp.app.utils.app.SurahTranslationHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +69,7 @@ public class SurahAdapter extends RecyclerView.Adapter<SurahAdapter.SurahViewHol
             
             String currentLang = com.mosleemapp.app.utils.LocaleHelper.getLanguage(itemView.getContext());
             if ("in".equals(currentLang)) {
-                binding.tvEnglishNameTranslation.setText(com.mosleemapp.app.utils.SurahTranslationHelper.getIndonesianTranslation(surah.number));
+                binding.tvEnglishNameTranslation.setText(SurahTranslationHelper.getIndonesianTranslation(surah.number));
             } else {
                 binding.tvEnglishNameTranslation.setText(surah.englishNameTranslation);
             }
@@ -78,7 +81,7 @@ public class SurahAdapter extends RecyclerView.Adapter<SurahAdapter.SurahViewHol
             binding.tvNameArabic.setText(arabicName);
             binding.tvVerses.setText(" ("+surah.numberOfAyahs + " "+ itemView.getContext().getString(R.string.verses) +")");
 
-            float fontSize = com.mosleemapp.app.utils.SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
+            float fontSize = SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
             binding.tvNameArabic.setTextSize(fontSize);
         }
     }

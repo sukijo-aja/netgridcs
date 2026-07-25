@@ -16,9 +16,9 @@ import com.mosleemapp.app.ui.activities.DuaActivity;
 import com.mosleemapp.app.ui.activities.QiblaActivity;
 import com.mosleemapp.app.ui.activities.TasbihActivity;
 import com.mosleemapp.app.ui.activities.SurahDetailActivity;
-import android.content.Context;
+
 import android.content.Intent;
-import android.content.SharedPreferences;
+
 import com.mosleemapp.app.ui.adapters.HomeMenuAdapter;
 import com.mosleemapp.app.ui.viewmodel.PrayerViewModel;
 
@@ -35,6 +35,7 @@ import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.ads.nativead.NativeAdView;
 import com.mosleemapp.app.utils.AdMobUtil;
 import com.mosleemapp.app.utils.AppPreference;
+import com.mosleemapp.app.utils.app.SettingsManager;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 
@@ -61,10 +62,11 @@ public class HomeFragment extends Fragment {
 
         // Setup Home Menu
         List<HomeMenuAdapter.HomeMenuItem> menuItems = new ArrayList<>();
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Prayer", R.drawable.ic_history));
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Tasbih", R.drawable.ic_tasbih));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Quran", R.drawable.ic_quran));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Hadith", R.drawable.ic_book));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Tasbih", R.drawable.ic_tasbih));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Dua", R.drawable.dua));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Prayer", R.drawable.ic_history));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Tracker", R.drawable.ic_history));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Qibla", R.drawable.ic_kaaba));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("Remove Ads", R.drawable.ic_premium));
@@ -201,7 +203,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadNativeAd() {
-        com.mosleemapp.app.utils.SettingsManager settingsManager = com.mosleemapp.app.utils.SettingsManager.getInstance(requireContext());
+        SettingsManager settingsManager = SettingsManager.getInstance(requireContext());
         if (settingsManager.isPremium()) {
             if (binding != null) {
                 binding.flAdPlaceholder.removeAllViews();
@@ -260,6 +262,10 @@ public class HomeFragment extends Fragment {
     private void observeViewModel() {
         prayerViewModel.getNextPrayerName().observe(getViewLifecycleOwner(), name -> {
             binding.tvNextPrayerName.setText(name);
+        });
+
+        prayerViewModel.getNextPrayerTime().observe(getViewLifecycleOwner(), time -> {
+            binding.tvNextPrayerTime.setText(time);
         });
 
         prayerViewModel.getNextPrayerTimeRemaining().observe(getViewLifecycleOwner(), time -> {

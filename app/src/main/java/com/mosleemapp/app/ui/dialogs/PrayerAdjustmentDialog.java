@@ -2,7 +2,6 @@ package com.mosleemapp.app.ui.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.mosleemapp.app.R;
-import com.mosleemapp.app.utils.SettingsManager;
+import com.mosleemapp.app.utils.app.SettingsManager;
 
 public class PrayerAdjustmentDialog extends DialogFragment {
 

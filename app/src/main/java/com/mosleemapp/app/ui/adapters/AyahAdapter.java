@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.mosleemapp.app.R;
 import com.mosleemapp.app.data.remote.Responses.AyahResponse;
-import com.mosleemapp.app.utils.SettingsManager;
+import com.mosleemapp.app.utils.app.SettingsManager;
 import com.mosleemapp.app.utils.ShareUtil;
-import com.mosleemapp.app.utils.TajweedHelper;
+import com.mosleemapp.app.utils.app.TajweedHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +69,13 @@ public class AyahAdapter extends RecyclerView.Adapter<AyahAdapter.AyahViewHolder
                 tvAyahText.setText(ayah.text);
             }
             
-            tvAyahTranslation.setText(ayah.translation);
+            boolean showTranslation = SettingsManager.getInstance(itemView.getContext()).isShowTranslationEnabled();
+            if (showTranslation) {
+                tvAyahTranslation.setVisibility(View.VISIBLE);
+                tvAyahTranslation.setText(ayah.translation);
+            } else {
+                tvAyahTranslation.setVisibility(View.GONE);
+            }
 
             float fontSize = SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
             tvAyahText.setTextSize(fontSize);

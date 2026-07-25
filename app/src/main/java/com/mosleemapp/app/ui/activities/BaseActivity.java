@@ -1,7 +1,6 @@
 package com.mosleemapp.app.ui.activities;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,7 +8,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
-import com.mosleemapp.app.utils.ReminderWatchdog;
+import com.mosleemapp.app.utils.app.ReminderWatchdog;
 
 public class BaseActivity extends AppCompatActivity {
 

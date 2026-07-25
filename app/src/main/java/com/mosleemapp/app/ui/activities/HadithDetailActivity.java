@@ -26,7 +26,7 @@ public class HadithDetailActivity extends AppCompatActivity {
 
     private RecyclerView rvHadithDetail;
     private HadithDetailAdapter adapter;
-    private ProgressBar progressBar;
+    private View loadingLayout;
     private TextView tvBookName;
     private String bookId;
 
@@ -36,7 +36,7 @@ public class HadithDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_hadith_detail);
 
         rvHadithDetail = findViewById(R.id.rvHadithDetail);
-        progressBar = findViewById(R.id.progressBar);
+        loadingLayout = findViewById(R.id.loadingLayout);
         tvBookName = findViewById(R.id.tvBookName);
 
         bookId = getIntent().getStringExtra(EXTRA_BOOK_ID);
@@ -78,10 +78,10 @@ public class HadithDetailActivity extends AppCompatActivity {
 
     private void showLoading(boolean isLoading) {
         if (isLoading) {
-            progressBar.setVisibility(View.VISIBLE);
+            loadingLayout.setVisibility(View.VISIBLE);
             rvHadithDetail.setVisibility(View.GONE);
         } else {
-            progressBar.setVisibility(View.GONE);
+            loadingLayout.setVisibility(View.GONE);
             rvHadithDetail.setVisibility(View.VISIBLE);
         }
     }

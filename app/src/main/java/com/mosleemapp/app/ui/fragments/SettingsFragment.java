@@ -29,7 +29,7 @@ import com.mosleemapp.app.utils.AdMobUtil;
 import com.mosleemapp.app.utils.AppPreference;
 import com.mosleemapp.app.utils.FirebaseUtil;
 import com.mosleemapp.app.utils.LocaleHelper;
-import com.mosleemapp.app.utils.SettingsManager;
+import com.mosleemapp.app.utils.app.SettingsManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -111,6 +111,14 @@ public class SettingsFragment extends Fragment {
                 Toast.LENGTH_SHORT).show();
         });
 
+        SwitchMaterial switchTranslation = view.findViewById(R.id.switchTranslation);
+        switchTranslation.setChecked(settingsManager.isShowTranslationEnabled());
+        switchTranslation.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            settingsManager.setShowTranslationEnabled(isChecked);
+            Toast.makeText(requireContext(), 
+                isChecked ? "Translation Enabled." : "Translation Disabled.", 
+                Toast.LENGTH_SHORT).show();
+        });
 
         SwitchMaterial switchPremium = view.findViewById(R.id.switchPremium);
         switchPremium.setChecked(settingsManager.isPremium());

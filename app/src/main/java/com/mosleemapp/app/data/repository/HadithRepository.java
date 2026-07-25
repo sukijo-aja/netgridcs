@@ -27,7 +27,7 @@ public class HadithRepository {
     private HadithDao hadithDao;
     private HadithApiService apiService;
     private ExecutorService executorService;
-    private static final String BASE_URL = "https://api.hadith.gading.dev/";
+    private static final String BASE_URL = "https://raw.githubusercontent.com/renomureza/hadis-api-id/master/";
 
     public HadithRepository(Context context) {
         AppDatabase db = AppDatabase.getDatabase(context);
@@ -54,11 +54,11 @@ public class HadithRepository {
     }
 
     private void fetchBooksFromApi(QuranRepository.Callback<List<HadithBookResponse.HadithBook>> callback) {
-        apiService.getBooks().enqueue(new Callback<HadithBookResponse>() {
+        apiService.getBooks().enqueue(new Callback<List<HadithBookResponse.HadithBook>>() {
             @Override
-            public void onResponse(Call<HadithBookResponse> call, Response<HadithBookResponse> response) {
+            public void onResponse(Call<List<HadithBookResponse.HadithBook>> call, Response<List<HadithBookResponse.HadithBook>> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<HadithBookResponse.HadithBook> books = response.body().data;
+                    List<HadithBookResponse.HadithBook> books = response.body();
                     executorService.execute(() -> {
                         hadithDao.insertBooks(mapBooksToEntities(books));
                     });
@@ -69,7 +69,7 @@ public class HadithRepository {
             }
 
             @Override
-            public void onFailure(Call<HadithBookResponse> call, Throwable t) {
+            public void onFailure(Call<List<HadithBookResponse.HadithBook>> call, Throwable t) {
                 callback.onError(t.getMessage());
             }
         });
@@ -88,11 +88,11 @@ public class HadithRepository {
     }
 
     private void fetchHadithsFromApi(String bookId, QuranRepository.Callback<List<HadithDetailResponse.Hadith>> callback) {
-        apiService.getHadithByBook(bookId).enqueue(new Callback<HadithDetailResponse>() {
+        apiService.getHadithByBook(bookId).enqueue(new Callback<List<HadithDetailResponse.Hadith>>() {
             @Override
-            public void onResponse(Call<HadithDetailResponse> call, Response<HadithDetailResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().data != null) {
-                    List<HadithDetailResponse.Hadith> hadiths = response.body().data.hadiths;
+            public void onResponse(Call<List<HadithDetailResponse.Hadith>> call, Response<List<HadithDetailResponse.Hadith>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<HadithDetailResponse.Hadith> hadiths = response.body();
                     executorService.execute(() -> {
                         hadithDao.insertHadiths(mapHadithsToEntities(hadiths, bookId));
                     });
@@ -103,7 +103,7 @@ public class HadithRepository {
             }
 
             @Override
-            public void onFailure(Call<HadithDetailResponse> call, Throwable t) {
+            public void onFailure(Call<List<HadithDetailResponse.Hadith>> call, Throwable t) {
                  callback.onError(t.getMessage());
             }
         });
@@ -172,14 +172,14 @@ public class HadithRepository {
 
             try {
                 // Step 1: Fetch book list
-                Response<HadithBookResponse> booksResponse = apiService.getBooks().execute();
+                Response<List<HadithBookResponse.HadithBook>> booksResponse = apiService.getBooks().execute();
                 if (!booksResponse.isSuccessful() || booksResponse.body() == null) {
                     new android.os.Handler(android.os.Looper.getMainLooper()).post(
                         () -> callback.onError("Failed to fetch Hadith book list"));
                     return;
                 }
 
-                List<HadithBookResponse.HadithBook> books = booksResponse.body().data;
+                List<HadithBookResponse.HadithBook> books = booksResponse.body();
                 hadithDao.insertBooks(mapBooksToEntities(books));
 
                 // Step 2: For each book, fetch all hadiths
@@ -192,10 +192,9 @@ public class HadithRepository {
                             continue;
                         }
 
-                        Response<HadithDetailResponse> detailResponse = apiService.getHadithByBook(book.id).execute();
-                        if (detailResponse.isSuccessful() && detailResponse.body() != null
-                                && detailResponse.body().data != null) {
-                            List<HadithDetailResponse.Hadith> hadiths = detailResponse.body().data.hadiths;
+                        Response<List<HadithDetailResponse.Hadith>> detailResponse = apiService.getHadithByBook(book.id).execute();
+                        if (detailResponse.isSuccessful() && detailResponse.body() != null) {
+                            List<HadithDetailResponse.Hadith> hadiths = detailResponse.body();
                             hadithDao.insertHadiths(mapHadithsToEntities(hadiths, book.id));
                         }
                     } catch (Exception e) {
