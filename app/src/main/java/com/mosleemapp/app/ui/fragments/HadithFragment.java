@@ -50,6 +50,20 @@ public class HadithFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        com.google.android.material.appbar.MaterialToolbar toolbar = binding.getRoot().findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle(R.string.hadith);
+            toolbar.setNavigationOnClickListener(v -> {
+                com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = 
+                    requireActivity().findViewById(R.id.bottom_navigation);
+                if (bottomNav != null) {
+                    bottomNav.setSelectedItemId(R.id.nav_home);
+                } else {
+                    requireActivity().onBackPressed();
+                }
+            });
+        }
+
         // Setup RecyclerView
         adapter = new HadithBookAdapter();
         adapter.setOnItemClickListener(book -> {

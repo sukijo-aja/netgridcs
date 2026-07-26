@@ -7,23 +7,14 @@
     android:background="?attr/colorSurface"
     tools:context=".ui.activities.QiblaActivity">
 
-    <!-- App Bar -->
-    <com.google.android.material.appbar.AppBarLayout
+    <include
         android:id="@+id/appBarLayout"
+        layout="@layout/layout_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="Qibla Compass"
-            app:titleTextColor="?attr/colorOnPrimary"
-            app:navigationIcon="@drawable/ic_back"
-            app:navigationIconTint="?attr/colorOnPrimary" />
-    </com.google.android.material.appbar.AppBarLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/tv_bearingInfo"

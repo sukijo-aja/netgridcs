@@ -22,8 +22,28 @@ public class AyahAdapter extends RecyclerView.Adapter<AyahAdapter.AyahViewHolder
 
     private List<AyahResponse.Ayah> ayahs = new ArrayList<>();
 
+    private List<AyahResponse.Ayah> ayahsFull = new ArrayList<>();
+
     public void setAyahs(List<AyahResponse.Ayah> ayahs) {
-        this.ayahs = ayahs;
+        this.ayahsFull = new ArrayList<>(ayahs);
+        this.ayahs = new ArrayList<>(ayahs);
+        notifyDataSetChanged();
+    }
+
+    public void filter(String text) {
+        ayahs.clear();
+        if (text == null || text.isEmpty()) {
+            ayahs.addAll(ayahsFull);
+        } else {
+            text = text.toLowerCase();
+            for (AyahResponse.Ayah item : ayahsFull) {
+                if (item.translation != null && item.translation.toLowerCase().contains(text) || 
+                    item.text != null && item.text.contains(text) || 
+                    String.valueOf(item.numberInSurah).contains(text)) {
+                    ayahs.add(item);
+                }
+            }
+        }
         notifyDataSetChanged();
     }
 
@@ -70,7 +90,10 @@ public class AyahAdapter extends RecyclerView.Adapter<AyahAdapter.AyahViewHolder
             }
             
             boolean showTranslation = SettingsManager.getInstance(itemView.getContext()).isShowTranslationEnabled();
-            if (showTranslation) {
+            String currentLang = com.mosleemapp.app.utils.LocaleHelper.getLanguage(itemView.getContext());
+            boolean isArabic = "ar".equals(currentLang);
+            
+            if (showTranslation && !isArabic) {
                 tvAyahTranslation.setVisibility(View.VISIBLE);
                 tvAyahTranslation.setText(ayah.translation);
             } else {

@@ -61,12 +61,18 @@ public class HomeMenuAdapter extends RecyclerView.Adapter<HomeMenuAdapter.ViewHo
     }
 
     public static class HomeMenuItem {
+        private String id;
         private String title;
         private int iconRes;
 
-        public HomeMenuItem(String title, int iconRes) {
+        public HomeMenuItem(String id, String title, int iconRes) {
+            this.id = id;
             this.title = title;
             this.iconRes = iconRes;
+        }
+
+        public String getId() {
+            return id;
         }
 
         public String getTitle() {

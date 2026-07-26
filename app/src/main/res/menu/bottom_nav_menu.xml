@@ -6,14 +6,14 @@
         android:icon="@drawable/ic_home" />
     <item
         android:id="@+id/nav_quran"
-        android:title="@string/al_quran"
+        android:title="@string/quran"
         android:icon="@drawable/ic_quran" />
     <item
         android:id="@+id/nav_hadith"
-        android:title="@string/string_hadith"
+        android:title="@string/hadith"
         android:icon="@drawable/ic_book" />
     <item
         android:id="@+id/nav_settings"
-        android:title="@string/string_settings"
+        android:title="@string/settings"
         android:icon="@drawable/ic_settings" />
 </menu>

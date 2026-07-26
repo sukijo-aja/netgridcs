@@ -29,6 +29,7 @@ android {
     }
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 }
 
@@ -76,4 +77,7 @@ dependencies {
     
     // Auto-generated: Location Services
     implementation 'com.google.android.gms:play-services-location:21.1.0'
+
+    // Glide
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
 }

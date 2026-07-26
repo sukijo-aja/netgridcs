@@ -15,6 +15,7 @@
         android:contentDescription="@string/app_name" />
 
     <TextView
+        android:id="@+id/tvAppName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/logo"

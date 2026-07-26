@@ -15,4 +15,8 @@
     </style>
 
     <style name="Theme.MoslemApp" parent="Base.Theme.MoslemApp" />
+
+    <style name="TextAppearance.App.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

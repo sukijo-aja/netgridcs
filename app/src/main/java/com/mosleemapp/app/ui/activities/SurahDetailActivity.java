@@ -11,9 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.widget.ImageButton;
-import android.widget.Spinner;
-import android.widget.ArrayAdapter;
-import android.widget.AdapterView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +36,30 @@ public class SurahDetailActivity extends AppCompatActivity {
     private String surahName;
 
     private ImageButton btnPrevSurah, btnNextSurah;
-    private Spinner spinnerAyahs;
     private List<SurahResponse.Surah> allSurahs = new ArrayList<>();
-    private boolean isSpinnerInitialized = false;
+
+    private android.os.Handler autoScrollHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private boolean isAutoScrolling = false;
+    private Runnable autoScrollRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isAutoScrolling && rvAyah != null) {
+                rvAyah.scrollBy(0, 2);
+                autoScrollHandler.postDelayed(this, 30);
+            }
+        }
+    };
+
+    private void toggleAutoScroll(android.view.MenuItem item) {
+        isAutoScrolling = !isAutoScrolling;
+        if (isAutoScrolling) {
+            item.setIcon(android.R.drawable.ic_media_pause);
+            autoScrollHandler.post(autoScrollRunnable);
+        } else {
+            item.setIcon(android.R.drawable.ic_media_play);
+            autoScrollHandler.removeCallbacks(autoScrollRunnable);
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,10 +71,79 @@ public class SurahDetailActivity extends AppCompatActivity {
         tvSurahNameTitle = findViewById(R.id.tvSurahNameTitle);
         btnPrevSurah = findViewById(R.id.btnPrevSurah);
         btnNextSurah = findViewById(R.id.btnNextSurah);
-        spinnerAyahs = findViewById(R.id.spinnerAyahs);
 
         surahNumber = getIntent().getIntExtra(EXTRA_SURAH_NUMBER, 1);
         surahName = getIntent().getStringExtra(EXTRA_SURAH_NAME);
+
+        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle(surahName != null ? surahName : getString(R.string.quran));
+            toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+            toolbar.inflateMenu(R.menu.menu_surah_detail);
+            toolbar.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.action_options) {
+                    showOptionsDialog();
+                    return true;
+                } else if (item.getItemId() == R.id.action_auto_scroll) {
+                    toggleAutoScroll(item);
+                    return true;
+                }
+                return false;
+            });
+            
+            android.view.MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
+            if (searchItem != null) {
+                androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) searchItem.getActionView();
+                if (searchView != null) {
+                    searchView.setQueryHint(getString(R.string.search));
+                    
+                    android.widget.ImageView closeBtn = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+                    if (closeBtn != null) {
+                        closeBtn.setOnClickListener(v -> {
+                            if (searchView.getQuery().length() == 0) {
+                                searchItem.collapseActionView();
+                            } else {
+                                searchView.setQuery("", false);
+                            }
+                        });
+                    }
+
+                    searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            if (adapter != null) adapter.filter(query);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String newText) {
+                            if (adapter != null) adapter.filter(newText);
+                            if (closeBtn != null) {
+                                closeBtn.post(() -> closeBtn.setVisibility(android.view.View.VISIBLE));
+                            }
+                            return false;
+                        }
+                    });
+
+                    searchItem.setOnActionExpandListener(new android.view.MenuItem.OnActionExpandListener() {
+                        @Override
+                        public boolean onMenuItemActionExpand(android.view.MenuItem item) {
+                            if (closeBtn != null) {
+                                closeBtn.post(() -> closeBtn.setVisibility(android.view.View.VISIBLE));
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onMenuItemActionCollapse(android.view.MenuItem item) {
+                            if (adapter != null) adapter.filter("");
+                            return true;
+                        }
+                    });
+                }
+            }
+        }
 
 
         loadAllSurahs();
@@ -79,6 +167,10 @@ public class SurahDetailActivity extends AppCompatActivity {
     private void updateHeader() {
         if (surahName != null) {
             tvSurahNameTitle.setText(surahName);
+            com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+            if (toolbar != null) {
+                toolbar.setTitle(surahName);
+            }
         }
         btnPrevSurah.setEnabled(surahNumber > 1);
         btnPrevSurah.setAlpha(surahNumber > 1 ? 1.0f : 0.5f);
@@ -86,25 +178,22 @@ public class SurahDetailActivity extends AppCompatActivity {
         btnNextSurah.setAlpha(surahNumber < 114 ? 1.0f : 0.5f);
     }
     
+    @Override
+    public void onBackPressed() {
+        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null && toolbar.getMenu() != null) {
+            android.view.MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
+            if (searchItem != null && searchItem.isActionViewExpanded()) {
+                searchItem.collapseActionView();
+                return;
+            }
+        }
+        super.onBackPressed();
+    }
+
     private void setupListeners() {
         btnPrevSurah.setOnClickListener(v -> navigateSurah(-1));
         btnNextSurah.setOnClickListener(v -> navigateSurah(1));
-        
-        spinnerAyahs.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (isSpinnerInitialized) {
-                    RecyclerView.LayoutManager layoutManager = rvAyah.getLayoutManager();
-                    if (layoutManager instanceof LinearLayoutManager) {
-                        ((LinearLayoutManager) layoutManager).scrollToPositionWithOffset(position, 0);
-                    }
-                }
-                isSpinnerInitialized = true;
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
     }
     
     private void navigateSurah(int offset) {
@@ -153,6 +242,17 @@ public class SurahDetailActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         saveLastRead();
+        if (isAutoScrolling) {
+            isAutoScrolling = false;
+            autoScrollHandler.removeCallbacks(autoScrollRunnable);
+            com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+            if (toolbar != null && toolbar.getMenu() != null) {
+                android.view.MenuItem autoScrollItem = toolbar.getMenu().findItem(R.id.action_auto_scroll);
+                if (autoScrollItem != null) {
+                    autoScrollItem.setIcon(android.R.drawable.ic_media_play);
+                }
+            }
+        }
     }
 
     private void setupRecyclerView() {
@@ -181,25 +281,12 @@ public class SurahDetailActivity extends AppCompatActivity {
                 
                 adapter.setAyahs(data);
                 
-                // Populate Spinner
-                isSpinnerInitialized = false;
-                List<String> ayahStrings = new ArrayList<>();
-                if (data != null) {
-                    for (int i = 0; i < data.size(); i++) {
-                        ayahStrings.add("Ayah " + (i + 1));
-                    }
-                }
-                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(SurahDetailActivity.this, android.R.layout.simple_spinner_item, ayahStrings);
-                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerAyahs.setAdapter(spinnerAdapter);
-                
                 // Scroll to last read Ayah if applicable
                 com.mosleemapp.app.utils.AppPreference prefs = new com.mosleemapp.app.utils.AppPreference(SurahDetailActivity.this);
                 int savedSurah = prefs.getInt("last_read_surah_number", -1);
                 int savedAyah = prefs.getInt("last_read_ayah_number", -1);
                 
                 if (savedSurah == surahNumber && savedAyah > 0) {
-                    spinnerAyahs.setSelection(savedAyah - 1);
                     rvAyah.post(() -> {
                         RecyclerView.LayoutManager layoutManager = rvAyah.getLayoutManager();
                         if (layoutManager instanceof LinearLayoutManager) {
@@ -239,5 +326,33 @@ public class SurahDetailActivity extends AppCompatActivity {
         prefs.saveInt("last_read_surah_number", surahNumber);
         prefs.saveString("last_read_surah_name", getIntent().getStringExtra(EXTRA_SURAH_NAME));
         prefs.saveInt("last_read_ayah_number", ayahNumber);
+    }
+
+    private void showOptionsDialog() {
+        com.mosleemapp.app.utils.app.SettingsManager settingsManager = com.mosleemapp.app.utils.app.SettingsManager.getInstance(this);
+        boolean[] checkedItems = {
+            settingsManager.isTajweedEnabled(),
+            settingsManager.isShowTranslationEnabled()
+        };
+
+        String[] options = {
+            getString(R.string.show_tajweed_colored_quran),
+            getString(R.string.show_translation)
+        };
+
+        new android.app.AlertDialog.Builder(this)
+            .setTitle(R.string.settings)
+            .setMultiChoiceItems(options, checkedItems, (dialog, which, isChecked) -> {
+                if (which == 0) {
+                    settingsManager.setTajweedEnabled(isChecked);
+                } else if (which == 1) {
+                    settingsManager.setShowTranslationEnabled(isChecked);
+                }
+                if (adapter != null) {
+                    adapter.notifyDataSetChanged();
+                }
+            })
+            .setPositiveButton(android.R.string.ok, null)
+            .show();
     }
 }

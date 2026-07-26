@@ -303,7 +303,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:$PROJECT_DIR$/../../../sdk/icons/material/materialicons/shopping_bag/baseline_shopping_bag_24.xml" />
+                                      <entry key="url" value="file:$PROJECT_DIR$/../../../sdk/icons/material/materialicons/menu/baseline_menu_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -313,7 +313,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="outputName" value="ic_shopping_bag" />
+                            <entry key="outputName" value="ic_menu" />
                             <entry key="sourceFile" value="$PROJECT_DIR$/../../../Downloads/LogoApp/doa.svg" />
                           </map>
                         </option>

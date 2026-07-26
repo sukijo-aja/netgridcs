@@ -27,9 +27,11 @@ public class HadithRepository {
     private HadithDao hadithDao;
     private HadithApiService apiService;
     private ExecutorService executorService;
-    private static final String BASE_URL = "https://raw.githubusercontent.com/renomureza/hadis-api-id/master/";
+    private Context context;
+    private static final String BASE_URL = "https://raw.githubusercontent.com/sukijo-aja/repodata/main/data/muslimapp/";
 
     public HadithRepository(Context context) {
+        this.context = context;
         AppDatabase db = AppDatabase.getDatabase(context);
         hadithDao = db.hadithDao();
         executorService = Executors.newSingleThreadExecutor();
@@ -161,6 +163,14 @@ public class HadithRepository {
 
     public void downloadAllData(QuranRepository.Callback<Boolean> callback) {
         executorService.execute(() -> {
+            com.mosleemapp.app.utils.AppPreference prefs = new com.mosleemapp.app.utils.AppPreference(context);
+            if (prefs.getBoolean("UPDATE_HADIST_REQUIRED", false)) {
+                Log.d("HadithRepository", "Update required, clearing hadith cache.");
+                hadithDao.clearHadiths();
+                hadithDao.clearBooks();
+                prefs.saveBoolean("UPDATE_HADIST_REQUIRED", false);
+            }
+
             // Guard: skip if Hadith is already complete (books and hadiths exist)
             int bookCount = hadithDao.getBookCount();
             int hadithCount = hadithDao.getTotalHadithCount();

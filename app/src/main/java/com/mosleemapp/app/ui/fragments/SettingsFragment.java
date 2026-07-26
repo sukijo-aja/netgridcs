@@ -60,8 +60,8 @@ public class SettingsFragment extends Fragment {
         tvPreview = view.findViewById(R.id.tvPreview);
         tvLabelFontSize = view.findViewById(R.id.labelFontSize);
 
-        MaterialToolbar toolbar = view.findViewById(R.id.toolbarSettings);
-        toolbar.setNavigationIcon(androidx.appcompat.R.drawable.abc_ic_ab_back_material);
+        MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.settings);
         toolbar.setNavigationOnClickListener(v -> {
             com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = 
                 requireActivity().findViewById(R.id.bottom_navigation);
@@ -287,7 +287,7 @@ public class SettingsFragment extends Fragment {
     private void updateLoginUI() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
-            btnLogin.setText("Logout");
+            btnLogin.setText(R.string.logout);
             btnLogin.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
             String displayName = user.getDisplayName();
             String email = user.getEmail();
@@ -299,7 +299,7 @@ public class SettingsFragment extends Fragment {
                 tvUserId.setText("Logged in as: " + user.getUid());
             }
         } else {
-            btnLogin.setText("Login");
+            btnLogin.setText(R.string.login);
             SettingsManager settingsManager = SettingsManager.getInstance(requireContext());
             tvUserId.setText("User ID: " + settingsManager.getUserId());
         }
@@ -386,13 +386,14 @@ public class SettingsFragment extends Fragment {
     }
 
     private void showLanguageDialog() {
-        final String[] languages = {"English", "Bahasa Indonesia", "العربية"};
-        final String[] codes = {"en", "in", "ar"};
+        final String[] languages = {"English", "Bahasa Indonesia", "العربية", "中文"};
+        final String[] codes = {"en", "in", "ar", "zh"};
 
         int checkedItem = 0;
         String currentLang = LocaleHelper.getLanguage(requireContext());
         if (currentLang.equals("in")) checkedItem = 1;
         else if (currentLang.equals("ar")) checkedItem = 2;
+        else if (currentLang.equals("zh")) checkedItem = 3;
 
         new AlertDialog.Builder(requireContext())
                 .setTitle(R.string.select_language)

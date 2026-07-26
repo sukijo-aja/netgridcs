@@ -4,19 +4,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:elevation="0dp"
-        app:liftOnScroll="true">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbarSettings"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:title="@string/settings"
-            app:titleTextAppearance="@style/TextAppearance.Material3.TitleMedium" />
-    </com.google.android.material.appbar.AppBarLayout>
+    <include
+        android:id="@+id/appBarLayout"
+        layout="@layout/layout_app_bar" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -85,7 +75,7 @@
             android:id="@+id/btnCalculationMethod"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Calculation Method"
+            android:text="@string/calculation_method"
             android:textColor="@android:color/white"
             android:drawableEnd="@android:drawable/ic_menu_info_details"
             android:drawableTint="@android:color/white"

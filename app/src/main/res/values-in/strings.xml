@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">Mosleem App</string>
-    <string name="al_quran">Al Quran</string>
-    <string name="string_hadith">Hadis</string>
-    <string name="string_settings">Pengaturan</string>
+
     <string name="manage_prayer_alarms">Kelola Alarm Sholat</string>
     <string name="location_permission_required">Izin lokasi diperlukan untuk waktu sholat yang akurat</string>
     <string name="double_back_to_exit">Tekan KEMBALI lagi untuk keluar</string>
@@ -62,7 +60,11 @@
     <string name="last_read">Terakhir Dibaca</string>
     <string name="next_prayer">Sholat Berikutnya</string>
     <string name="reminder_before_adhan_minutes">Pengingat Sebelum Adzan : %1$s menit</string>
+    <string name="search">Cari</string>
+    <string name="search_surah">Cari Surah</string>
     <string name="show_tajweed_colored_quran">Tampilkan Tajwid (Al-Qur\'an Berwarna)</string>
+    <string name="show_translation">Tampilkan Terjemahan</string>
+    <string name="calculation_method">Metode Perhitungan</string>
     <string name="download_hadith">Unduh Semua Hadis (Offline)</string>
     <string name="upcoming_prayer">Mendatang %1$s</string>
     <string name="is_coming_soon">segera tiba</string>

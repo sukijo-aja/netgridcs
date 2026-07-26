@@ -20,9 +20,30 @@ import java.util.List;
 public class HadithDetailAdapter extends RecyclerView.Adapter<HadithDetailAdapter.HadithViewHolder> {
 
     private List<HadithDetailResponse.Hadith> hadithList = new ArrayList<>();
+    private List<HadithDetailResponse.Hadith> allHadiths = new ArrayList<>();
 
     public void setHadiths(List<HadithDetailResponse.Hadith> hadiths) {
-        this.hadithList = hadiths;
+        this.hadithList = new ArrayList<>(hadiths);
+        this.allHadiths = new ArrayList<>(hadiths);
+        notifyDataSetChanged();
+    }
+    
+    public void filter(String query) {
+        hadithList.clear();
+        if (query == null || query.isEmpty()) {
+            hadithList.addAll(allHadiths);
+        } else {
+            String filterPattern = query.toLowerCase().trim();
+            for (HadithDetailResponse.Hadith hadith : allHadiths) {
+                boolean matchesNumber = String.valueOf(hadith.number).contains(filterPattern);
+                boolean matchesArab = hadith.arab != null && hadith.arab.toLowerCase().contains(filterPattern);
+                boolean matchesTranslation = hadith.id != null && hadith.id.toLowerCase().contains(filterPattern);
+                
+                if (matchesNumber || matchesArab || matchesTranslation) {
+                    hadithList.add(hadith);
+                }
+            }
+        }
         notifyDataSetChanged();
     }
 
@@ -62,6 +83,14 @@ public class HadithDetailAdapter extends RecyclerView.Adapter<HadithDetailAdapte
             tvHadithNumber.setText("Hadith No. " + hadith.number);
             tvHadithArabic.setText(hadith.arab);
             tvHadithTranslation.setText(hadith.id);
+
+            String currentLang = com.mosleemapp.app.utils.LocaleHelper.getLanguage(itemView.getContext());
+            boolean isArabic = "ar".equals(currentLang);
+            if (isArabic) {
+                tvHadithTranslation.setVisibility(View.GONE);
+            } else {
+                tvHadithTranslation.setVisibility(View.VISIBLE);
+            }
 
             float fontSize = SettingsManager.getInstance(itemView.getContext()).getArabicFontSize();
             tvHadithArabic.setTextSize(fontSize);

@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="8dp"
+    android:padding="4dp"
     android:background="@color/background_light">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <include
+        android:id="@+id/appBarLayout"
+        layout="@layout/layout_app_bar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Prayer Tracker"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@color/text_primary"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="24dp"/>
+        android:layout_marginBottom="4dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="24dp">
+        android:gravity="center_horizontal"
+        android:layout_marginBottom="4dp">
 
         <ImageButton
             android:id="@+id/btnPrevDay"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@android:drawable/ic_media_previous"
+            android:layout_gravity="start"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Previous Day"/>
+            android:contentDescription="Previous Day"
+            app:tint="@color/black" />
 
         <TextView
             android:id="@+id/tvDate"
@@ -38,7 +38,8 @@
             android:text="Today"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_marginHorizontal="24dp"/>
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="24dp" />
 
         <ImageButton
             android:id="@+id/btnNextDay"
@@ -46,7 +47,9 @@
             android:layout_height="48dp"
             android:src="@android:drawable/ic_media_next"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Next Day"/>
+            android:layout_gravity="end"
+            android:contentDescription="Next Day"
+            app:tint="@color/black" />
     </LinearLayout>
 
     <androidx.cardview.widget.CardView

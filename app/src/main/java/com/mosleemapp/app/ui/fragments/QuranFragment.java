@@ -49,6 +49,87 @@ public class QuranFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        com.google.android.material.appbar.MaterialToolbar toolbar = binding.getRoot().findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle(R.string.quran);
+            toolbar.inflateMenu(R.menu.menu_quran);
+            android.view.MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
+            if (searchItem != null) {
+                androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) searchItem.getActionView();
+                if (searchView != null) {
+                    searchView.setQueryHint(getString(R.string.search_surah));
+                    
+                    android.widget.ImageView closeBtn = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+                    if (closeBtn != null) {
+                        closeBtn.setOnClickListener(v -> {
+                            if (searchView.getQuery().length() == 0) {
+                                searchItem.collapseActionView();
+                            } else {
+                                searchView.setQuery("", false);
+                            }
+                        });
+                    }
+
+                    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            filterSurahs(query);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String newText) {
+                            filterSurahs(newText);
+                            if (closeBtn != null) {
+                                closeBtn.post(() -> closeBtn.setVisibility(android.view.View.VISIBLE));
+                            }
+                            return false;
+                        }
+                    });
+
+                    searchItem.setOnActionExpandListener(new android.view.MenuItem.OnActionExpandListener() {
+                        @Override
+                        public boolean onMenuItemActionExpand(android.view.MenuItem item) {
+                            if (closeBtn != null) {
+                                closeBtn.post(() -> closeBtn.setVisibility(android.view.View.VISIBLE));
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onMenuItemActionCollapse(android.view.MenuItem item) {
+                            filterSurahs("");
+                            return true;
+                        }
+                    });
+                }
+            }
+
+            toolbar.setNavigationOnClickListener(v -> {
+                com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = 
+                    requireActivity().findViewById(R.id.bottom_navigation);
+                if (bottomNav != null) {
+                    bottomNav.setSelectedItemId(R.id.nav_home);
+                } else {
+                    requireActivity().onBackPressed();
+                }
+            });
+            
+            if (searchItem != null) {
+                requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new androidx.activity.OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (searchItem.isActionViewExpanded()) {
+                            searchItem.collapseActionView();
+                        } else {
+                            setEnabled(false);
+                            requireActivity().onBackPressed();
+                        }
+                    }
+                });
+            }
+        }
+
         // Setup RecyclerView
         adapter = new SurahAdapter();
         adapter.setOnItemClickListener(surah -> {
@@ -63,7 +144,7 @@ public class QuranFragment extends Fragment {
 
         binding.rvQuran.setAdapter(adapter);
 
-        setupSearchView();
+
         
         quranRepository = new QuranRepository(requireContext());
 
@@ -98,21 +179,7 @@ public class QuranFragment extends Fragment {
         });
     }
 
-    private void setupSearchView() {
-        binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                filterSurahs(query);
-                return false;
-            }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                filterSurahs(newText);
-                return false;
-            }
-        });
-    }
 
     private void filterSurahs(String query) {
         List<SurahResponse.Surah> filteredList = new ArrayList<>();

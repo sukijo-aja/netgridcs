@@ -62,31 +62,31 @@ public class HomeFragment extends Fragment {
 
         // Setup Home Menu
         List<HomeMenuAdapter.HomeMenuItem> menuItems = new ArrayList<>();
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Quran", R.drawable.ic_quran));
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Hadith", R.drawable.ic_book));
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Tasbih", R.drawable.ic_tasbih));
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Dua", R.drawable.dua));
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Prayer", R.drawable.ic_history));
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Tracker", R.drawable.ic_history));
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Qibla", R.drawable.ic_kaaba));
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Remove Ads", R.drawable.ic_premium));
-//        menuItems.add(new HomeMenuAdapter.HomeMenuItem("Favorites", R.drawable.ic_favorite));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("quran", getString(R.string.quran), R.drawable.ic_quran));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("hadith", getString(R.string.hadith), R.drawable.ic_book));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("tasbih", getString(R.string.menu_tasbih), R.drawable.ic_tasbih));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("dua", getString(R.string.menu_dua), R.drawable.dua));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("prayer", getString(R.string.menu_prayer), R.drawable.ic_history));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("tracker", getString(R.string.menu_tracker), R.drawable.ic_history));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("qibla", getString(R.string.menu_qibla), R.drawable.ic_kaaba));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("remove_ads", getString(R.string.menu_remove_ads), R.drawable.ic_premium));
+//        menuItems.add(new HomeMenuAdapter.HomeMenuItem("favorites", "Favorites", R.drawable.ic_favorite));
 
         HomeMenuAdapter menuAdapter = new HomeMenuAdapter(menuItems, item -> {
             com.google.android.material.bottomnavigation.BottomNavigationView bottomNav =
                     requireActivity().findViewById(R.id.bottom_navigation);
 
-            if (item.getTitle().equals("Quran")) {
+            if (item.getId().equals("quran")) {
                 bottomNav.setSelectedItemId(R.id.nav_quran);
-            } else if (item.getTitle().equals("Settings")) {
+            } else if (item.getId().equals("settings")) {
                 bottomNav.setSelectedItemId(R.id.nav_settings);
-            } else if (item.getTitle().equals("Hadith")) {
+            } else if (item.getId().equals("hadith")) {
                 bottomNav.setSelectedItemId(R.id.nav_hadith);
-            } else if (item.getTitle().equals("Tasbih")) {
+            } else if (item.getId().equals("tasbih")) {
                 startActivity(new android.content.Intent(getContext(), TasbihActivity.class));
-            } else if (item.getTitle().equals("Dua")) {
+            } else if (item.getId().equals("dua")) {
                 startActivity(new android.content.Intent(getContext(), DuaActivity.class));
-            } else if (item.getTitle().equals("Remove Ads")) {
+            } else if (item.getId().equals("remove_ads")) {
                 com.mosleemapp.app.utils.AppPreference appPreference = new com.mosleemapp.app.utils.AppPreference(getContext());
                 if (appPreference.getString("UID", "").isEmpty()) {
                     android.widget.Toast.makeText(getContext(), "Please login to continue", android.widget.Toast.LENGTH_SHORT).show();
@@ -94,9 +94,9 @@ public class HomeFragment extends Fragment {
                 } else {
                     startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.PurchaseActivity.class));
                 }
-            } else if (item.getTitle().equals("Tracker")) {
+            } else if (item.getId().equals("tracker")) {
                 startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.PrayerTrackerActivity.class));
-            } else if (item.getTitle().equals("Qibla")) {
+            } else if (item.getId().equals("qibla")) {
                 startActivity(new android.content.Intent(getContext(), QiblaActivity.class));
             } else {
                 android.content.Intent intent = new android.content.Intent(getContext(), DetailActivity.class);
@@ -118,15 +118,27 @@ public class HomeFragment extends Fragment {
 
         prayerViewModel = new ViewModelProvider(requireActivity()).get(PrayerViewModel.class);
         observeViewModel();
+
+        binding.products.setOnClickListener(v -> {
+            startActivity(new Intent(getContext(), com.mosleemapp.app.ui.activities.ProductsActivity.class));
+        });
     }
         
     @Override
     public void onResume() {
         super.onResume();
-        loadNativeAd();
+        loadBannerAd();
         updateLastRead();
         setupGreetingAndDate();
+        setupAppName();
        logAllSharedPreferences();
+    }
+
+    private void setupAppName() {
+        if (binding == null || getContext() == null) return;
+        com.mosleemapp.app.utils.AppPreference prefs = new com.mosleemapp.app.utils.AppPreference(requireContext());
+        String customAppName = prefs.getString("app_name", getString(R.string.app_name));
+        binding.tvTitle.setText(customAppName);
     }
 
     private void logAllSharedPreferences() {
@@ -197,9 +209,13 @@ public class HomeFragment extends Fragment {
                 intent.putExtra(SurahDetailActivity.EXTRA_SURAH_NAME, lastReadSurahName);
                 startActivity(intent);
             });
-        } else {
-            binding.cardLastRead.setVisibility(View.GONE);
         }
+    }
+
+    private void loadBannerAd(){
+        AdMobUtil.initialize(getContext());
+        AdMobUtil.loadBanner(binding.adView);
+        binding.adView.setVisibility(View.VISIBLE);
     }
 
     private void loadNativeAd() {
@@ -259,9 +275,26 @@ public class HomeFragment extends Fragment {
         adView.setNativeAd(nativeAd);
     }
 
+    private int getPrayerNameResource(String name) {
+        if (name == null) return -1;
+        switch (name.toLowerCase()) {
+            case "fajr": return R.string.fajr;
+            case "dhuhr": return R.string.dhuhr;
+            case "asr": return R.string.asr;
+            case "maghrib": return R.string.maghrib;
+            case "isha": return R.string.isha;
+            default: return -1;
+        }
+    }
+
     private void observeViewModel() {
         prayerViewModel.getNextPrayerName().observe(getViewLifecycleOwner(), name -> {
-            binding.tvNextPrayerName.setText(name);
+            int resId = getPrayerNameResource(name);
+            if (resId != -1) {
+                binding.tvNextPrayerName.setText(resId);
+            } else {
+                binding.tvNextPrayerName.setText(name);
+            }
         });
 
         prayerViewModel.getNextPrayerTime().observe(getViewLifecycleOwner(), time -> {

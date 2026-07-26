@@ -88,10 +88,9 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener, 
         });
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        if (toolbar != null) {
+            toolbar.setTitle("Qibla Compass");
+            toolbar.setNavigationOnClickListener(v -> finish());
         }
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -130,14 +129,7 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener, 
          }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+
 
     @Override
     public void onSensorChanged(SensorEvent event) {

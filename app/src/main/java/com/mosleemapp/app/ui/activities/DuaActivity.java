@@ -38,21 +38,31 @@ public class DuaActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dua);
 
-        ImageView btnBack = findViewById(R.id.btnBack);
-        ImageView btnSync = findViewById(R.id.btnSync);
         rvDuaList = findViewById(R.id.rvDuaList);
         rvCategories = findViewById(R.id.rvCategories);
         flAdPlaceholder = findViewById(R.id.flAdPlaceholder);
 
-        btnBack.setOnClickListener(v -> finish());
+        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle("Daily Dua");
+            toolbar.setNavigationOnClickListener(v -> finish());
+            toolbar.inflateMenu(R.menu.menu_dua);
+            toolbar.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.action_sync) {
+                    android.widget.Toast.makeText(this, "Syncing data...", android.widget.Toast.LENGTH_SHORT).show();
+                    if (viewModel != null) {
+                        viewModel.syncDuas();
+                    }
+                    return true;
+                }
+                return false;
+            });
+        }
         
         // Setup ViewModel
         viewModel = new ViewModelProvider(this).get(DuaViewModel.class);
         
-        btnSync.setOnClickListener(v -> {
-            android.widget.Toast.makeText(this, "Syncing data...", android.widget.Toast.LENGTH_SHORT).show();
-            viewModel.syncDuas();
-        });
+
         rvDuaList.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DuaAdapter(new ArrayList<>());
         rvDuaList.setAdapter(adapter);

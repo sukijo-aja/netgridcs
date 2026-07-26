@@ -32,4 +32,10 @@ public interface HadithDao {
     
     @Query("SELECT COUNT(*) FROM hadiths WHERE bookId = :bookId")
     int getHadithCountByBookId(String bookId);
+
+    @Query("DELETE FROM hadith_books")
+    void clearBooks();
+
+    @Query("DELETE FROM hadiths")
+    void clearHadiths();
 }

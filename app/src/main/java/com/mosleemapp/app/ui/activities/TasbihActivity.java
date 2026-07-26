@@ -41,13 +41,18 @@ public class TasbihActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tasbih);
 
-        ImageView btnBack = findViewById(R.id.btnBack);
-        RecyclerView rvTasbihList = findViewById(R.id.rvTasbihList);
-        MaterialButton btnResetAll = findViewById(R.id.btnResetAll);
-        
         tvActiveName = findViewById(R.id.tvActiveName);
         tvActiveCount = findViewById(R.id.tvActiveCount);
         btnTap = findViewById(R.id.btnTap);
+        RecyclerView rvTasbihList = findViewById(R.id.rvTasbihList);
+        MaterialButton btnResetAll = findViewById(R.id.btnResetAll);
+        
+        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle("Digital Tasbih");
+            toolbar.setNavigationOnClickListener(v -> finish());
+            toolbar.inflateMenu(R.menu.menu_tasbih);
+        }
 
         // OdometerCounterView handles its own view factory/animations internally
 
@@ -56,15 +61,22 @@ public class TasbihActivity extends BaseActivity {
         // Initialize Data
         initializeData();
         
-        // Sound Icon
-        ImageView btnSound = findViewById(R.id.btnSound);
-        updateSoundIcon(btnSound);
-        
-        btnSound.setOnClickListener(v -> {
-            boolean isSoundEnabled = prefs.getBoolean("sound_enabled", true);
-            prefs.saveBoolean("sound_enabled", !isSoundEnabled);
-            updateSoundIcon(btnSound);
-        });
+        // Sound Menu Item
+        if (toolbar != null) {
+            android.view.MenuItem soundItem = toolbar.getMenu().findItem(R.id.action_sound);
+            if (soundItem != null) {
+                updateSoundMenuIcon(soundItem);
+                toolbar.setOnMenuItemClickListener(item -> {
+                    if (item.getItemId() == R.id.action_sound) {
+                        boolean isSoundEnabled = prefs.getBoolean("sound_enabled", true);
+                        prefs.saveBoolean("sound_enabled", !isSoundEnabled);
+                        updateSoundMenuIcon(item);
+                        return true;
+                    }
+                    return false;
+                });
+            }
+        }
 
         // Setup Adapter
         adapter = new TasbihAdapter(tasbihList, new TasbihAdapter.OnTasbihInteractionListener() {
@@ -132,7 +144,7 @@ public class TasbihActivity extends BaseActivity {
             startPulseAnimation();
         }
 
-        btnBack.setOnClickListener(v -> finish());
+
         
         // AdMob
         AdMobUtil.initialize(this);
@@ -186,12 +198,12 @@ public class TasbihActivity extends BaseActivity {
 //        android.widget.Toast.makeText(this, "Simulation Started (100 -> 999)", android.widget.Toast.LENGTH_SHORT).show();
 //    }
     
-    private void updateSoundIcon(ImageView btnSound) {
+    private void updateSoundMenuIcon(android.view.MenuItem item) {
         boolean isSoundEnabled = prefs.getBoolean("sound_enabled", false);
         if (isSoundEnabled) {
-            btnSound.setImageResource(R.drawable.ic_volume_up);
+            item.setIcon(R.drawable.ic_volume_up);
         } else {
-            btnSound.setImageResource(R.drawable.ic_volume_off);
+            item.setIcon(R.drawable.ic_volume_off);
         }
     }
     

@@ -59,6 +59,7 @@
         <activity android:name=".ui.activities.TasbihActivity" android:screenOrientation="portrait" />
         <activity android:name=".ui.activities.DetailActivity" android:screenOrientation="portrait" />
         <activity android:name=".ui.activities.DuaActivity" android:screenOrientation="portrait" />
+        <activity android:name=".ui.activities.ProductsActivity" android:screenOrientation="portrait" android:parentActivityName=".MainActivity" />
         <activity android:name=".ui.activities.PurchaseActivity"
             android:label="Prayer Tracker"
             android:theme="@style/Theme.MoslemApp"

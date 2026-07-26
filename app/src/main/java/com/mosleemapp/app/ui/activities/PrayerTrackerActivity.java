@@ -51,6 +51,12 @@ public class PrayerTrackerActivity extends AppCompatActivity {
         
         viewModel = new ViewModelProvider(this).get(PrayerTrackerViewModel.class);
         
+        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle("Prayer Tracker");
+            toolbar.setNavigationOnClickListener(v -> finish());
+        }
+        
         initViews();
         setupListeners();
         observeViewModel();

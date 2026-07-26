@@ -27,7 +27,7 @@ public class HadithDetailActivity extends AppCompatActivity {
     private RecyclerView rvHadithDetail;
     private HadithDetailAdapter adapter;
     private View loadingLayout;
-    private TextView tvBookName;
+
     private String bookId;
 
     @Override
@@ -37,13 +37,66 @@ public class HadithDetailActivity extends AppCompatActivity {
 
         rvHadithDetail = findViewById(R.id.rvHadithDetail);
         loadingLayout = findViewById(R.id.loadingLayout);
-        tvBookName = findViewById(R.id.tvBookName);
-
         bookId = getIntent().getStringExtra(EXTRA_BOOK_ID);
         String bookName = getIntent().getStringExtra(EXTRA_BOOK_NAME);
 
-        if (bookName != null) {
-            tvBookName.setText(bookName);
+        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle(bookName != null ? bookName : getString(R.string.hadith));
+            toolbar.setNavigationOnClickListener(v -> onBackPressed());
+            
+            toolbar.inflateMenu(R.menu.menu_quran); // Reusing search menu
+            android.view.MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
+            if (searchItem != null) {
+                androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) searchItem.getActionView();
+                if (searchView != null) {
+                    searchView.setQueryHint(getString(R.string.search));
+                    
+                    android.widget.ImageView closeBtn = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+                    if (closeBtn != null) {
+                        closeBtn.setOnClickListener(v -> {
+                            if (searchView.getQuery().length() == 0) {
+                                searchItem.collapseActionView();
+                            } else {
+                                searchView.setQuery("", false);
+                            }
+                        });
+                    }
+
+                    searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            if (adapter != null) adapter.filter(query);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String newText) {
+                            if (adapter != null) adapter.filter(newText);
+                            if (closeBtn != null) {
+                                closeBtn.post(() -> closeBtn.setVisibility(android.view.View.VISIBLE));
+                            }
+                            return false;
+                        }
+                    });
+                    
+                    searchItem.setOnActionExpandListener(new android.view.MenuItem.OnActionExpandListener() {
+                        @Override
+                        public boolean onMenuItemActionExpand(android.view.MenuItem item) {
+                            if (closeBtn != null) {
+                                closeBtn.post(() -> closeBtn.setVisibility(android.view.View.VISIBLE));
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onMenuItemActionCollapse(android.view.MenuItem item) {
+                            if (adapter != null) adapter.filter("");
+                            return true;
+                        }
+                    });
+                }
+            }
         }
 
         setupRecyclerView();
@@ -95,6 +148,19 @@ public class HadithDetailActivity extends AppCompatActivity {
     private void loadAd() {
         com.google.android.gms.ads.AdView adView = findViewById(R.id.adView);
         com.mosleemapp.app.utils.AdMobUtil.loadBanner(adView);
+    }
+    
+    @Override
+    public void onBackPressed() {
+        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar != null && toolbar.getMenu() != null) {
+            android.view.MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
+            if (searchItem != null && searchItem.isActionViewExpanded()) {
+                searchItem.collapseActionView();
+                return;
+            }
+        }
+        super.onBackPressed();
     }
 
 }

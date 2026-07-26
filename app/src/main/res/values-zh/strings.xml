@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Mosleem App</string>
+    <string name="manage_prayer_alarms">管理提醒</string>
+    <string name="calculation_method">计算方法</string>
+    <string name="location_permission_required">需要位置权限以提供准确的祈祷时间</string>
+    <string name="double_back_to_exit">请再按一次返回键退出</string>
+    <string name="location_updated">位置已更新</string>
+    <string name="reminders_enabled">提醒已开启</string>
+    <string name="reminders_disabled">提醒已关闭</string>
+    <string name="reminder_offset_updated">提醒时间已更新</string>
+    <string name="error_prefix">错误：%1$s</string>
+    <string name="reminder_for_prayer_enabled">%1$s 提醒已开启</string>
+    <string name="reminder_for_prayer_disabled">%1$s 提醒已关闭</string>
+    <string name="language">语言</string>
+    <string name="select_language">选择语言</string>
+    <string name="verses">阿亚</string>
+    <string name="login">登录</string>
+    <string name="logout">退出</string>
+    <string name="register">注册</string>
+    <string name="reset_all">全部重置</string>
+    <string name="label_font_size">阿拉伯语字体大小</string>
+    <string name="home">主页</string>
+    <string name="prayer">祈祷</string>
+    <string name="fajr">晨礼</string>
+    <string name="dhuhr">晌礼</string>
+    <string name="asr">晡礼</string>
+    <string name="maghrib">昏礼</string>
+    <string name="isha">宵礼</string>
+    <string name="quran">古兰经</string>
+    <string name="hadith">圣训</string>
+    <string name="settings">设置</string>
+    <string name="upcoming_prayer">即将到来的 %1$s</string>
+    <string name="is_coming_soon">即将到来</string>
+    <string name="its_time_for">是时候进行</string>
+    
+    <string name="admob_app_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
+    <string name="admob_banner_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="admob_interstitial_id" translatable="false">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="admob_rewarded_id" translatable="false">ca-app-pub-3940256099942544/5224354917</string>
+    <string name="admob_native_id" translatable="false">ca-app-pub-3940256099942544/2247696110</string>
+    <string name="admob_app_open_id" translatable="false">ca-app-pub-3940256099942544/3419835294</string>
+    
+    <string name="premium_access">高级权限</string>
+    <string name="remove_ads">移除广告</string>
+    <string name="unlock_all_features">解锁所有功能</string>
+    <string name="premium_desc">获取我们高级计划的无限使用权限。您可以随时取消。</string>
+    <string name="monthly">每月</string>
+    <string name="monthly_price">$2.99 / 月</string>
+    <string name="annually">每年</string>
+    <string name="annually_price">$29.99 / 年</string>
+    <string name="save_percent">节省 17%</string>
+    <string name="purchase_simulated">模拟购买：%1$s</string>
+    <string name="purchase_successful">购买成功！谢谢。</string>
+    <string name="check_your_internet_connection_and_try_again">检查您的互联网连接并重试。</string>
+    <string name="moslem_app">Moslem App</string>
+    <string name="auto_silent_mode">自动静音模式</string>
+    <string name="auto_silent_mode_desc">在祈祷时间内自动将手机设置为震动</string>
+    <string name="silent_duration">静音时长</string>
+    <string name="silent_mode_enabled">自动静音模式已开启</string>
+    <string name="silent_mode_disabled">自动静音模式已关闭</string>
+    <string name="silent_mode_restored">铃声模式已恢复</string>
+    <string name="dnd_permission_required">需要请勿打扰权限。请在设置中授予访问权限。</string>
+    <string name="assalamu_alaikum">赛俩目 (Assalamu \'alaikum)</string>
+    <string name="user_name">穆斯林</string>
+    <string name="enable_prayer_alarms">开启提醒</string>
+    <string name="reminder_before_adhan">宣礼前提醒</string>
+    <string name="manage_custom_habits">管理自定义习惯</string>
+    <string name="download_all_resources_offline">下载所有资源（离线）</string>
+    <string name="download_all_resources_desc">下载所有资源以供离线使用</string>
+    <string name="last_read">最后阅读</string>
+    <string name="next_prayer">下一次祈祷</string>
+    <string name="reminder_before_adhan_minutes">宣礼前提醒：%1$s 分钟</string>
+    <string name="search">搜索</string>
+    <string name="search_surah">搜索古兰经</string>
+    <string name="show_tajweed_colored_quran">显示泰吉威德 (彩色古兰经)</string>
+    <string name="show_translation">显示翻译</string>
+    <string name="download_hadith">下载所有圣训（离线）</string>
+    
+    <string name="default_web_client_id" translatable="false">918294205518-r8nalp68nh18id7n8dgbn7l6hs65fr6c.apps.googleusercontent.com</string>
+    
+    <string name="menu_tasbih">念珠</string>
+    <string name="menu_dua">祈求</string>
+    <string name="menu_prayer">祈祷</string>
+    <string name="menu_tracker">追踪器</string>
+    <string name="menu_qibla">朝向</string>
+    <string name="menu_remove_ads">移除广告</string>
+    <string name="menu_calendar">日历</string>
+    <string name="menu_islamic_study">讲座</string>
+    <string name="menu_our_apps">我们的应用</string>
+</resources>

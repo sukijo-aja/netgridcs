@@ -6,48 +6,14 @@
     android:layout_height="match_parent"
     android:background="@color/background_light">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/headerContainer"
+    <include
+        android:id="@+id/appBarLayout"
+        layout="@layout/layout_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        >
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_back"
-            app:tint="@color/primary_green"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Digital Tasbih"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/primary_green"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btnBack"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/btnSound"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_volume_up"
-            app:tint="@color/primary_green"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginEnd="16dp"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
     <LinearLayout
@@ -56,7 +22,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingBottom="4dp"
-        app:layout_constraintTop_toBottomOf="@id/headerContainer"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         >
