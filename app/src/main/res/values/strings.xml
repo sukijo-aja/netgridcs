@@ -96,4 +96,5 @@
     <string name="menu_calendar">Calendar</string>
     <string name="menu_islamic_study">Lectures</string>
     <string name="menu_our_apps">Our Apps</string>
+    <string name="menu_khutbah">Khutbah</string>
 </resources>

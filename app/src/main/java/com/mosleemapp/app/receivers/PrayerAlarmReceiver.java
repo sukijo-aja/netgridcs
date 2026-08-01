@@ -21,6 +21,7 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
     private static final String CHANNEL_ID = "prayer_reminder_channel";
     private static final String CHANNEL_NAME = "Prayer Reminders";
 
+    public static final String ACTION_ACTIVATE_SILENT = "com.mosleemapp.app.ACTION_ACTIVATE_SILENT";
     public static final String ACTION_RESTORE_RINGER = "com.mosleemapp.app.ACTION_RESTORE_RINGER";
 
     private String getLocalizedPrayerName(Context context, String prayerName) {
@@ -49,6 +50,11 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (ACTION_ACTIVATE_SILENT.equals(intent.getAction())) {
+            SilentModeManager.activateSilentMode(context);
+            return;
+        }
+        
         // Handle restore-ringer alarm
         if (ACTION_RESTORE_RINGER.equals(intent.getAction())) {
             SilentModeManager.restoreRingerMode(context);
@@ -83,9 +89,11 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
             // Auto-silent mode: activate silent and schedule restore
             SettingsManager sm = SettingsManager.getInstance(context);
             if (sm.isAutoSilentEnabled() && SilentModeManager.hasDoNotDisturbPermission(context)) {
-                SilentModeManager.activateSilentMode(context);
+                // Schedule activation 3 minutes later to allow Adzan to finish playing
+                AlarmScheduler.scheduleActivateSilentAlarm(context, 3);
+                
                 int duration = sm.getAutoSilentDuration();
-                AlarmScheduler.scheduleRestoreRingerAlarm(context, duration);
+                AlarmScheduler.scheduleRestoreRingerAlarm(context, duration + 3);
             }
         }
     }
@@ -120,11 +128,11 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
         );
 
         android.net.Uri soundUri = android.net.Uri.parse(android.content.ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/" + R.raw.adhan);
-        String channelId = "prayer_reminder_channel_adhan_4";
+        String channelId = "prayer_reminder_channel_adhan_5";
 
         if ("Fajr".equalsIgnoreCase(prayerName) || "Subuh".equalsIgnoreCase(prayerName)) {
             soundUri = android.net.Uri.parse(android.content.ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + context.getPackageName() + "/" + R.raw.adhan_fajr);
-            channelId = "prayer_reminder_channel_fajr_1";
+            channelId = "prayer_reminder_channel_fajr_2";
         }
 
         String nextName = getNextFromCurrent(prayerName);
@@ -138,6 +146,7 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
                 .setCategory(NotificationCompat.CATEGORY_ALARM)
                 .setSound(soundUri)
                 .setContentIntent(fullScreenPendingIntent)
+                .setFullScreenIntent(fullScreenPendingIntent, true)
                 .setAutoCancel(true);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -149,7 +158,7 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
     private void createNotificationChannel(Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                    "prayer_reminder_channel_adhan_4",
+                    "prayer_reminder_channel_adhan_5",
                     CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_HIGH // Crucial for FullScreenIntent
             );
@@ -164,7 +173,7 @@ public class PrayerAlarmReceiver extends BroadcastReceiver {
             
             // Fajr reminder channel - Specific Adhan sound attached
             NotificationChannel fajrChannel = new NotificationChannel(
-                    "prayer_reminder_channel_fajr_1",
+                    "prayer_reminder_channel_fajr_2",
                     "Fajr Reminders",
                     NotificationManager.IMPORTANCE_HIGH
             );

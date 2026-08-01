@@ -1,4 +1,4 @@
-package com.mosleemapp.app.ui.activities;
+package com.mosleemapp.app.ui.fragments;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -15,13 +15,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.mosleemapp.app.R;
 import com.mosleemapp.app.utils.LocationManagerHelper;
 
-public class QiblaActivity extends BaseActivity implements SensorEventListener, LocationManagerHelper.LocationListener {
+public class QiblaFragment extends Fragment implements SensorEventListener, LocationManagerHelper.LocationListener {
 
     private ImageView ivCompassDial;
     private android.view.View ivQiblaNeedle;
@@ -57,43 +62,49 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener, 
     private final float[] rotationMatrix = new float[9];
     private final float[] orientationAngles = new float[3];
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_qibla);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_qibla, container, false);
+    }
 
-        ivCompassDial = findViewById(R.id.iv_compass_dial);
-        ivQiblaNeedle = findViewById(R.id.iv_qibla_needle);
-        ivKaabaIcon = findViewById(R.id.iv_kaaba_icon);
-        tvBearingInfo = findViewById(R.id.tv_bearingInfo);
-        tvDistanceInfo = findViewById(R.id.tv_distanceInfo);
-        tvNotFlatWarning = findViewById(R.id.tv_not_flat_warning);
-        tvCityName = findViewById(R.id.tv_city_name);
-        cvCalibrationOverlay = findViewById(R.id.cv_calibration_overlay);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        ivCompassDial = view.findViewById(R.id.iv_compass_dial);
+        ivQiblaNeedle = view.findViewById(R.id.iv_qibla_needle);
+        ivKaabaIcon = view.findViewById(R.id.iv_kaaba_icon);
+        tvBearingInfo = view.findViewById(R.id.tv_bearingInfo);
+        tvDistanceInfo = view.findViewById(R.id.tv_distanceInfo);
+        tvNotFlatWarning = view.findViewById(R.id.tv_not_flat_warning);
+        tvCityName = view.findViewById(R.id.tv_city_name);
+        cvCalibrationOverlay = view.findViewById(R.id.cv_calibration_overlay);
         
-        appPreference = new com.mosleemapp.app.utils.AppPreference(this);
+        appPreference = new com.mosleemapp.app.utils.AppPreference(requireContext());
         String savedCity = appPreference.getString("city", "");
         if (savedCity != null && !savedCity.isEmpty()) {
             tvCityName.setText(savedCity);
         }
 
-        prayerViewModel = new androidx.lifecycle.ViewModelProvider(this).get(com.mosleemapp.app.ui.viewmodel.PrayerViewModel.class);
+        prayerViewModel = new androidx.lifecycle.ViewModelProvider(requireActivity()).get(com.mosleemapp.app.ui.viewmodel.PrayerViewModel.class);
         
-        com.google.android.gms.ads.AdView adView = findViewById(R.id.adView);
-        com.mosleemapp.app.utils.AdMobUtil.loadBanner(adView);
-        prayerViewModel.getCityName().observe(this, name -> {
+        com.google.android.gms.ads.AdView adView = view.findViewById(R.id.adView);
+        prayerViewModel.getCityName().observe(getViewLifecycleOwner(), name -> {
             if (name != null && !name.isEmpty()) {
                 tvCityName.setText(name);
             }
         });
 
-        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         if (toolbar != null) {
             toolbar.setTitle("Qibla Compass");
-            toolbar.setNavigationOnClickListener(v -> finish());
+            toolbar.setNavigationOnClickListener(v -> {
+                requireActivity().getSupportFragmentManager().popBackStack();
+            });
         }
 
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sensorManager = (SensorManager) requireActivity().getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {
             rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
             if (rotationVectorSensor == null) {
@@ -103,18 +114,18 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener, 
         }
 
         if (rotationVectorSensor == null) {
-            Toast.makeText(this, "Device doesn't have required sensors for compass", Toast.LENGTH_LONG).show();
+            Toast.makeText(requireContext(), "Device doesn't have required sensors for compass", Toast.LENGTH_LONG).show();
             tvBearingInfo.setText("Compass not supported");
         }
 
-        locationManagerHelper = new LocationManagerHelper(this, this);
+        locationManagerHelper = new LocationManagerHelper(requireActivity(), this);
         locationManagerHelper.getLocation(); // Request location update
 
         calculateQibla(); // initial calculation with default coords
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
          if (sensorManager != null && rotationVectorSensor != null) {
              sensorManager.registerListener(this, rotationVectorSensor, SensorManager.SENSOR_DELAY_UI);
@@ -122,7 +133,7 @@ public class QiblaActivity extends BaseActivity implements SensorEventListener, 
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
          if (sensorManager != null) {
              sensorManager.unregisterListener(this);

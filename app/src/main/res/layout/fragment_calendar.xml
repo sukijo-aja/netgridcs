@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background_light">
+
+    <include
+        android:id="@+id/appBarLayout"
+        layout="@layout/layout_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="@color/white"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/btnPrevMonth"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            android:rotation="0" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvHijriMonthYear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary_green_dark" />
+
+            <TextView
+                android:id="@+id/tvMasehiMonthYear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnNextMonth"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            android:rotation="180" />
+    </LinearLayout>
+    
+    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
+
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Min" android:textAlignment="center" android:textColor="@color/text_secondary" android:textStyle="bold"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Sen" android:textAlignment="center" android:textColor="@color/text_secondary" android:textStyle="bold"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Sel" android:textAlignment="center" android:textColor="@color/text_secondary" android:textStyle="bold"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Rab" android:textAlignment="center" android:textColor="@color/text_secondary" android:textStyle="bold"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Kam" android:textAlignment="center" android:textColor="@color/text_secondary" android:textStyle="bold"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Jum" android:textAlignment="center" android:textColor="@color/primary_green" android:textStyle="bold"/>
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Sab" android:textAlignment="center" android:textColor="@color/text_secondary" android:textStyle="bold"/>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCalendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="16dp" />
+
+    <!-- Islamic Events List -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Peristiwa Islam Bulan Ini"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="@color/text_primary"
+        android:padding="16dp"
+        android:layout_marginTop="8dp" />
+        
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvEvents"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:clipToPadding="false"
+        android:paddingBottom="32dp"/>
+
+</LinearLayout>

@@ -81,8 +81,6 @@ public class PrayerFragment extends Fragment {
     }
 
     private void loadNativeAd() {
-        AdMobUtil.initialize(getContext());
-        AdMobUtil.loadBanner(binding.adView);
     }
 
     private void populateNativeAdView(NativeAd nativeAd, NativeAdView adView) {

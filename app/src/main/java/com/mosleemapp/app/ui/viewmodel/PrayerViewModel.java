@@ -60,11 +60,41 @@ public class PrayerViewModel extends AndroidViewModel {
         repository.getPrayerTimes(currentLat, currentLon, method, date).observeForever(entity -> {
             prayerData.postValue(entity);
             if (entity != null) {
-
                 startCountdown(entity);
-                com.mosleemapp.app.utils.AlarmScheduler.schedulePrayerAlarms(getApplication(), entity);
+                com.mosleemapp.app.utils.AlarmScheduler.schedulePrayerAlarms(getApplication(), null);
             }
         });
+        
+        // Background fetch for tomorrow and day after
+        new Thread(() -> {
+            try {
+                java.util.Calendar cal = java.util.Calendar.getInstance();
+                for (int i = 1; i <= 2; i++) {
+                    cal.add(java.util.Calendar.DAY_OF_YEAR, 1);
+                    String futureDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(cal.getTime());
+                    
+                    com.mosleemapp.app.data.remote.services.AladhanApiService apiService = 
+                        com.mosleemapp.app.data.remote.RetrofitClient.getRetrofitInstance().create(com.mosleemapp.app.data.remote.services.AladhanApiService.class);
+                    
+                    retrofit2.Response<com.mosleemapp.app.data.remote.Responses.PrayerResponse> response = 
+                        apiService.getPrayerTimes(futureDate, currentLat, currentLon, method).execute();
+                        
+                    if (response.isSuccessful() && response.body() != null && response.body().data != null) {
+                        com.mosleemapp.app.data.remote.Responses.PrayerResponse.Timings timings = response.body().data.timings;
+                        PrayerTimeEntity entity = new PrayerTimeEntity(
+                                futureDate, timings.fajr, timings.dhuhr, timings.asr, timings.maghrib, timings.isha,
+                                timings.sunrise, timings.sunset, timings.imsak, timings.lastThird);
+                        
+                        com.mosleemapp.app.data.local.AppDatabase db = com.mosleemapp.app.data.local.AppDatabase.getDatabase(getApplication());
+                        db.prayerDao().insertPrayerTimes(java.util.Collections.singletonList(entity));
+                        
+                        com.mosleemapp.app.utils.AlarmScheduler.schedulePrayerAlarms(getApplication(), entity);
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("PrayerViewModel", "Error fetching future days", e);
+            }
+        }).start();
     }
 
     public LiveData<PrayerTimeEntity> getPrayerTimes() {

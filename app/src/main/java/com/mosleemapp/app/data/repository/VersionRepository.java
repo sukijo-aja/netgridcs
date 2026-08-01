@@ -53,7 +53,12 @@ public class VersionRepository {
                         }
                         
                         if (version.getModules().getKhutbah() != null) {
-                            prefs.saveLong("khutbah_last_updated", version.getModules().getKhutbah().getLastUpdated());
+                            long serverKhutbahTime = version.getModules().getKhutbah().getLastUpdated();
+                            long localKhutbahTime = prefs.getLong("khutbah_last_updated", 0);
+                            if (serverKhutbahTime > localKhutbahTime) {
+                                prefs.saveBoolean("UPDATE_KHUTBAH_REQUIRED", true);
+                                prefs.saveLong("khutbah_last_updated", serverKhutbahTime);
+                            }
                         }
                     }
                 }

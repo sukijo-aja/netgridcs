@@ -1,4 +1,4 @@
-package com.mosleemapp.app.ui.activities;
+package com.mosleemapp.app.ui.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -13,6 +13,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+
 import com.google.android.material.button.MaterialButton;
 import com.mosleemapp.app.R;
 import com.mosleemapp.app.ui.adapters.TasbihAdapter;
@@ -23,7 +29,7 @@ import com.mosleemapp.app.utils.AdMobUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TasbihActivity extends BaseActivity {
+public class TasbihFragment extends Fragment {
 
     private static final String PREFS_NAME = "TasbihPrefs";
     private TasbihAdapter adapter;
@@ -35,28 +41,35 @@ public class TasbihActivity extends BaseActivity {
     private com.mosleemapp.app.ui.custom.OdometerCounterView tvActiveCount;
     private CardView btnTap;
 
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_tasbih, container, false);
+    }
+
     @SuppressLint("MissingInflatedId")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tasbih);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        tvActiveName = findViewById(R.id.tvActiveName);
-        tvActiveCount = findViewById(R.id.tvActiveCount);
-        btnTap = findViewById(R.id.btnTap);
-        RecyclerView rvTasbihList = findViewById(R.id.rvTasbihList);
-        MaterialButton btnResetAll = findViewById(R.id.btnResetAll);
+        tvActiveName = view.findViewById(R.id.tvActiveName);
+        tvActiveCount = view.findViewById(R.id.tvActiveCount);
+        btnTap = view.findViewById(R.id.btnTap);
+        RecyclerView rvTasbihList = view.findViewById(R.id.rvTasbihList);
+        MaterialButton btnResetAll = view.findViewById(R.id.btnResetAll);
         
-        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        com.google.android.material.appbar.MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         if (toolbar != null) {
             toolbar.setTitle("Digital Tasbih");
-            toolbar.setNavigationOnClickListener(v -> finish());
+            toolbar.setNavigationOnClickListener(v -> {
+                requireActivity().getSupportFragmentManager().popBackStack();
+            });
             toolbar.inflateMenu(R.menu.menu_tasbih);
         }
 
         // OdometerCounterView handles its own view factory/animations internally
 
-        prefs = new com.mosleemapp.app.utils.AppPreference(this, PREFS_NAME);
+        prefs = new com.mosleemapp.app.utils.AppPreference(requireContext(), PREFS_NAME);
 
         // Initialize Data
         initializeData();
@@ -101,7 +114,7 @@ public class TasbihActivity extends BaseActivity {
             }
         });
 
-        rvTasbihList.setLayoutManager(new LinearLayoutManager(this));
+        rvTasbihList.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvTasbihList.setAdapter(adapter);
         
         // Initialize Main Display with first item
@@ -145,10 +158,7 @@ public class TasbihActivity extends BaseActivity {
         }
 
 
-        
         // AdMob
-        AdMobUtil.initialize(this);
-        AdMobUtil.loadBanner(findViewById(R.id.adView));
 
 //        btnTap.setOnLongClickListener(v -> {
 //            startSimulation();

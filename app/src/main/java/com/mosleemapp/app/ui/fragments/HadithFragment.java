@@ -53,6 +53,7 @@ public class HadithFragment extends Fragment {
         com.google.android.material.appbar.MaterialToolbar toolbar = binding.getRoot().findViewById(R.id.toolbar);
         if (toolbar != null) {
             toolbar.setTitle(R.string.hadith);
+            // Navigation listener will be updated after inflating menu
             toolbar.setNavigationOnClickListener(v -> {
                 com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = 
                     requireActivity().findViewById(R.id.bottom_navigation);
@@ -77,7 +78,68 @@ public class HadithFragment extends Fragment {
 
         binding.rvHadith.setAdapter(adapter);
 
-        setupSearchView();
+        if (toolbar != null) {
+            toolbar.inflateMenu(R.menu.menu_hadith);
+            android.view.MenuItem searchItem = toolbar.getMenu().findItem(R.id.action_search);
+            SearchView searchView = (SearchView) searchItem.getActionView();
+            searchView.setQueryHint("Search Hadith Book");
+            toolbar.setNavigationOnClickListener(v -> {
+                if (searchItem.isActionViewExpanded()) {
+                    searchItem.collapseActionView();
+                } else {
+                    com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = 
+                        requireActivity().findViewById(R.id.bottom_navigation);
+                    if (bottomNav != null) {
+                        bottomNav.setSelectedItemId(R.id.nav_home);
+                    } else {
+                        requireActivity().onBackPressed();
+                    }
+                }
+            });
+
+            android.widget.ImageView closeButton = searchView.findViewById(androidx.appcompat.R.id.search_close_btn);
+            if (closeButton != null) {
+                closeButton.setOnClickListener(v -> {
+                    searchView.setQuery("", false);
+                    searchView.clearFocus();
+                    searchItem.collapseActionView();
+                });
+            }
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    filterBooks(query);
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    if (closeButton != null && newText.isEmpty()) {
+                        closeButton.post(() -> closeButton.setVisibility(View.VISIBLE));
+                    }
+                    filterBooks(newText);
+                    return false;
+                }
+            });
+
+            searchItem.setOnActionExpandListener(new android.view.MenuItem.OnActionExpandListener() {
+                @Override
+                public boolean onMenuItemActionExpand(android.view.MenuItem item) {
+                    if (closeButton != null) {
+                        closeButton.post(() -> closeButton.setVisibility(View.VISIBLE));
+                    }
+                    return true;
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(android.view.MenuItem item) {
+                    filterBooks(""); // Reset list when search is closed
+                    return true;
+                }
+            });
+        }
+
         
         hadithRepository = new HadithRepository(requireContext());
 
@@ -105,21 +167,7 @@ public class HadithFragment extends Fragment {
         });
     }
 
-    private void setupSearchView() {
-        binding.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                filterBooks(query);
-                return false;
-            }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                filterBooks(newText);
-                return false;
-            }
-        });
-    }
 
     private void filterBooks(String query) {
         List<HadithBookResponse.HadithBook> filteredList = new ArrayList<>();
@@ -143,8 +191,6 @@ public class HadithFragment extends Fragment {
     }
 
     private void loadNativeAd() {
-        AdMobUtil.initialize(getContext());
-        AdMobUtil.loadBanner(binding.adView);
     }
 
     private void populateNativeAdView(NativeAd nativeAd, NativeAdView adView) {

@@ -89,6 +89,7 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
         
         // Initialize AdMob
         AdMobUtil.initialize(this);
+        AdMobUtil.loadBanner(binding.adView);
         
         // Setup Location
         locationManagerHelper = new LocationManagerHelper(this, this);
@@ -147,17 +148,21 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
 
 
 
-        // Double back to exit
+        // Double back to exit or pop backstack
         getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (doubleBackToExitPressedOnce) {
-                    finish();
-                    return;
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    getSupportFragmentManager().popBackStack();
+                } else {
+                    if (doubleBackToExitPressedOnce) {
+                        finish();
+                        return;
+                    }
+                    doubleBackToExitPressedOnce = true;
+                    Toast.makeText(MainActivity.this, R.string.double_back_to_exit, Toast.LENGTH_SHORT).show();
+                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
                 }
-                doubleBackToExitPressedOnce = true;
-                Toast.makeText(MainActivity.this, R.string.double_back_to_exit, Toast.LENGTH_SHORT).show();
-                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
             }
         });
     }
@@ -183,12 +188,31 @@ public class MainActivity extends BaseActivity implements LocationManagerHelper.
             }
             return false;
         });
+
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                binding.bottomNavigation.setVisibility(android.view.View.GONE);
+            } else {
+                binding.bottomNavigation.setVisibility(android.view.View.VISIBLE);
+            }
+        });
     }
 
 
     private void loadFragment(Fragment fragment) {
+        // Clear backstack when navigating via bottom navigation
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment)
+                .commit();
+    }
+
+    public void loadFragmentWithBackStack(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
                 .commit();
     }
 

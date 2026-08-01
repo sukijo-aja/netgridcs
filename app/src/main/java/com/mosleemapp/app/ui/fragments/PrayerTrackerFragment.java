@@ -1,4 +1,4 @@
-package com.mosleemapp.app.ui.activities;
+package com.mosleemapp.app.ui.fragments;
 
 import android.os.Bundle;
 import android.widget.CheckBox;
@@ -6,8 +6,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.mosleemapp.app.R;
@@ -22,7 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class PrayerTrackerActivity extends AppCompatActivity {
+public class PrayerTrackerFragment extends Fragment {
 
     private CheckBox cbFajr, cbDhuhr, cbAsr, cbMaghrib, cbIsha;
     private CheckBox cbTilawah, cbTahajud, cbDuha, cbFast;
@@ -44,45 +48,52 @@ public class PrayerTrackerActivity extends AppCompatActivity {
     private List<CustomHabitEntity> allHabits = new java.util.ArrayList<>();
     private List<CustomHabitLogEntity> currentLogs = new java.util.ArrayList<>();
 
+    @Nullable
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_prayer_tracker);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_prayer_tracker, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         
-        viewModel = new ViewModelProvider(this).get(PrayerTrackerViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(PrayerTrackerViewModel.class);
         
-        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        com.google.android.material.appbar.MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         if (toolbar != null) {
             toolbar.setTitle("Prayer Tracker");
-            toolbar.setNavigationOnClickListener(v -> finish());
+            toolbar.setNavigationOnClickListener(v -> {
+                requireActivity().getSupportFragmentManager().popBackStack();
+            });
         }
         
-        initViews();
+        initViews(view);
         setupListeners();
         observeViewModel();
     }
 
-    private void initViews() {
-        cbFajr = findViewById(R.id.cbFajr);
-        cbDhuhr = findViewById(R.id.cbDhuhr);
-        cbAsr = findViewById(R.id.cbAsr);
-        cbMaghrib = findViewById(R.id.cbMaghrib);
-        cbIsha = findViewById(R.id.cbIsha);
+    private void initViews(View view) {
+        cbFajr = view.findViewById(R.id.cbFajr);
+        cbDhuhr = view.findViewById(R.id.cbDhuhr);
+        cbAsr = view.findViewById(R.id.cbAsr);
+        cbMaghrib = view.findViewById(R.id.cbMaghrib);
+        cbIsha = view.findViewById(R.id.cbIsha);
         
-        cbTilawah = findViewById(R.id.cbTilawah);
-        cbTahajud = findViewById(R.id.cbTahajud);
-        cbDuha = findViewById(R.id.cbDuha);
-        cbFast = findViewById(R.id.cbFast);
+        cbTilawah = view.findViewById(R.id.cbTilawah);
+        cbTahajud = view.findViewById(R.id.cbTahajud);
+        cbDuha = view.findViewById(R.id.cbDuha);
+        cbFast = view.findViewById(R.id.cbFast);
         
-        tvDate = findViewById(R.id.tvDate);
-        tvProgress = findViewById(R.id.tvProgress);
+        tvDate = view.findViewById(R.id.tvDate);
+        tvProgress = view.findViewById(R.id.tvProgress);
         
-        btnPrevDay = findViewById(R.id.btnPrevDay);
-        btnNextDay = findViewById(R.id.btnNextDay);
+        btnPrevDay = view.findViewById(R.id.btnPrevDay);
+        btnNextDay = view.findViewById(R.id.btnNextDay);
 
         // Custom Habits
-        llCustomHabitsContainer = findViewById(R.id.llCustomHabitsContainer);
-        tvNoHabits = findViewById(R.id.tvNoHabits);
+        llCustomHabitsContainer = view.findViewById(R.id.llCustomHabitsContainer);
+        tvNoHabits = view.findViewById(R.id.tvNoHabits);
     }
 
     private void setupListeners() {
@@ -121,12 +132,12 @@ public class PrayerTrackerActivity extends AppCompatActivity {
     }
 
     private void observeViewModel() {
-        viewModel.getSelectedDate().observe(this, date -> {
+        viewModel.getSelectedDate().observe(getViewLifecycleOwner(), date -> {
             currentDateString = dateFormat.format(date);
             tvDate.setText(displayFormat.format(date));
         });
 
-        viewModel.getCurrentTrackerEntity().observe(this, entity -> {
+        viewModel.getCurrentTrackerEntity().observe(getViewLifecycleOwner(), entity -> {
             isUpdating = true;
             currentEntity = entity;
             if (entity != null) {
@@ -156,12 +167,12 @@ public class PrayerTrackerActivity extends AppCompatActivity {
             isUpdating = false;
         });
 
-        viewModel.getAllCustomHabits().observe(this, habits -> {
+        viewModel.getAllCustomHabits().observe(getViewLifecycleOwner(), habits -> {
             allHabits = habits;
             renderCustomHabits();
         });
 
-        viewModel.getCurrentCustomHabitLogs().observe(this, logs -> {
+        viewModel.getCurrentCustomHabitLogs().observe(getViewLifecycleOwner(), logs -> {
             currentLogs = logs;
             renderCustomHabits();
         });

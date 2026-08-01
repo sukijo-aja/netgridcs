@@ -314,6 +314,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
                 <TextView
+                    android:id="@+id/menu_calendar"
                     android:text="@string/menu_calendar"
                     android:textSize="10sp"
                     android:textStyle="bold"
@@ -360,6 +361,7 @@
                     android:paddingVertical="8dp"
                     android:textColor="@color/white"
                     android:drawableTint="@color/white"
+                    android:visibility="gone"
                     />
             </LinearLayout>
 
@@ -375,21 +377,6 @@
     
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
-
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        app:adSize="BANNER"
-        android:layout_gravity="center"
-        app:adUnitId="@string/admob_banner_id"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:visibility="gone"
-        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

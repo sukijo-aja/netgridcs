@@ -122,8 +122,7 @@
         android:textColor="@color/primary_green_dark"
         android:backgroundTint="@android:color/transparent"
         style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone"/>
+        android:layout_marginBottom="8dp" />
 
     <Button
         android:id="@+id/btnTestWorker"

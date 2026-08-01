@@ -50,37 +50,43 @@ public class PrayerUpdateWorker extends Worker {
         try {
             int method = SettingsManager.getInstance(getApplicationContext()).getCalculationMethod();
             AladhanApiService apiService = RetrofitClient.getRetrofitInstance().create(AladhanApiService.class);
-            // Dynamic method selection
-            Response<PrayerResponse> response = apiService.getPrayerTimes(date, lat, lon, method).execute();
+            AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
 
-
-            if (response.isSuccessful() && response.body() != null && response.body().data != null) {
-                PrayerResponse.Timings timings = response.body().data.timings;
-
-                PrayerTimeEntity entity = new PrayerTimeEntity(
-                        date,
-                        timings.fajr,
-                        timings.dhuhr,
-                        timings.asr,
-                        timings.maghrib,
-                        timings.isha,
-                        timings.sunrise,
-                        timings.sunset,
-                        timings.imsak,
-                        timings.lastThird);
-
-                AppDatabase db = AppDatabase.getDatabase(getApplicationContext());
-                db.prayerDao().insertPrayerTimes(Collections.singletonList(entity));
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            for (int i = 0; i < 3; i++) {
+                if (i > 0) cal.add(java.util.Calendar.DAY_OF_YEAR, 1);
+                String targetDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(cal.getTime());
                 
-                // Reschedule alarms using newly fetched entity
-                AlarmScheduler.schedulePrayerAlarms(getApplicationContext(), entity);
-                
-                Log.d(TAG, "Successfully updated prayer times for " + date);
-                return Result.success();
-            } else {
-                Log.e(TAG, "API call failed or empty response");
-                return Result.retry(); // Retreat/Retry backoff on failure
+                Response<PrayerResponse> response = apiService.getPrayerTimes(targetDate, lat, lon, method).execute();
+
+                if (response.isSuccessful() && response.body() != null && response.body().data != null) {
+                    PrayerResponse.Timings timings = response.body().data.timings;
+
+                    PrayerTimeEntity entity = new PrayerTimeEntity(
+                            targetDate,
+                            timings.fajr,
+                            timings.dhuhr,
+                            timings.asr,
+                            timings.maghrib,
+                            timings.isha,
+                            timings.sunrise,
+                            timings.sunset,
+                            timings.imsak,
+                            timings.lastThird);
+
+                    db.prayerDao().insertPrayerTimes(Collections.singletonList(entity));
+                    
+                    // Reschedule alarms using newly fetched entity
+                    AlarmScheduler.schedulePrayerAlarms(getApplicationContext(), entity);
+                } else if (i == 0) {
+                    Log.e(TAG, "API call failed or empty response for today");
+                    return Result.retry(); // Retreat/Retry backoff on failure
+                }
             }
+            
+            Log.d(TAG, "Successfully updated prayer times for next 3 days");
+            return Result.success();
+
         } catch (Exception e) {
             Log.e(TAG, "Error fetching prayer times in worker", e);
             return Result.retry();

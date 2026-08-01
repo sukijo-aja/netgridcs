@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="1dp"
+    android:layout_marginHorizontal="4dp"
+    android:layout_marginVertical="8dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="4dp">
 
@@ -12,6 +13,7 @@
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:background="@drawable/bg_card_green"
+        android:backgroundTint="@color/white"
         >
         <TextView
             android:id="@+id/tvBookName"
@@ -40,11 +42,11 @@
         <ImageView
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/ic_read_more_24"
+            android:src="@drawable/ic_arrow_forward"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:tint="@color/black"
+            app:tint="@color/text_secondary"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

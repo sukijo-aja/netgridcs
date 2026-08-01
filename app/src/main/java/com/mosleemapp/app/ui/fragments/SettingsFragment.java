@@ -395,15 +395,35 @@ public class SettingsFragment extends Fragment {
         else if (currentLang.equals("ar")) checkedItem = 2;
         else if (currentLang.equals("zh")) checkedItem = 3;
 
-        new AlertDialog.Builder(requireContext())
-                .setTitle(R.string.select_language)
-                .setSingleChoiceItems(languages, checkedItem, (dialog, which) -> {
-                    LocaleHelper.setLocale(requireContext(), codes[which]);
-                    dialog.dismiss();
-                    requireActivity().recreate();
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
+        com.google.android.material.bottomsheet.BottomSheetDialog dialog = new com.google.android.material.bottomsheet.BottomSheetDialog(requireContext());
+        
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(requireContext());
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(64, 64, 64, 64);
+
+        android.widget.TextView title = new android.widget.TextView(requireContext());
+        title.setText(R.string.select_language);
+        title.setTextSize(20);
+        title.setTypeface(null, android.graphics.Typeface.BOLD);
+        title.setPadding(0, 0, 0, 32);
+        layout.addView(title);
+
+        android.widget.ListView listView = new android.widget.ListView(requireContext());
+        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_single_choice, languages);
+        listView.setAdapter(adapter);
+        listView.setChoiceMode(android.widget.ListView.CHOICE_MODE_SINGLE);
+        listView.setItemChecked(checkedItem, true);
+        listView.setDivider(null);
+        
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            LocaleHelper.setLocale(requireContext(), codes[position]);
+            dialog.dismiss();
+            requireActivity().recreate();
+        });
+        
+        layout.addView(listView);
+        dialog.setContentView(layout);
+        dialog.show();
     }
 
     private void showAddHabitDialog() {
@@ -454,7 +474,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void showCalculationMethodDialog(Button button) {
-        final String[] methods = {
+        String[] originalMethods = {
             "Univ. Islamic Sciences, Karachi (1)",
             "ISNA (North America) (2)",
             "Muslim World League (MWL) (3)",
@@ -471,40 +491,98 @@ public class SettingsFragment extends Fragment {
             "MWL (Worldwide) (15)",
             "Kemenag Indonesia (20)"
         };
-        final int[] ids = {1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20};
+        int[] originalIds = {1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20};
 
         int currentMethod = SettingsManager.getInstance(requireContext()).getCalculationMethod();
-        int checkedItem = -1;
-        for (int i = 0; i < ids.length; i++) {
-            if (ids[i] == currentMethod) {
-                checkedItem = i;
+        
+        java.util.List<String> methodsList = new java.util.ArrayList<>();
+        java.util.List<Integer> idsList = new java.util.ArrayList<>();
+        
+        int selectedIndexInOriginal = -1;
+        for (int i = 0; i < originalIds.length; i++) {
+            if (originalIds[i] == currentMethod) {
+                selectedIndexInOriginal = i;
                 break;
             }
         }
+        
+        // Add selected item to the top
+        if (selectedIndexInOriginal != -1) {
+            methodsList.add(originalMethods[selectedIndexInOriginal]);
+            idsList.add(originalIds[selectedIndexInOriginal]);
+        }
+        
+        // Add the rest
+        for (int i = 0; i < originalIds.length; i++) {
+            if (i != selectedIndexInOriginal) {
+                methodsList.add(originalMethods[i]);
+                idsList.add(originalIds[i]);
+            }
+        }
+        
+        final String[] finalMethods = methodsList.toArray(new String[0]);
+        final Integer[] finalIds = idsList.toArray(new Integer[0]);
+        int checkedItem = selectedIndexInOriginal != -1 ? 0 : -1;
 
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Select Calculation Method")
-                .setSingleChoiceItems(methods, checkedItem, (dialog, which) -> {
-                    int selectedId = ids[which];
-                    SettingsManager.getInstance(requireContext()).setCalculationMethod(selectedId);
-                    updateCalculationMethodButtonText(button);
-                    
-                    // Clear prayer cache to force re-fetch
-                    new Thread(() -> {
-                        AppDatabase.getDatabase(requireContext()).prayerDao().deleteAllPrayerTimes();
-                        // Trigger re-fetch in ViewModel
-                        requireActivity().runOnUiThread(() -> {
-                            PrayerViewModel prayerViewModel = new androidx.lifecycle.ViewModelProvider(requireActivity()).get(PrayerViewModel.class);
-                            prayerViewModel.fetchPrayerTimes();
-                        });
-                    }).start();
-                    
-                    Toast.makeText(requireContext(), "Method updated. Times refreshed.", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
+        com.google.android.material.bottomsheet.BottomSheetDialog dialog = new com.google.android.material.bottomsheet.BottomSheetDialog(requireContext());
+        
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(requireContext());
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(64, 64, 64, 64);
 
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
+        android.widget.TextView title = new android.widget.TextView(requireContext());
+        title.setText("Select Calculation Method");
+        title.setTextSize(20);
+        title.setTypeface(null, android.graphics.Typeface.BOLD);
+        title.setPadding(0, 0, 0, 32);
+        layout.addView(title);
+
+        android.widget.ListView listView = new android.widget.ListView(requireContext());
+        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_single_choice, finalMethods);
+        listView.setAdapter(adapter);
+        listView.setChoiceMode(android.widget.ListView.CHOICE_MODE_SINGLE);
+        if (checkedItem != -1) {
+            listView.setItemChecked(checkedItem, true);
+        }
+        listView.setDivider(null);
+        
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            int selectedId = finalIds[position];
+            SettingsManager.getInstance(requireContext()).setCalculationMethod(selectedId);
+            updateCalculationMethodButtonText(button);
+            
+            // Clear prayer cache to force re-fetch
+            new Thread(() -> {
+                AppDatabase.getDatabase(requireContext()).prayerDao().deleteAllPrayerTimes();
+                // Trigger re-fetch in ViewModel
+                requireActivity().runOnUiThread(() -> {
+                    PrayerViewModel prayerViewModel = new androidx.lifecycle.ViewModelProvider(requireActivity()).get(PrayerViewModel.class);
+                    prayerViewModel.fetchPrayerTimes();
+                });
+            }).start();
+            
+            Toast.makeText(requireContext(), "Method updated. Times refreshed.", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+        
+        layout.addView(listView);
+        dialog.setContentView(layout);
+        
+        // Ensure bottom sheet doesn't take up the full screen (limit to ~55% height)
+        dialog.setOnShowListener(d -> {
+            com.google.android.material.bottomsheet.BottomSheetDialog bottomSheet = (com.google.android.material.bottomsheet.BottomSheetDialog) d;
+            android.widget.FrameLayout bottomSheetInternal = bottomSheet.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheetInternal != null) {
+                int screenHeight = requireContext().getResources().getDisplayMetrics().heightPixels;
+                android.view.ViewGroup.LayoutParams layoutParams = bottomSheetInternal.getLayoutParams();
+                layoutParams.height = (int) (screenHeight * 0.55);
+                bottomSheetInternal.setLayoutParams(layoutParams);
+                
+                com.google.android.material.bottomsheet.BottomSheetBehavior.from(bottomSheetInternal).setState(com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
+        
+        dialog.show();
     }
 }
 

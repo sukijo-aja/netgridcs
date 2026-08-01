@@ -24,7 +24,10 @@ import com.mosleemapp.app.data.local.dao.CustomHabitDao;
 import com.mosleemapp.app.data.local.entity.CustomHabitEntity;
 import com.mosleemapp.app.data.local.entity.CustomHabitLogEntity;
 
-@Database(entities = { PrayerTimeEntity.class, SurahEntity.class, AyahEntity.class, HadithBookEntity.class, HadithEntity.class, DuaEntity.class, PrayerTrackerEntity.class, CustomHabitEntity.class, CustomHabitLogEntity.class }, version = 13, exportSchema = false)
+import com.mosleemapp.app.data.local.entity.KhutbahEntity;
+import com.mosleemapp.app.data.local.dao.KhutbahDao;
+
+@Database(entities = { PrayerTimeEntity.class, SurahEntity.class, AyahEntity.class, HadithBookEntity.class, HadithEntity.class, DuaEntity.class, PrayerTrackerEntity.class, CustomHabitEntity.class, CustomHabitLogEntity.class, KhutbahEntity.class }, version = 14, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract PrayerDao prayerDao();
@@ -33,6 +36,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract DuaDao duaDao();
     public abstract PrayerTrackerDao prayerTrackerDao();
     public abstract CustomHabitDao customHabitDao();
+    public abstract KhutbahDao khutbahDao();
 
     private static volatile AppDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;

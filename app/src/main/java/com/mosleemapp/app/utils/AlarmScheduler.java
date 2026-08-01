@@ -111,6 +111,34 @@ public class AlarmScheduler {
     }
 
     /**
+     * Schedule an alarm to activate silent mode after the given duration (in minutes).
+     */
+    @SuppressLint("ScheduleExactAlarm")
+    public static void scheduleActivateSilentAlarm(Context context, int delayMinutes) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager == null) return;
+
+        Intent intent = new Intent(context, PrayerAlarmReceiver.class);
+        intent.setAction(PrayerAlarmReceiver.ACTION_ACTIVATE_SILENT);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                98, // unique request code for activate-silent
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        Calendar target = Calendar.getInstance();
+        target.add(Calendar.MINUTE, delayMinutes);
+
+        try {
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, target.getTimeInMillis(), pendingIntent);
+        } catch (SecurityException e) {
+            Log.e("AlarmScheduler", "SecurityException scheduling activate silent alarm", e);
+        }
+    }
+
+    /**
      * Schedule an alarm to restore the ringer mode after the given duration.
      */
     @SuppressLint("ScheduleExactAlarm")
@@ -132,11 +160,7 @@ public class AlarmScheduler {
         target.add(Calendar.MINUTE, durationMinutes);
 
         try {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, target.getTimeInMillis(), pendingIntent);
-            } else {
-                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, target.getTimeInMillis(), pendingIntent);
-            }
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, target.getTimeInMillis(), pendingIntent);
         } catch (SecurityException e) {
             Log.e("AlarmScheduler", "SecurityException scheduling restore ringer alarm", e);
         }
@@ -152,6 +176,13 @@ public class AlarmScheduler {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
         am.cancel(pendingIntent);
+        
+        Intent intentSilent = new Intent(context, PrayerAlarmReceiver.class);
+        intentSilent.setAction(PrayerAlarmReceiver.ACTION_ACTIVATE_SILENT);
+        PendingIntent piSilent = PendingIntent.getBroadcast(
+                context, 98, intentSilent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+        am.cancel(piSilent);
     }
 
     private static void cancelPendingIntent(Context context, AlarmManager am, int requestCode) {
@@ -227,12 +258,18 @@ public class AlarmScheduler {
 
             if (alarmManager != null) {
                 try {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
-                        alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, target.getTimeInMillis(), pendingIntent);
-                    } else {
-                        // Use setExactAndAllowWhileIdle for reliable timing
-                        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, target.getTimeInMillis(), pendingIntent);
-                    }
+                    Intent infoIntent = new Intent(context, com.mosleemapp.app.MainActivity.class);
+                    PendingIntent infoPendingIntent = PendingIntent.getActivity(
+                            context,
+                            requestCode,
+                            infoIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                    );
+                    AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(
+                            target.getTimeInMillis(),
+                            infoPendingIntent
+                    );
+                    alarmManager.setAlarmClock(alarmClockInfo, pendingIntent);
                 } catch (SecurityException e) {
                     Log.e("AlarmScheduler", "SecurityException scheduling alarm", e);
                 }

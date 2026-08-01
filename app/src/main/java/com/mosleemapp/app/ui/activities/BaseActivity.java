@@ -30,7 +30,7 @@ public class BaseActivity extends AppCompatActivity {
 //        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
         if (controller != null) {
-            controller.hide(WindowInsetsCompat.Type.systemBars());
+//            controller.hide(WindowInsetsCompat.Type.systemBars());
 //            controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
         }
     }

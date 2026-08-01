@@ -11,10 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.mosleemapp.app.databinding.FragmentHomeBinding;
-import com.mosleemapp.app.ui.activities.DetailActivity;
-import com.mosleemapp.app.ui.activities.DuaActivity;
-import com.mosleemapp.app.ui.activities.QiblaActivity;
-import com.mosleemapp.app.ui.activities.TasbihActivity;
+
 import com.mosleemapp.app.ui.activities.SurahDetailActivity;
 
 import android.content.Intent;
@@ -64,44 +61,91 @@ public class HomeFragment extends Fragment {
         List<HomeMenuAdapter.HomeMenuItem> menuItems = new ArrayList<>();
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("quran", getString(R.string.quran), R.drawable.ic_quran));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("hadith", getString(R.string.hadith), R.drawable.ic_book));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("khutbah", getString(R.string.menu_khutbah), R.drawable.ic_menu_book));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("calendar", getString(R.string.menu_calendar), R.drawable.ic_calendar));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("tasbih", getString(R.string.menu_tasbih), R.drawable.ic_tasbih));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("dua", getString(R.string.menu_dua), R.drawable.dua));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("prayer", getString(R.string.menu_prayer), R.drawable.ic_history));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("tracker", getString(R.string.menu_tracker), R.drawable.ic_history));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("qibla", getString(R.string.menu_qibla), R.drawable.ic_kaaba));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("our_apps", getString(R.string.menu_our_apps), R.drawable.ic_menu));
+        menuItems.add(new HomeMenuAdapter.HomeMenuItem("share_app", "Share App", R.drawable.ic_share));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("remove_ads", getString(R.string.menu_remove_ads), R.drawable.ic_premium));
-//        menuItems.add(new HomeMenuAdapter.HomeMenuItem("favorites", "Favorites", R.drawable.ic_favorite));
 
         HomeMenuAdapter menuAdapter = new HomeMenuAdapter(menuItems, item -> {
             com.google.android.material.bottomnavigation.BottomNavigationView bottomNav =
                     requireActivity().findViewById(R.id.bottom_navigation);
 
-            if (item.getId().equals("quran")) {
-                bottomNav.setSelectedItemId(R.id.nav_quran);
-            } else if (item.getId().equals("settings")) {
-                bottomNav.setSelectedItemId(R.id.nav_settings);
-            } else if (item.getId().equals("hadith")) {
-                bottomNav.setSelectedItemId(R.id.nav_hadith);
-            } else if (item.getId().equals("tasbih")) {
-                startActivity(new android.content.Intent(getContext(), TasbihActivity.class));
-            } else if (item.getId().equals("dua")) {
-                startActivity(new android.content.Intent(getContext(), DuaActivity.class));
-            } else if (item.getId().equals("remove_ads")) {
-                com.mosleemapp.app.utils.AppPreference appPreference = new com.mosleemapp.app.utils.AppPreference(getContext());
-                if (appPreference.getString("UID", "").isEmpty()) {
-                    android.widget.Toast.makeText(getContext(), "Please login to continue", android.widget.Toast.LENGTH_SHORT).show();
-                    startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.LoginActivity.class));
-                } else {
-                    startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.PurchaseActivity.class));
-                }
-            } else if (item.getId().equals("tracker")) {
-                startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.PrayerTrackerActivity.class));
-            } else if (item.getId().equals("qibla")) {
-                startActivity(new android.content.Intent(getContext(), QiblaActivity.class));
-            } else {
-                android.content.Intent intent = new android.content.Intent(getContext(), DetailActivity.class);
-                intent.putExtra("EXTRA_TITLE", item.getTitle());
-                startActivity(intent);
+            switch (item.getId()) {
+                case "quran":
+                    bottomNav.setSelectedItemId(R.id.nav_quran);
+                    break;
+                case "settings":
+                    bottomNav.setSelectedItemId(R.id.nav_settings);
+                    break;
+                case "hadith":
+                    bottomNav.setSelectedItemId(R.id.nav_hadith);
+                    break;
+                case "khutbah":
+                    ((com.mosleemapp.app.MainActivity) requireActivity()).loadFragmentWithBackStack(new KhutbahFragment());
+                    break;
+                case "calendar":
+                    ((com.mosleemapp.app.MainActivity) requireActivity()).loadFragmentWithBackStack(new CalendarFragment());
+                    break;
+                case "tasbih":
+                    ((com.mosleemapp.app.MainActivity) requireActivity()).loadFragmentWithBackStack(new TasbihFragment());
+                    break;
+                case "dua":
+                    ((com.mosleemapp.app.MainActivity) requireActivity()).loadFragmentWithBackStack(new DuaFragment());
+                    break;
+                case "remove_ads":
+                    com.mosleemapp.app.utils.AppPreference appPreference = new com.mosleemapp.app.utils.AppPreference(getContext());
+                    if (appPreference.getString("UID", "").isEmpty()) {
+                        android.widget.Toast.makeText(getContext(), "Please login to continue", android.widget.Toast.LENGTH_SHORT).show();
+                        startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.LoginActivity.class));
+                    } else {
+                        startActivity(new android.content.Intent(getContext(), com.mosleemapp.app.ui.activities.PurchaseActivity.class));
+                    }
+                    break;
+                case "tracker":
+                    ((com.mosleemapp.app.MainActivity) requireActivity()).loadFragmentWithBackStack(new PrayerTrackerFragment());
+                    break;
+                case "qibla":
+                    ((com.mosleemapp.app.MainActivity) requireActivity()).loadFragmentWithBackStack(new QiblaFragment());
+                    break;
+                case "prayer":
+                    com.mosleemapp.app.ui.dialogs.PrayerSettingsBottomSheet bottomSheet = new com.mosleemapp.app.ui.dialogs.PrayerSettingsBottomSheet();
+                    bottomSheet.show(getParentFragmentManager(), com.mosleemapp.app.ui.dialogs.PrayerSettingsBottomSheet.TAG);
+                    break;
+                case "our_apps":
+                    com.mosleemapp.app.utils.AppPreference appPref = new com.mosleemapp.app.utils.AppPreference(getContext());
+                    String ourAppsUrl = appPref.getString("our_apps", "");
+                    if (!ourAppsUrl.isEmpty()) {
+                        try {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(ourAppsUrl));
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            android.widget.Toast.makeText(getContext(), "Invalid link format", android.widget.Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        android.widget.Toast.makeText(getContext(), "Link not available yet", android.widget.Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case "share_app":
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, "Check out MosleemApp: https://play.google.com/store/apps/details?id=" + requireContext().getPackageName());
+                    sendIntent.setType("text/plain");
+                    Intent shareIntent = Intent.createChooser(sendIntent, "Share App via");
+                    startActivity(shareIntent);
+                    break;
+                default:
+                    DetailFragment detailFragment = new DetailFragment();
+                    android.os.Bundle args = new android.os.Bundle();
+                    args.putString("EXTRA_TITLE", item.getTitle());
+                    detailFragment.setArguments(args);
+                    ((com.mosleemapp.app.MainActivity) requireActivity()).loadFragmentWithBackStack(detailFragment);
+                    break;
             }
 
         });
@@ -120,14 +164,13 @@ public class HomeFragment extends Fragment {
         observeViewModel();
 
         binding.products.setOnClickListener(v -> {
-            startActivity(new Intent(getContext(), com.mosleemapp.app.ui.activities.ProductsActivity.class));
+            ((com.mosleemapp.app.MainActivity) requireActivity()).loadFragmentWithBackStack(new ProductsFragment());
         });
     }
         
     @Override
     public void onResume() {
         super.onResume();
-        loadBannerAd();
         updateLastRead();
         setupGreetingAndDate();
         setupAppName();
@@ -210,12 +253,6 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             });
         }
-    }
-
-    private void loadBannerAd(){
-        AdMobUtil.initialize(getContext());
-        AdMobUtil.loadBanner(binding.adView);
-        binding.adView.setVisibility(View.VISIBLE);
     }
 
     private void loadNativeAd() {
