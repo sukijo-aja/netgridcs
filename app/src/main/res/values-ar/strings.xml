@@ -2,36 +2,16 @@
 <resources>
     <string name="app_name" translatable="false">Starter App</string>
 
-    <string name="manage_prayer_alarms">إدارة منبهات الصلاة</string>
-    <string name="location_permission_required">مطلوب إذن الموقع لأوقات الصلاة الدقيقة</string>
     <string name="double_back_to_exit">انقر على زر الرجوع مرة أخرى للخروج</string>
-    <string name="location_updated">تم تحديث الموقع</string>
-    <string name="reminders_enabled">تم تمكين التنبيهات</string>
-    <string name="reminders_disabled">تم تعطيل التنبيهات</string>
-    <string name="reminder_offset_updated">تم تحديث وقت التنبيه</string>
-    <string name="error_prefix">خطأ: %1$s</string>
-    <string name="reminder_for_prayer_enabled">تنبيهات %1$s مفعلة</string>
-    <string name="reminder_for_prayer_disabled">تنبيهات %1$s معطلة</string>
     <string name="language">اللغة</string>
     <string name="select_language">اختر اللغة</string>
-    <string name="verses">آية</string>
     <string name="login">تسجيل الدخول</string>
     <string name="logout">تسجيل الخروج</string>
-    <string name="register">تسجيل</string>
-    <string name="reset_all">إعادة تعيين الكل</string>
-    <string name="label_font_size">حجم الخط العربي</string>
     <string name="home">الرئيسية</string>
-    <string name="prayer">الصلاة</string>
-    <string name="fajr">الفجر</string>
-    <string name="dhuhr">الظهر</string>
-    <string name="asr">العصر</string>
-    <string name="maghrib">المغرب</string>
-    <string name="isha">العشاء</string>
     <string name="quran">القرآن</string>
     <string name="hadith">الحديث</string>
     <string name="settings">الإعدادات</string>
     <string name="premium_access">وصول مميز</string>
-    <string name="remove_ads">إزالة الإعلانات</string>
     <string name="unlock_all_features">فتح جميع الميزات</string>
     <string name="premium_desc">احصل على وصول غير محدود إلى جميع الميزات. يمكنك الإلغاء في أي وقت.</string>
     <string name="monthly">شهرياً</string>
@@ -41,40 +21,11 @@
     <string name="save_percent">وفر 17%</string>
     <string name="purchase_simulated">محاكاة الشراء لـ: %1$s</string>
     <string name="purchase_successful">تمت عملية الشراء بنجاح! شكراً لك.</string>
-    <string name="check_your_internet_connection_and_try_again">تحقق من اتصالك بالإنترنت وحاول مرة أخرى.</string>
-    <string name="moslem_app">تطبيق مسلم</string>
-    <string name="auto_silent_mode">الوضع الصامت التلقائي</string>
-    <string name="auto_silent_mode_desc">تعيين الهاتف تلقائياً إلى الاهتزاز أثناء وقت الصلاة</string>
-    <string name="silent_duration">مدة الصامت</string>
-    <string name="silent_mode_enabled">تم تمكين الوضع الصامت التلقائي</string>
-    <string name="silent_mode_disabled">تم تعطيل الوضع الصامت التلقائي</string>
-    <string name="silent_mode_restored">ترجيع وضع الرنين</string>
-    <string name="dnd_permission_required">مطلوب إذن عدم الإزعاج. يرجى منح الوصول في الإعدادات.</string>
     <string name="welcome_message">مرحباً</string>
     <string name="user_name">مسلم</string>
-    <string name="enable_prayer_alarms">تمكين منبه المشغل</string>
-    <string name="reminder_before_adhan">التذكير قبل الأذان</string>
-    <string name="manage_custom_habits">إدارة العادات المخصصة</string>
-    <string name="download_all_resources_offline">تنزيل جميع الموارد (بدون إنترنت)</string>
-    <string name="download_all_resources_desc">تنزيل جميع الموارد للاستخدام في وضع عدم الاتصال</string>
-    <string name="last_read">القراءة الأخيرة</string>
-    <string name="next_prayer">الصلاة القادمة</string>
-    <string name="reminder_before_adhan_minutes">التذكير قبل الأذان : %1$s دقيقة</string>
-    <string name="search">بحث</string>
-    <string name="search_surah">البحث عن سورة</string>
-    <string name="show_tajweed_colored_quran">إظهار التجويد (قرآن ملون)</string>
-    <string name="show_translation">إظهار الترجمة</string>
-    <string name="calculation_method">طريقة الحساب</string>
-    <string name="download_hadith">تنزيل جميع الأحاديث (بدون إنترنت)</string>
-    <string name="upcoming_prayer">الصلاة القادمة %1$s</string>
-    <string name="is_coming_soon">ستأتي قريباً</string>
-    <string name="its_time_for">حان وقت</string>
     <!-- Home Menu Items -->
 
-    <string name="menu_tasbih">تسبيح</string>
-    <string name="menu_prayer">الصلاة</string>
-    <string name="menu_tracker">المتابعة</string>
-    <string name="menu_qibla">القبلة</string>
+
     <string name="menu_remove_ads">إزالة الإعلانات</string>
     <string name="menu_islamic_study">محاضرات</string>
     <string name="menu_our_apps">تطبيقاتنا</string>

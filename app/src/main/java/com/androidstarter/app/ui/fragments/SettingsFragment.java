@@ -35,6 +35,9 @@ public class SettingsFragment extends Fragment {
 
 
     private TextView btnLogin;
+    private TextView btnEditProfile;
+    private TextView btnChangePassword;
+    private TextView btnDeleteAccount;
     private TextView tvUserId;
     private FirebaseAuth mAuth;
 
@@ -72,7 +75,7 @@ public class SettingsFragment extends Fragment {
             settingsManager.setPremium(isChecked);
             AdMobUtil.setPremium(isChecked);
             Toast.makeText(requireContext(), 
-                isChecked ? "Premium Enabled (Ads Disabled)" : "Premium Disabled (Ads Enabled)", 
+                isChecked ? getString(R.string.premium_enabled) : getString(R.string.premium_disabled), 
                 Toast.LENGTH_SHORT).show();
         });
 
@@ -82,10 +85,10 @@ public class SettingsFragment extends Fragment {
             settingsManager.setPushNotificationsEnabled(isChecked);
             if (isChecked) {
                 // Subscribe to Firebase Topic if using FCM
-                Toast.makeText(requireContext(), "Notifications Enabled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.notifications_enabled, Toast.LENGTH_SHORT).show();
             } else {
                 // Unsubscribe from Firebase Topic
-                Toast.makeText(requireContext(), "Notifications Disabled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.notifications_disabled, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -141,6 +144,17 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        TextView btnFaqHelp = view.findViewById(R.id.btnFaqHelp);
+        btnFaqHelp.setOnClickListener(v -> {
+            Toast.makeText(requireContext(), R.string.feature_coming_soon, Toast.LENGTH_SHORT).show();
+        });
+
+        TextView btnTermsOfService = view.findViewById(R.id.btnTermsOfService);
+        btnTermsOfService.setOnClickListener(v -> {
+            android.content.Intent browserIntent = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://policies.google.com/terms"));
+            startActivity(browserIntent);
+        });
+
         TextView btnPrivacyPolicy = view.findViewById(R.id.btnPrivacyPolicy);
         btnPrivacyPolicy.setOnClickListener(v -> {
             android.content.Intent browserIntent = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://policies.google.com/privacy"));
@@ -166,6 +180,9 @@ public class SettingsFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         tvUserId = view.findViewById(R.id.tvUserId);
         btnLogin = view.findViewById(R.id.btnLogin);
+        btnEditProfile = view.findViewById(R.id.btnEditProfile);
+        btnChangePassword = view.findViewById(R.id.btnChangePassword);
+        btnDeleteAccount = view.findViewById(R.id.btnDeleteAccount);
         
         updateLoginUI();
         
@@ -195,7 +212,7 @@ public class SettingsFragment extends Fragment {
                 appPreference.remove("USER_EMAIL");
                 appPreference.remove("USER_NAME");
 
-                Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), R.string.logged_out, Toast.LENGTH_SHORT).show();
                 updateLoginUI();
             } else {
                 // Login
@@ -203,17 +220,29 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        btnEditProfile.setOnClickListener(v -> {
+            Toast.makeText(requireContext(), R.string.feature_coming_soon, Toast.LENGTH_SHORT).show();
+        });
+
+        btnChangePassword.setOnClickListener(v -> {
+            Toast.makeText(requireContext(), R.string.feature_coming_soon, Toast.LENGTH_SHORT).show();
+        });
+
+        btnDeleteAccount.setOnClickListener(v -> {
+            showDeleteAccountDialog();
+        });
+
         // Initial check for unique ID if not logged in
         String currentId = settingsManager.getUserId();
-        tvUserId.setText("User ID: " + currentId);
+        tvUserId.setText(getString(R.string.user_id_prefix, currentId));
 
         if ("Fetching...".equals(currentId)) {
             FirebaseUtil.getInstance(requireContext()).getInstallationId(id -> {
                 if (isAdded()) {
                     if (id != null) {
-                        tvUserId.setText("User ID: " + id);
+                        tvUserId.setText(getString(R.string.user_id_prefix, id));
                     } else {
-                        tvUserId.setText("User ID: Error fetching ID");
+                        tvUserId.setText(getString(R.string.user_id_prefix, "Error fetching ID"));
                     }
                 }
             });
@@ -225,15 +254,9 @@ public class SettingsFragment extends Fragment {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText("User ID", uid);
             clipboard.setPrimaryClip(clip);
-            Toast.makeText(requireContext(), "User ID copied", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), R.string.user_id_copied, Toast.LENGTH_SHORT).show();
             return true;
         });
-
-        TextView btnResetData = view.findViewById(R.id.btnResetData);
-        btnResetData.setOnClickListener(v -> {
-            Toast.makeText(requireContext(), "Fitur ini segera hadir", Toast.LENGTH_SHORT).show();
-        });
-
 
     }
 
@@ -253,17 +276,26 @@ public class SettingsFragment extends Fragment {
             String displayName = user.getDisplayName();
             String email = user.getEmail();
             if (displayName != null && !displayName.isEmpty()) {
-                tvUserId.setText("Logged in as: " + displayName);
+                tvUserId.setText(getString(R.string.logged_in_as, displayName));
+                tvUserId.setVisibility(View.VISIBLE);
             } else if (email != null && !email.isEmpty()) {
-                tvUserId.setText("Logged in as: " + email);
+                tvUserId.setText(getString(R.string.logged_in_as, email));
+                tvUserId.setVisibility(View.VISIBLE);
             } else {
-                tvUserId.setText("Logged in as: " + user.getUid());
+                tvUserId.setText(getString(R.string.logged_in_as, user.getUid()));
+                tvUserId.setVisibility(View.VISIBLE);
             }
+            
+            btnEditProfile.setVisibility(View.VISIBLE);
+            btnChangePassword.setVisibility(View.VISIBLE);
+            btnDeleteAccount.setVisibility(View.VISIBLE);
         } else {
             btnLogin.setText(R.string.login);
             btnLogin.setTextColor(getResources().getColor(R.color.text_primary));
-            SettingsManager settingsManager = SettingsManager.getInstance(requireContext());
-            tvUserId.setText("User ID: " + settingsManager.getUserId());
+            tvUserId.setVisibility(View.GONE);
+            btnEditProfile.setVisibility(View.GONE);
+            btnChangePassword.setVisibility(View.GONE);
+            btnDeleteAccount.setVisibility(View.GONE);
         }
     }
 
@@ -322,5 +354,21 @@ public class SettingsFragment extends Fragment {
     // Removed showAddHabitDialog
 
     // Removed calculation method dialog and formatting
+
+    private void showDeleteAccountDialog() {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle(R.string.confirm_delete_title)
+            .setMessage(R.string.confirm_delete_msg)
+            .setPositiveButton("Delete", (dialog, which) -> {
+                // Mock delete account
+                if (mAuth.getCurrentUser() != null) {
+                    mAuth.signOut();
+                }
+                Toast.makeText(requireContext(), R.string.account_deleted_successfully, Toast.LENGTH_SHORT).show();
+                updateLoginUI();
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
 }
 

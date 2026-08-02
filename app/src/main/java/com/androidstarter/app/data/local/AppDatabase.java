@@ -10,12 +10,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.androidstarter.app.data.local.dao.ExampleDao;
+import com.androidstarter.app.data.local.dao.NotificationDao;
 import com.androidstarter.app.data.local.entity.ExampleEntity;
+import com.androidstarter.app.data.local.entity.NotificationEntity;
 
-@Database(entities = { ExampleEntity.class }, version = 17, exportSchema = false)
+@Database(entities = { ExampleEntity.class, NotificationEntity.class }, version = 18, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract ExampleDao exampleDao();
+    public abstract NotificationDao notificationDao();
 
     private static volatile AppDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;

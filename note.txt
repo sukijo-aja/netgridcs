@@ -2,3 +2,8 @@ keytool -list -v -keystore /home/masjo/.android/debug.keystore -alias androiddeb
 
 SHA1: FB:07:15:B7:16:C9:4C:B9:ED:EB:2C:9B:1B:A3:32:61:3B:E2:A6:37
          SHA256: 8E:39:6F:56:12:7B:34:43:6B:D9:66:2F:58:FB:DC:16:4C:BB:EE:D8:03:CD:9E:F2:88:8D:6C:29:EF:49:05:1F
+
+
+
+FCM Token Android Starter App: 
+epBdhpQDQk6QXeOfiEvFbE:APA91bFSN_qxkI9Z0YmEoN7xSFyj3oKfGfvqj5AkdrM9NXfzt-K3nJm-ohvJbkQblq6iM2UM2S-PFrhuc4Nb7vlXJ09gA9qCN8NYSpepS4DT7qbRL91Hqt0

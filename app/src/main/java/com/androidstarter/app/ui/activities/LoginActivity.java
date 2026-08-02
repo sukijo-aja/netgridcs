@@ -5,7 +5,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.credentials.CredentialManager;
@@ -31,6 +34,12 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private Button btnGoogleSignIn;
     
+    private TextInputEditText etEmail;
+    private TextInputEditText etPassword;
+    private Button btnLoginEmail;
+    private TextView tvRegister;
+    private boolean isLoginMode = true;
+    
     // NOTE: In a real app, use the actual Web Client ID from google-services.json
     // We will attempt to use default_web_client_id if available, or fallback.
     private String serverClientId;
@@ -46,6 +55,11 @@ public class LoginActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         btnGoogleSignIn = findViewById(R.id.btnGoogleSignIn);
         
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
+        btnLoginEmail = findViewById(R.id.btnLoginEmail);
+        tvRegister = findViewById(R.id.tvRegister);
+        
         // Attempt to fetch default web client id from string resources
         int stringId = getResources().getIdentifier("default_web_client_id", "string", getPackageName());
         if (stringId != 0) {
@@ -56,6 +70,66 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         btnGoogleSignIn.setOnClickListener(v -> handleGoogleSignIn());
+        
+        tvRegister.setOnClickListener(v -> {
+            isLoginMode = !isLoginMode;
+            if (isLoginMode) {
+                btnLoginEmail.setText("Sign In");
+                tvRegister.setText("Don't have an account? Register");
+            } else {
+                btnLoginEmail.setText("Register");
+                tvRegister.setText("Already have an account? Sign In");
+            }
+        });
+        
+        btnLoginEmail.setOnClickListener(v -> handleEmailPasswordAuth());
+    }
+
+    private void handleEmailPasswordAuth() {
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+        
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        setLoading(true);
+        if (isLoginMode) {
+            mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        handleAuthSuccess();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Authentication Failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        setLoading(false);
+                    }
+                });
+        } else {
+            mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        handleAuthSuccess();
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Registration Failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        setLoading(false);
+                    }
+                });
+        }
+    }
+    
+    private void handleAuthSuccess() {
+        Log.d("LoginActivity", "Auth:success");
+        AppPreference appPreference = new AppPreference(LoginActivity.this);
+        if (mAuth.getCurrentUser() != null) {
+            appPreference.saveString("UID", mAuth.getCurrentUser().getUid());
+            appPreference.saveString("USER_EMAIL", mAuth.getCurrentUser().getEmail());
+            String name = mAuth.getCurrentUser().getDisplayName();
+            appPreference.saveString("USER_NAME", name != null ? name : "User");
+        }
+        Toast.makeText(LoginActivity.this, "Signed in successfully", Toast.LENGTH_SHORT).show();
+        setResult(RESULT_OK);
+        finish();
     }
 
     private void handleGoogleSignIn() {
@@ -147,5 +221,9 @@ public class LoginActivity extends AppCompatActivity {
     private void setLoading(boolean isLoading) {
         progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         btnGoogleSignIn.setEnabled(!isLoading);
+        btnLoginEmail.setEnabled(!isLoading);
+        etEmail.setEnabled(!isLoading);
+        etPassword.setEnabled(!isLoading);
+        tvRegister.setEnabled(!isLoading);
     }
 }

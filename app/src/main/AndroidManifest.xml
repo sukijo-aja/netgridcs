@@ -36,8 +36,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" android:screenOrientation="portrait" />
-        <activity android:name=".ui.activities.SurahDetailActivity" android:screenOrientation="portrait" />
-        <activity android:name=".ui.activities.HadithDetailActivity" android:screenOrientation="portrait" />
         <activity android:name=".ui.activities.LoginActivity"
             android:theme="@style/Theme.AndroidStarter"
             android:screenOrientation="portrait" />
@@ -59,6 +57,18 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <!-- Set custom default icon and color for FCM background notifications -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_launcher_foreground" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/primary_green" />
+        <!-- Set default channel ID for background notifications (Android 8+) -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="default_notification_channel_id" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

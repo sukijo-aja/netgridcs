@@ -22,42 +22,49 @@
 
             <!-- ACCOUNT SECTION -->
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Account"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="?colorPrimary"
-                android:paddingHorizontal="16dp"
-                android:paddingBottom="8dp"
-                android:layout_marginTop="8dp"/>
+                style="@style/SettingsHeader"
+                android:text="@string/account" />
 
             <TextView
                 android:id="@+id/tvUserId"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="User ID: "
-                android:textSize="14sp"
+                style="@style/SettingsItem"
+                android:text="@string/user_id_label"
                 android:textColor="@color/text_secondary"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="12dp"
                 android:drawableStart="@android:drawable/ic_menu_info_details"
-                android:drawablePadding="16dp"
-                android:background="?attr/selectableItemBackground"
+                android:visibility="gone"
                 />
 
             <TextView
                 android:id="@+id/btnLogin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/SettingsItem"
                 android:text="@string/login"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp"
                 android:drawableStart="@android:drawable/ic_secure"
-                android:drawablePadding="16dp"
-                android:background="?attr/selectableItemBackground"
+                />
+
+            <TextView
+                android:id="@+id/btnEditProfile"
+                style="@style/SettingsItem"
+                android:text="@string/edit_profile"
+                android:drawableStart="@android:drawable/ic_menu_edit"
+                android:visibility="gone"
+                />
+
+            <TextView
+                android:id="@+id/btnChangePassword"
+                style="@style/SettingsItem"
+                android:text="@string/change_password"
+                android:drawableStart="@android:drawable/ic_menu_manage"
+                android:visibility="gone"
+                />
+
+            <TextView
+                android:id="@+id/btnDeleteAccount"
+                style="@style/SettingsItem"
+                android:text="@string/delete_account"
+                android:textColor="@color/design_default_color_error"
+                android:drawableStart="@android:drawable/ic_menu_delete"
+                android:drawableTint="@color/design_default_color_error"
+                android:visibility="gone"
                 />
 
             <com.google.android.material.divider.MaterialDivider
@@ -67,64 +74,35 @@
 
             <!-- GENERAL SECTION -->
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="General"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="?colorPrimary"
-                android:paddingHorizontal="16dp"
-                android:paddingBottom="8dp"
-                android:layout_marginTop="8dp"/>
+                style="@style/SettingsHeader"
+                android:text="@string/general" />
 
             <TextView
                 android:id="@+id/btnLanguage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/SettingsItem"
                 android:text="@string/language"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp"
                 android:drawableStart="@android:drawable/ic_menu_sort_by_size"
-                android:drawablePadding="16dp"
-                android:background="?attr/selectableItemBackground"
                 />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/switchNotifications"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/SettingsSwitch"
                 android:text="@string/push_notifications"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="12dp"
-                android:background="?attr/selectableItemBackground"
+                android:drawableStart="@drawable/ic_notifications"
                 />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/switchDarkMode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/SettingsSwitch"
                 android:text="@string/dark_mode"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="12dp"
-                android:background="?attr/selectableItemBackground"
+                android:drawableStart="@android:drawable/ic_menu_view"
                 />
 
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/switchPremium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Simulate Premium User (No Ads)"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="12dp"
-                android:background="?attr/selectableItemBackground"
+                style="@style/SettingsSwitch"
+                android:text="@string/simulate_premium"
+                android:drawableStart="@android:drawable/btn_star"
                 android:visibility="gone"
                 />
 
@@ -135,97 +113,56 @@
 
             <!-- ABOUT & SUPPORT SECTION -->
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="About &amp; Support"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="?colorPrimary"
-                android:paddingHorizontal="16dp"
-                android:paddingBottom="8dp"
-                android:layout_marginTop="8dp"/>
+                style="@style/SettingsHeader"
+                android:text="@string/about_support" />
+
+            <TextView
+                android:id="@+id/btnFaqHelp"
+                style="@style/SettingsItem"
+                android:text="@string/faq_help"
+                android:drawableStart="@android:drawable/ic_dialog_info"
+                />
 
             <TextView
                 android:id="@+id/btnClearCache"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/SettingsItem"
                 android:text="@string/clear_cache"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp"
                 android:drawableStart="@android:drawable/ic_menu_delete"
-                android:drawablePadding="16dp"
-                android:background="?attr/selectableItemBackground"
                 />
 
             <TextView
                 android:id="@+id/btnRateUs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/SettingsItem"
                 android:text="@string/rate_us"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp"
                 android:drawableStart="@android:drawable/btn_star"
-                android:drawablePadding="16dp"
-                android:background="?attr/selectableItemBackground"
                 />
 
             <TextView
                 android:id="@+id/btnShareApp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/SettingsItem"
                 android:text="@string/share_app"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp"
                 android:drawableStart="@android:drawable/ic_menu_share"
-                android:drawablePadding="16dp"
-                android:background="?attr/selectableItemBackground"
                 />
 
             <TextView
                 android:id="@+id/btnContactUs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/SettingsItem"
                 android:text="@string/contact_us"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp"
                 android:drawableStart="@android:drawable/ic_dialog_email"
-                android:drawablePadding="16dp"
-                android:background="?attr/selectableItemBackground"
+                />
+
+            <TextView
+                android:id="@+id/btnTermsOfService"
+                style="@style/SettingsItem"
+                android:text="@string/terms_of_service"
+                android:drawableStart="@android:drawable/ic_menu_agenda"
                 />
 
             <TextView
                 android:id="@+id/btnPrivacyPolicy"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                style="@style/SettingsItem"
                 android:text="@string/privacy_policy"
-                android:textSize="16sp"
-                android:textColor="@color/text_primary"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp"
                 android:drawableStart="@android:drawable/ic_menu_info_details"
-                android:drawablePadding="16dp"
-                android:background="?attr/selectableItemBackground"
-                />
-
-            <TextView
-                android:id="@+id/btnResetData"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Reset Data (Test Online)"
-                android:textSize="16sp"
-                android:textColor="@color/design_default_color_error"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp"
-                android:background="?attr/selectableItemBackground"
-                android:visibility="gone"
                 />
 
             <!-- APP VERSION -->

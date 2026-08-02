@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
     <View
-        android:background="@drawable/bg_gradient_double"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
@@ -29,7 +28,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome to Mosleem App"
+        android:text="Welcome to Starter App"
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"
@@ -38,11 +37,73 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sign in to save your settings and custom habits."
+        android:text="Sign in to continue"
         android:textSize="14sp"
         android:textColor="#757575"
         android:textAlignment="center"
-        android:layout_marginBottom="32dp" />
+        android:layout_marginBottom="24dp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:boxCornerRadiusTopStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusBottomEnd="8dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:inputType="textEmailAddress" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        app:passwordToggleEnabled="true"
+        app:boxCornerRadiusTopStart="8dp"
+        app:boxCornerRadiusTopEnd="8dp"
+        app:boxCornerRadiusBottomStart="8dp"
+        app:boxCornerRadiusBottomEnd="8dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLoginEmail"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Sign In"
+        android:textSize="16sp"
+        android:textAllCaps="false"
+        app:cornerRadius="8dp"
+        android:layout_marginBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Don't have an account? Register"
+        android:textSize="14sp"
+        android:padding="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OR"
+        android:textSize="14sp"
+        android:textColor="#757575"
+        android:layout_marginBottom="16dp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnGoogleSignIn"

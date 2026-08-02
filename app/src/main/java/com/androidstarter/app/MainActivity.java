@@ -1,6 +1,7 @@
 package com.androidstarter.app;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,7 +37,17 @@ public class MainActivity extends BaseActivity {
     }
 
     private ActivityMainBinding binding;
-    // Removed Location and Permission Launcher
+    
+    // Permission Launcher for POST_NOTIFICATIONS (Android 13+)
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    Log.d(TAG, "Notification permission granted");
+                } else {
+                    Log.d(TAG, "Notification permission denied");
+                    Toast.makeText(this, "Notification permission denied", Toast.LENGTH_SHORT).show();
+                }
+            });
 
     private boolean doubleBackToExitPressedOnce = false;
 
@@ -58,29 +69,45 @@ public class MainActivity extends BaseActivity {
             loadFragment(new HomeFragment());
         }
 
-        // Initialize FCM Token in background
-        new Thread(() -> {
-            AppPreference appPref = new AppPreference(MainActivity.this);
-            String existingToken = appPref.getString("fcm_token", null);
-            Log.d(TAG, "Background Thread: Current saved FCM Token: " + (existingToken != null ? existingToken : "null"));
+        // Handle notification click intent
+        handleNotificationIntent(getIntent());
 
-            if (existingToken == null) {
-                Log.d(TAG, "Background Thread: Requesting new FCM Token...");
-                try {
-                    FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            String newToken = task.getResult();
-                            appPref.saveString("fcm_token", newToken);
-                            Log.d(TAG, "FCM Token successfully initialized: " + newToken);
-                        } else {
-                            Log.e(TAG, "FCM Token retrieval failed", task.getException());
-                        }
-                    });
-                } catch (Exception e) {
-                    Log.e(TAG, "Error during FirebaseMessaging.getInstance().getToken()", e);
-                }
+        // Request Notification Permission for Android 13+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
-        }).start();
+        }
+
+        // Initialize FCM Token
+        AppPreference appPref = new AppPreference(MainActivity.this);
+        String existingToken = appPref.getString("fcm_token", null);
+        
+        if (existingToken != null) {
+            Log.d(TAG, "FCM_TEST: Current saved FCM Token: " + existingToken);
+            System.out.println("FCM_TEST_TOKEN: " + existingToken);
+            runOnUiThread(() -> Toast.makeText(MainActivity.this, "FCM Ready", Toast.LENGTH_SHORT).show());
+        } else {
+            Log.d(TAG, "FCM_TEST: Requesting new FCM Token...");
+            try {
+                FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        String newToken = task.getResult();
+                        appPref.saveString("fcm_token", newToken);
+                        Log.d(TAG, "FCM_TEST: Token successfully initialized: " + newToken);
+                        System.out.println("FCM_TEST_TOKEN: " + newToken);
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "FCM Token Success", Toast.LENGTH_SHORT).show());
+                    } else {
+                        Log.e(TAG, "FCM_TEST: Token retrieval failed", task.getException());
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "FCM Token Failed", Toast.LENGTH_SHORT).show());
+                    }
+                });
+            } catch (Exception e) {
+                Log.e(TAG, "FCM_TEST: Error during FirebaseMessaging.getInstance().getToken()", e);
+                runOnUiThread(() -> Toast.makeText(MainActivity.this, "FCM Token Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        }
 
 
 
@@ -135,6 +162,39 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleNotificationIntent(intent);
+    }
+
+    private void handleNotificationIntent(Intent intent) {
+        if (intent != null && intent.getExtras() != null) {
+            Bundle extras = intent.getExtras();
+            boolean openDetail = extras.getBoolean("open_notification_detail", false);
+            
+            // Check if it's from FCM system tray (background)
+            if (!openDetail && extras.containsKey("google.message_id")) {
+                openDetail = true;
+            }
+            
+            if (openDetail) {
+                String title = extras.getString("title", "Notifikasi");
+                String message = extras.getString("message", extras.getString("body", ""));
+                String date = extras.getString("date", new java.text.SimpleDateFormat("dd MMM yyyy, HH:mm", java.util.Locale.getDefault()).format(new java.util.Date()));
+                
+                com.androidstarter.app.ui.fragments.NotificationDetailFragment detailFragment = new com.androidstarter.app.ui.fragments.NotificationDetailFragment();
+                Bundle args = new Bundle();
+                args.putString("title", title);
+                args.putString("message", message);
+                args.putString("date", date);
+                detailFragment.setArguments(args);
+                
+                loadFragmentWithBackStack(detailFragment);
+            }
+        }
+    }
 
     private void loadFragment(Fragment fragment) {
         // Clear backstack when navigating via bottom navigation

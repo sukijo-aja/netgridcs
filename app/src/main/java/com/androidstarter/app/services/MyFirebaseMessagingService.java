@@ -36,15 +36,35 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         Log.d(TAG, "From: " + remoteMessage.getFrom());
 
+        String title = null;
+        String body = null;
+
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
+            title = remoteMessage.getData().get("title");
+            body = remoteMessage.getData().get("body");
+            if (body == null) body = remoteMessage.getData().get("message");
         }
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
-            sendNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
+            title = remoteMessage.getNotification().getTitle();
+            body = remoteMessage.getNotification().getBody();
+            sendNotification(title, body);
+        }
+
+        // Save to Database
+        if (title != null || body != null) {
+            final String finalTitle = title != null ? title : "Notification";
+            final String finalBody = body != null ? body : "";
+            com.androidstarter.app.data.local.AppDatabase.databaseWriteExecutor.execute(() -> {
+                com.androidstarter.app.data.local.AppDatabase db = com.androidstarter.app.data.local.AppDatabase.getDatabase(getApplicationContext());
+                db.notificationDao().insert(new com.androidstarter.app.data.local.entity.NotificationEntity(
+                        finalTitle, finalBody, System.currentTimeMillis(), false
+                ));
+            });
         }
     }
 
@@ -84,16 +104,21 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
      */
     private void sendNotification(String title, String messageBody) {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_IMMUTABLE);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra("open_notification_detail", true);
+        intent.putExtra("title", title);
+        intent.putExtra("message", messageBody);
+        intent.putExtra("date", new java.text.SimpleDateFormat("dd MMM yyyy, HH:mm", java.util.Locale.getDefault()).format(new java.util.Date()));
+        
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis() /* Request code */, intent,
+                PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
 
         String channelId = "default_notification_channel_id";
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.drawable.ic_launcher_foreground)
-                        .setContentTitle(title != null ? title : "Mosleem App")
+                        .setContentTitle(title != null ? title : getString(R.string.app_name))
                         .setContentText(messageBody)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)

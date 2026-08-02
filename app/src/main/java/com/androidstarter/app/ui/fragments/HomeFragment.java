@@ -134,9 +134,10 @@ public class HomeFragment extends Fragment {
             binding.tvCity.setVisibility(View.VISIBLE);
         }
 
-        // Removed observeViewModel
-
-
+        binding.btnNotification.setOnClickListener(v -> {
+            com.androidstarter.app.ui.fragments.NotificationFragment notifFragment = new com.androidstarter.app.ui.fragments.NotificationFragment();
+            ((com.androidstarter.app.MainActivity) requireActivity()).loadFragmentWithBackStack(notifFragment);
+        });
     }
         
     @Override
