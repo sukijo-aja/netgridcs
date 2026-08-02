@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Mosleem App</string>
+    <string name="app_name" translatable="false">Starter App</string>
 
     <string name="manage_prayer_alarms">إدارة منبهات الصلاة</string>
     <string name="location_permission_required">مطلوب إذن الموقع لأوقات الصلاة الدقيقة</string>
@@ -50,7 +50,7 @@
     <string name="silent_mode_disabled">تم تعطيل الوضع الصامت التلقائي</string>
     <string name="silent_mode_restored">ترجيع وضع الرنين</string>
     <string name="dnd_permission_required">مطلوب إذن عدم الإزعاج. يرجى منح الوصول في الإعدادات.</string>
-    <string name="assalamu_alaikum">السلام عليكم</string>
+    <string name="welcome_message">مرحباً</string>
     <string name="user_name">مسلم</string>
     <string name="enable_prayer_alarms">تمكين منبه المشغل</string>
     <string name="reminder_before_adhan">التذكير قبل الأذان</string>
@@ -72,12 +72,10 @@
     <!-- Home Menu Items -->
 
     <string name="menu_tasbih">تسبيح</string>
-    <string name="menu_dua">دعاء</string>
     <string name="menu_prayer">الصلاة</string>
     <string name="menu_tracker">المتابعة</string>
     <string name="menu_qibla">القبلة</string>
     <string name="menu_remove_ads">إزالة الإعلانات</string>
-    <string name="menu_calendar">التقويم</string>
     <string name="menu_islamic_study">محاضرات</string>
     <string name="menu_our_apps">تطبيقاتنا</string>
 </resources>

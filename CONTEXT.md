@@ -1,8 +1,8 @@
-# MISSION: Create Native Android App (Legacy Stack)
+# MISSION: Create Native Android App Boilerplate (Legacy Stack)
 # ROLE: Senior Android Engineer
 
 ## 1. OBJECTIVE
-Create a functional Android application using Java. The app is a Prayer Time Reminder App. with package name com.mosleemreminder.app
+Create a clean, reusable Android starter boilerplate application using Java. The app is a foundational generic template with package name com.starterandroid.app
 
 ## 2. TECH STACK
 - **Language:** Java 17
@@ -19,27 +19,18 @@ Create a functional Android application using Java. The app is a Prayer Time Rem
 
 ## 4. EXECUTION PLAN
 1. Setup `build.gradle` (Module level) to enable ViewBinding and add Room/Retrofit dependencies.
-2. Create the Layout XML files first using ConstraintLayout.
-3. Create the Entity and DAO for Room Database.
-4. Implement the ViewModel and Repository pattern in Java.
-5. Connect everything in the MainActivity using ViewBinding.
-6. Add the necessary permissions in the AndroidManifest.xml file.
-7. Implement dynamic location (GPS)
-8. Implement the PrayerTimeAdapter to display the prayer times in a RecyclerView.
-9. Add "Next Prayer" countdown.
-10. Improve UI styling.
-11. create Symbol @drawable/ic_launcher, @drawable/ic_launcher_foreground, resource color/purple_700,  resource drawable/ic_launcher_background
-12. set android.useAndroidX=true in gradle.properties
-13. add splash screen
-14. add notification
-15. add Al Quran and Hadist with detail read text arabian justify right, also last read
-16. Get data Al Quran and Hadist from Internet and save at Local Storage SQLite, With Consep Local First
-17. Add searching Al Quran and Hadist, with read detail Al Quran and Hadist with indonesia translate
-18. add bottom navigation fragment setting
-19. dont include Bismilah at detail ayah
-
-
-
+2. Ensure basic UI layouts (e.g. MainActivity) are clean using ConstraintLayout.
+3. Maintain generic Base Activity and Fragment for reusability.
+4. Implement basic examples of ViewModel and Repository pattern in Java.
+5. Connect everything seamlessly with ViewBinding.
+6. Ensure standard Android permissions (Internet, etc.) in AndroidManifest.xml.
+7. Include placeholder implementation for common utilities like Retrofit API Service, Room DB.
+8. Maintain a cleanly layered architecture (UI, Data, Domain).
+9. Setup Bottom Navigation with basic generic fragments (Home, Profile, Settings).
+10. Provide base styles and symbols (launcher icons, colors, themes).
+11. Ensure `android.useAndroidX=true` in `gradle.properties`.
+12. Include a basic Splash Screen implementation.
+13. Clean up any domain-specific features from previous projects.
 
 ## 5. OUTPUT
-Produce a clean, compilable project structure that I can open directly in Android Studio.
+Produce a clean, compilable boilerplate project structure that I can open directly in Android Studio and use as a starting point for any new Android applications.

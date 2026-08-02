@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Mosleem App</string>
+    <string name="app_name" translatable="false">Starter App</string>
 
     <string name="manage_prayer_alarms">Kelola Alarm Sholat</string>
     <string name="location_permission_required">Izin lokasi diperlukan untuk waktu sholat yang akurat</string>
@@ -42,7 +42,7 @@
     <string name="purchase_simulated">Mensimulasikan pembelian untuk: %1$s</string>
     <string name="purchase_successful">Pembelian Berhasil! Terima kasih.</string>
     <string name="check_your_internet_connection_and_try_again">Periksa koneksi internet Anda dan coba lagi.</string>
-    <string name="moslem_app">Mosleem App</string>
+    <string name="moslem_app">Starter App</string>
     <string name="auto_silent_mode">Mode Hening Otomatis</string>
     <string name="auto_silent_mode_desc">Otomatis mengatur ponsel ke mode getar saat waktu sholat</string>
     <string name="silent_duration">Durasi Hening</string>
@@ -50,7 +50,7 @@
     <string name="silent_mode_disabled">Mode Hening Otomatis Dinonaktifkan</string>
     <string name="silent_mode_restored">Mode dering dipulihkan</string>
     <string name="dnd_permission_required">Izin Jangan Ganggu (Do Not Disturb) diperlukan. Silakan berikan akses di pengaturan.</string>
-    <string name="assalamu_alaikum">Assalamu \'alaikum</string>
+    <string name="welcome_message">Selamat Datang</string>
     <string name="user_name">Mosleem</string>
     <string name="enable_prayer_alarms">Aktifkan Alarm Sholat</string>
     <string name="reminder_before_adhan">Pengingat Sebelum Adzan</string>
@@ -72,12 +72,10 @@
     <!-- Home Menu Items -->
 
     <string name="menu_tasbih">Tasbih</string>
-    <string name="menu_dua">Doa</string>
     <string name="menu_prayer">Sholat</string>
     <string name="menu_tracker">Pelacak</string>
     <string name="menu_qibla">Kiblat</string>
     <string name="menu_remove_ads">Hapus Iklan</string>
-    <string name="menu_calendar">Kalender</string>
     <string name="menu_islamic_study">Kajian</string>
     <string name="menu_our_apps">Aplikasi Kami</string>
 </resources>

@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.mosleemapp.app'
+    namespace 'com.androidstarter.app'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.mosleemapp.app"
+        applicationId "com.androidstarter.app"
         minSdk 24
         targetSdk 34
         versionCode 1

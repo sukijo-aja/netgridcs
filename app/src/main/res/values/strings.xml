@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Mosleem App</string>
+    <string name="app_name" translatable="false">Starter App</string>
 
     <string name="manage_prayer_alarms">Manage Reminders</string>
     <string name="calculation_method">Calculation Method</string>
@@ -65,7 +65,7 @@
     <string name="silent_mode_disabled">Auto Silent Mode Disabled</string>
     <string name="silent_mode_restored">Ringer mode restored</string>
     <string name="dnd_permission_required">Do Not Disturb permission required. Please grant access in settings.</string>
-    <string name="assalamu_alaikum">Assalamu \'alaikum</string>
+    <string name="welcome_message">Welcome</string>
     <string name="user_name">Mosleem</string>
     <string name="enable_prayer_alarms">Enable Reminder</string>
     <string name="reminder_before_adhan">Reminder Before Adhan</string>
@@ -88,13 +88,9 @@
     <!-- Home Menu Items -->
 
     <string name="menu_tasbih">Tasbih</string>
-    <string name="menu_dua">Dua</string>
-    <string name="menu_prayer">Prayer</string>
-    <string name="menu_tracker">Tracker</string>
-    <string name="menu_qibla">Qibla</string>
+
+    <string name="menu_notification">Notifications</string>
     <string name="menu_remove_ads">Remove Ads</string>
-    <string name="menu_calendar">Calendar</string>
     <string name="menu_islamic_study">Lectures</string>
     <string name="menu_our_apps">Our Apps</string>
-    <string name="menu_khutbah">Khutbah</string>
 </resources>

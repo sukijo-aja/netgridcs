@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Mosleem App</string>
+    <string name="app_name" translatable="false">Starter App</string>
 
     <string name="manage_prayer_alarms">Manage Reminders</string>
     <string name="location_permission_required">Location permission required for accurate prayer times</string>
@@ -50,7 +50,7 @@
     <string name="silent_mode_disabled">Auto Silent Mode Disabled</string>
     <string name="silent_mode_restored">Ringer mode restored</string>
     <string name="dnd_permission_required">Do Not Disturb permission required. Please grant access in settings.</string>
-    <string name="assalamu_alaikum">Assalamu \'alaikum</string>
+    <string name="welcome_message">Welcome</string>
     <string name="user_name">Mosleem</string>
     <string name="enable_prayer_alarms">Enable Reminder</string>
     <string name="reminder_before_adhan">Reminder Before Adhan</string>

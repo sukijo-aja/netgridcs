@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Mosleem App</string>
+    <string name="app_name" translatable="false">Starter App</string>
     <string name="manage_prayer_alarms">管理提醒</string>
     <string name="calculation_method">计算方法</string>
     <string name="location_permission_required">需要位置权限以提供准确的祈祷时间</string>
@@ -61,7 +61,7 @@
     <string name="silent_mode_disabled">自动静音模式已关闭</string>
     <string name="silent_mode_restored">铃声模式已恢复</string>
     <string name="dnd_permission_required">需要请勿打扰权限。请在设置中授予访问权限。</string>
-    <string name="assalamu_alaikum">赛俩目 (Assalamu \'alaikum)</string>
+    <string name="welcome_message">欢迎</string>
     <string name="user_name">穆斯林</string>
     <string name="enable_prayer_alarms">开启提醒</string>
     <string name="reminder_before_adhan">宣礼前提醒</string>
@@ -80,12 +80,10 @@
     <string name="default_web_client_id" translatable="false">918294205518-r8nalp68nh18id7n8dgbn7l6hs65fr6c.apps.googleusercontent.com</string>
     
     <string name="menu_tasbih">念珠</string>
-    <string name="menu_dua">祈求</string>
     <string name="menu_prayer">祈祷</string>
     <string name="menu_tracker">追踪器</string>
     <string name="menu_qibla">朝向</string>
     <string name="menu_remove_ads">移除广告</string>
-    <string name="menu_calendar">日历</string>
     <string name="menu_islamic_study">讲座</string>
     <string name="menu_our_apps">我们的应用</string>
 </resources>
