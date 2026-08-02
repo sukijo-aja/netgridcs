@@ -2,7 +2,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?android:attr/windowBackground">
 
     <include
         android:id="@+id/appBarLayout"
@@ -11,77 +12,235 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginHorizontal="4dp"
-        >
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="4dp">
+            android:paddingVertical="16dp">
 
-        <TextView
-            android:id="@+id/tvUserId"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="User ID: "
-            android:textSize="12sp"
-            android:textColor="@color/text_secondary"
-            android:layout_marginBottom="4dp"
-            android:visibility="gone"
-            />
+            <!-- ACCOUNT SECTION -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Account"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?colorPrimary"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="8dp"
+                android:layout_marginTop="8dp"/>
 
-        <Button
-            android:id="@+id/btnLogin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/login"
-            android:textColor="@android:color/white"
-            android:drawableEnd="@android:drawable/ic_secure"
-            android:drawableTint="@android:color/white"
-            />
+            <TextView
+                android:id="@+id/tvUserId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="User ID: "
+                android:textSize="14sp"
+                android:textColor="@color/text_secondary"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:drawableStart="@android:drawable/ic_menu_info_details"
+                android:drawablePadding="16dp"
+                android:background="?attr/selectableItemBackground"
+                />
 
-        <Button
-            android:id="@+id/btnLanguage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/language"
-            android:textColor="@android:color/white"
-            android:drawableEnd="@android:drawable/ic_menu_sort_by_size"
-            android:drawableTint="@android:color/white"
-            android:background="@drawable/bg_card_green"
-            android:layout_marginVertical="4dp"
-            />
+            <TextView
+                android:id="@+id/btnLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/login"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:drawableStart="@android:drawable/ic_secure"
+                android:drawablePadding="16dp"
+                android:background="?attr/selectableItemBackground"
+                />
 
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="8dp" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchPremium"
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:text="Simulate Premium User (No Ads)"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginVertical="4dp"
-            android:visibility="gone"
-            />
+            <!-- GENERAL SECTION -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="General"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?colorPrimary"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="8dp"
+                android:layout_marginTop="8dp"/>
 
-        <Button
-            android:id="@+id/btnResetData"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Reset Data (Test Online)"
-            android:backgroundTint="@color/design_default_color_error"
-            android:textColor="@android:color/white"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone"
-            style="@style/Widget.Material3.Button.OutlinedButton"/>
+            <TextView
+                android:id="@+id/btnLanguage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/language"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:drawableStart="@android:drawable/ic_menu_sort_by_size"
+                android:drawablePadding="16dp"
+                android:background="?attr/selectableItemBackground"
+                />
 
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchNotifications"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/push_notifications"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:background="?attr/selectableItemBackground"
+                />
 
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchDarkMode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/dark_mode"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:background="?attr/selectableItemBackground"
+                />
 
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchPremium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Simulate Premium User (No Ads)"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp"
+                android:background="?attr/selectableItemBackground"
+                android:visibility="gone"
+                />
 
-    </LinearLayout>
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="8dp" />
+
+            <!-- ABOUT & SUPPORT SECTION -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="About &amp; Support"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?colorPrimary"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="8dp"
+                android:layout_marginTop="8dp"/>
+
+            <TextView
+                android:id="@+id/btnClearCache"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/clear_cache"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:drawableStart="@android:drawable/ic_menu_delete"
+                android:drawablePadding="16dp"
+                android:background="?attr/selectableItemBackground"
+                />
+
+            <TextView
+                android:id="@+id/btnRateUs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/rate_us"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:drawableStart="@android:drawable/btn_star"
+                android:drawablePadding="16dp"
+                android:background="?attr/selectableItemBackground"
+                />
+
+            <TextView
+                android:id="@+id/btnShareApp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/share_app"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:drawableStart="@android:drawable/ic_menu_share"
+                android:drawablePadding="16dp"
+                android:background="?attr/selectableItemBackground"
+                />
+
+            <TextView
+                android:id="@+id/btnContactUs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/contact_us"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:drawableStart="@android:drawable/ic_dialog_email"
+                android:drawablePadding="16dp"
+                android:background="?attr/selectableItemBackground"
+                />
+
+            <TextView
+                android:id="@+id/btnPrivacyPolicy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/privacy_policy"
+                android:textSize="16sp"
+                android:textColor="@color/text_primary"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:drawableStart="@android:drawable/ic_menu_info_details"
+                android:drawablePadding="16dp"
+                android:background="?attr/selectableItemBackground"
+                />
+
+            <TextView
+                android:id="@+id/btnResetData"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Reset Data (Test Online)"
+                android:textSize="16sp"
+                android:textColor="@color/design_default_color_error"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:visibility="gone"
+                />
+
+            <!-- APP VERSION -->
+            <TextView
+                android:id="@+id/tvAppVersion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="32dp"
+                android:paddingBottom="16dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                />
+
+        </LinearLayout>
 
     </ScrollView>
 </LinearLayout>

@@ -93,4 +93,15 @@
     <string name="menu_remove_ads">Remove Ads</string>
     <string name="menu_islamic_study">Lectures</string>
     <string name="menu_our_apps">Our Apps</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="app_version">Version: %1$s</string>
+
+    <!-- General Settings Elements -->
+    <string name="push_notifications">Push Notifications</string>
+    <string name="clear_cache">Clear Cache</string>
+    <string name="rate_us">Rate Us</string>
+    <string name="share_app">Share App</string>
+    <string name="contact_us">Contact Us</string>
+    <string name="cache_cleared">Cache cleared successfully</string>
 </resources>

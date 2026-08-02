@@ -34,7 +34,7 @@ import android.widget.ImageButton;
 public class SettingsFragment extends Fragment {
 
 
-    private Button btnLogin;
+    private TextView btnLogin;
     private TextView tvUserId;
     private FirebaseAuth mAuth;
 
@@ -76,9 +76,90 @@ public class SettingsFragment extends Fragment {
                 Toast.LENGTH_SHORT).show();
         });
 
+        SwitchMaterial switchNotifications = view.findViewById(R.id.switchNotifications);
+        switchNotifications.setChecked(settingsManager.isPushNotificationsEnabled());
+        switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            settingsManager.setPushNotificationsEnabled(isChecked);
+            if (isChecked) {
+                // Subscribe to Firebase Topic if using FCM
+                Toast.makeText(requireContext(), "Notifications Enabled", Toast.LENGTH_SHORT).show();
+            } else {
+                // Unsubscribe from Firebase Topic
+                Toast.makeText(requireContext(), "Notifications Disabled", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        SwitchMaterial switchDarkMode = view.findViewById(R.id.switchDarkMode);
+        switchDarkMode.setChecked(settingsManager.isDarkModeEnabled());
+        switchDarkMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            settingsManager.setDarkModeEnabled(isChecked);
+            if (isChecked) {
+                androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO);
+            }
+        });
+
+        TextView btnClearCache = view.findViewById(R.id.btnClearCache);
+        btnClearCache.setOnClickListener(v -> {
+            try {
+                requireContext().getCacheDir().delete();
+                Toast.makeText(requireContext(), R.string.cache_cleared, Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        TextView btnRateUs = view.findViewById(R.id.btnRateUs);
+        btnRateUs.setOnClickListener(v -> {
+            try {
+                startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("market://details?id=" + requireContext().getPackageName())));
+            } catch (android.content.ActivityNotFoundException e) {
+                startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://play.google.com/store/apps/details?id=" + requireContext().getPackageName())));
+            }
+        });
+
+        TextView btnShareApp = view.findViewById(R.id.btnShareApp);
+        btnShareApp.setOnClickListener(v -> {
+            android.content.Intent shareIntent = new android.content.Intent(android.content.Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            String shareMessage = "\nLet me recommend you this application\n\n";
+            shareMessage = shareMessage + "https://play.google.com/store/apps/details?id=" + requireContext().getPackageName() + "\n\n";
+            shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareMessage);
+            startActivity(android.content.Intent.createChooser(shareIntent, "choose one"));
+        });
+
+        TextView btnContactUs = view.findViewById(R.id.btnContactUs);
+        btnContactUs.setOnClickListener(v -> {
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_SENDTO);
+            intent.setData(android.net.Uri.parse("mailto:support@yourdomain.com")); // only email apps should handle this
+            intent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Feedback for App");
+            try {
+                startActivity(intent);
+            } catch (Exception ex) {
+                Toast.makeText(requireContext(), "No email client found.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        TextView btnPrivacyPolicy = view.findViewById(R.id.btnPrivacyPolicy);
+        btnPrivacyPolicy.setOnClickListener(v -> {
+            android.content.Intent browserIntent = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://policies.google.com/privacy"));
+            startActivity(browserIntent);
+        });
+
+        TextView tvAppVersion = view.findViewById(R.id.tvAppVersion);
+        try {
+            android.content.pm.PackageInfo pInfo = requireContext().getPackageManager().getPackageInfo(requireContext().getPackageName(), 0);
+            String version = pInfo.versionName;
+            tvAppVersion.setText(getString(R.string.app_version, version));
+        } catch (android.content.pm.PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            tvAppVersion.setText(getString(R.string.app_version, "Unknown"));
+        }
+
         // Removed manage prayers and custom habits UI
 
-        Button btnLanguage = view.findViewById(R.id.btnLanguage);
+        TextView btnLanguage = view.findViewById(R.id.btnLanguage);
         updateLanguageButtonText(btnLanguage);
         btnLanguage.setOnClickListener(v -> showLanguageDialog());
 
@@ -148,7 +229,7 @@ public class SettingsFragment extends Fragment {
             return true;
         });
 
-        Button btnResetData = view.findViewById(R.id.btnResetData);
+        TextView btnResetData = view.findViewById(R.id.btnResetData);
         btnResetData.setOnClickListener(v -> {
             Toast.makeText(requireContext(), "Fitur ini segera hadir", Toast.LENGTH_SHORT).show();
         });
@@ -168,7 +249,7 @@ public class SettingsFragment extends Fragment {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             btnLogin.setText(R.string.logout);
-            btnLogin.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+            btnLogin.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
             String displayName = user.getDisplayName();
             String email = user.getEmail();
             if (displayName != null && !displayName.isEmpty()) {
@@ -180,6 +261,7 @@ public class SettingsFragment extends Fragment {
             }
         } else {
             btnLogin.setText(R.string.login);
+            btnLogin.setTextColor(getResources().getColor(R.color.text_primary));
             SettingsManager settingsManager = SettingsManager.getInstance(requireContext());
             tvUserId.setText("User ID: " + settingsManager.getUserId());
         }
@@ -187,7 +269,7 @@ public class SettingsFragment extends Fragment {
 
     // Removed download and reset methods
 
-    private void updateLanguageButtonText(Button button) {
+    private void updateLanguageButtonText(TextView button) {
         String currentLang = LocaleHelper.getLanguage(requireContext());
         String langName = "English";
         if (currentLang.equals("in")) langName = "Bahasa Indonesia";

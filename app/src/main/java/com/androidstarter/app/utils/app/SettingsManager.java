@@ -118,6 +118,22 @@ public class SettingsManager {
         appPreference.saveBoolean("is_premium", isPremium);
     }
 
+    public boolean isDarkModeEnabled() {
+        return appPreference.getBoolean("is_dark_mode", false);
+    }
+
+    public void setDarkModeEnabled(boolean enabled) {
+        appPreference.saveBoolean("is_dark_mode", enabled);
+    }
+
+    public boolean isPushNotificationsEnabled() {
+        return appPreference.getBoolean("push_notifications_enabled", true);
+    }
+
+    public void setPushNotificationsEnabled(boolean enabled) {
+        appPreference.saveBoolean("push_notifications_enabled", enabled);
+    }
+
     public String getUserId() {
         String userId = appPreference.getString("user_id", null);
         if (userId == null) {
