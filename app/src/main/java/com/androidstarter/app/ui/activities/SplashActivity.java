@@ -129,7 +129,10 @@ public class SplashActivity extends AppCompatActivity {
         if (!isNavigated) {
             isNavigated = true;
             Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+            if (getIntent() != null && getIntent().getExtras() != null) {
+                intent.putExtras(getIntent().getExtras());
+            }
+            // intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
             startActivity(intent);
             finish();
         }
