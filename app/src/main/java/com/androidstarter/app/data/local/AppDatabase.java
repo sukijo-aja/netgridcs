@@ -14,7 +14,7 @@ import com.androidstarter.app.data.local.dao.NotificationDao;
 import com.androidstarter.app.data.local.entity.ExampleEntity;
 import com.androidstarter.app.data.local.entity.NotificationEntity;
 
-@Database(entities = { ExampleEntity.class, NotificationEntity.class }, version = 18, exportSchema = false)
+@Database(entities = { ExampleEntity.class, NotificationEntity.class }, version = 20, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract ExampleDao exampleDao();

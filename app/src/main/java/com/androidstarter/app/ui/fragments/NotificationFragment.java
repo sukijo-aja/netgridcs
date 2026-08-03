@@ -27,8 +27,12 @@ public class NotificationFragment extends Fragment {
         if (toolbar != null) {
             toolbar.setTitle("Notifikasi");
             toolbar.setNavigationOnClickListener(v -> {
-                if (getActivity() != null) {
-                    getActivity().getSupportFragmentManager().popBackStack();
+                com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = 
+                    requireActivity().findViewById(R.id.bottom_navigation);
+                if (bottomNav != null) {
+                    bottomNav.setSelectedItemId(R.id.nav_home);
+                } else if (getActivity() != null) {
+                    getActivity().onBackPressed();
                 }
             });
         }
@@ -47,15 +51,28 @@ public class NotificationFragment extends Fragment {
                 });
             }
             
-            com.androidstarter.app.ui.fragments.NotificationDetailFragment detailFragment = new com.androidstarter.app.ui.fragments.NotificationDetailFragment();
-            android.os.Bundle args = new android.os.Bundle();
-            args.putString("title", notification.title);
-            args.putString("message", notification.message);
-            args.putString("date", formattedDate);
-            detailFragment.setArguments(args);
+            String actionType = notification.actionType != null ? notification.actionType : "info";
             
-            if (getActivity() instanceof com.androidstarter.app.MainActivity) {
-                ((com.androidstarter.app.MainActivity) getActivity()).loadFragmentWithBackStack(detailFragment);
+            switch (actionType) {
+                case "settings":
+                    com.androidstarter.app.ui.fragments.SettingsFragment settingsFragment = new com.androidstarter.app.ui.fragments.SettingsFragment();
+                    if (getActivity() instanceof com.androidstarter.app.MainActivity) {
+                        ((com.androidstarter.app.MainActivity) getActivity()).loadFragmentWithBackStack(settingsFragment);
+                    }
+                    break;
+                case "info":
+                default:
+                    com.androidstarter.app.ui.fragments.NotificationDetailFragment detailFragment = new com.androidstarter.app.ui.fragments.NotificationDetailFragment();
+                    android.os.Bundle args = new android.os.Bundle();
+                    args.putString("title", notification.title);
+                    args.putString("message", notification.message);
+                    args.putString("date", formattedDate);
+                    detailFragment.setArguments(args);
+                    
+                    if (getActivity() instanceof com.androidstarter.app.MainActivity) {
+                        ((com.androidstarter.app.MainActivity) getActivity()).loadFragmentWithBackStack(detailFragment);
+                    }
+                    break;
             }
         });
         rvNotifications.setAdapter(adapter);

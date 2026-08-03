@@ -57,7 +57,6 @@ public class HomeFragment extends Fragment {
         // Setup Home Menu
         List<HomeMenuAdapter.HomeMenuItem> menuItems = new ArrayList<>();
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("hadith", getString(R.string.hadith), R.drawable.ic_book));
-        menuItems.add(new HomeMenuAdapter.HomeMenuItem("notification", getString(R.string.menu_notification), R.drawable.ic_notifications));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("our_apps", getString(R.string.menu_our_apps), R.drawable.ic_menu));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("share_app", "Share App", R.drawable.ic_share));
         menuItems.add(new HomeMenuAdapter.HomeMenuItem("remove_ads", getString(R.string.menu_remove_ads), R.drawable.ic_premium));
@@ -75,10 +74,6 @@ public class HomeFragment extends Fragment {
                     break;
                 case "hadith":
                     android.widget.Toast.makeText(getContext(), "Fitur ini segera hadir", android.widget.Toast.LENGTH_SHORT).show();
-                    break;
-                case "notification":
-                    com.androidstarter.app.ui.fragments.NotificationFragment notifFragment = new com.androidstarter.app.ui.fragments.NotificationFragment();
-                    ((com.androidstarter.app.MainActivity) requireActivity()).loadFragmentWithBackStack(notifFragment);
                     break;
 
                 case "remove_ads":

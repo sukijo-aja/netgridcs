@@ -5,13 +5,13 @@
         android:title="@string/home"
         android:icon="@drawable/ic_home" />
     <item
-        android:id="@+id/nav_quran"
-        android:title="@string/quran"
-        android:icon="@drawable/ic_book" />
+        android:id="@+id/nav_history"
+        android:title="@string/history"
+        android:icon="@drawable/ic_history" />
     <item
-        android:id="@+id/nav_hadith"
-        android:title="@string/hadith"
-        android:icon="@drawable/ic_book" />
+        android:id="@+id/nav_notification"
+        android:title="@string/notification"
+        android:icon="@drawable/ic_notifications" />
     <item
         android:id="@+id/nav_settings"
         android:title="@string/settings"

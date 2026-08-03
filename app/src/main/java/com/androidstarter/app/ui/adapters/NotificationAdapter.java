@@ -51,6 +51,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault());
         holder.tvTimestamp.setText(sdf.format(new Date(notification.timestamp)));
         
+        if (notification.messageId != null && !notification.messageId.isEmpty()) {
+            holder.tvMessageId.setText("ID: " + notification.messageId);
+            holder.tvMessageId.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvMessageId.setVisibility(View.GONE);
+        }
+        
         if (notification.isRead) {
             holder.vUnreadIndicator.setVisibility(View.GONE);
             holder.itemView.setAlpha(0.7f);
@@ -77,6 +84,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         TextView tvTitle;
         TextView tvMessage;
         TextView tvTimestamp;
+        TextView tvMessageId;
         View vUnreadIndicator;
 
         public NotificationViewHolder(@NonNull View itemView) {
@@ -84,6 +92,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvMessage = itemView.findViewById(R.id.tvMessage);
             tvTimestamp = itemView.findViewById(R.id.tvTimestamp);
+            tvMessageId = itemView.findViewById(R.id.tvMessageId);
             vUnreadIndicator = itemView.findViewById(R.id.vUnreadIndicator);
         }
     }

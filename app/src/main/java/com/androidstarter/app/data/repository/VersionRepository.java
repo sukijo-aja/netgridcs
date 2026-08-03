@@ -36,30 +36,10 @@ public class VersionRepository {
             public void onResponse(Call<VersionResponse> call, Response<VersionResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     VersionResponse version = response.body();
-                    AppPreference prefs = new AppPreference(context);
+                    AppPreference prefs = new AppPreference(context);                  
                     
                     if (version.getModules() != null) {
-                        if (version.getModules().getHadist() != null) {
-                            long serverHadistTime = version.getModules().getHadist().getLastUpdated();
-                            long localHadistTime = prefs.getLong("hadist_last_updated", 0);
-                            if (serverHadistTime > localHadistTime) {
-                                prefs.saveBoolean("UPDATE_HADIST_REQUIRED", true);
-                                prefs.saveLong("hadist_last_updated", serverHadistTime);
-                            }
-                        }
-                        
-                        if (version.getModules().getProducts() != null) {
-                            prefs.saveLong("products_last_updated", version.getModules().getProducts().getLastUpdated());
-                        }
-                        
-                        if (version.getModules().getKhutbah() != null) {
-                            long serverKhutbahTime = version.getModules().getKhutbah().getLastUpdated();
-                            long localKhutbahTime = prefs.getLong("khutbah_last_updated", 0);
-                            if (serverKhutbahTime > localKhutbahTime) {
-                                prefs.saveBoolean("UPDATE_KHUTBAH_REQUIRED", true);
-                                prefs.saveLong("khutbah_last_updated", serverKhutbahTime);
-                            }
-                        }
+                        // Check for future generic module updates here
                     }
                 }
                 

@@ -36,7 +36,16 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" android:screenOrientation="portrait" />
+        <activity android:name=".ui.activities.OnboardingActivity"
+            android:theme="@style/Theme.AndroidStarter"
+            android:screenOrientation="portrait" />
         <activity android:name=".ui.activities.LoginActivity"
+            android:theme="@style/Theme.AndroidStarter"
+            android:screenOrientation="portrait" />
+        <activity android:name=".ui.activities.WebViewActivity"
+            android:theme="@style/Theme.AndroidStarter"
+            android:screenOrientation="portrait" />
+        <activity android:name=".ui.activities.PinActivity"
             android:theme="@style/Theme.AndroidStarter"
             android:screenOrientation="portrait" />
 

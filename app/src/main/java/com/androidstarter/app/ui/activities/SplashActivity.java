@@ -128,11 +128,19 @@ public class SplashActivity extends AppCompatActivity {
     private synchronized void navigateToMain() {
         if (!isNavigated) {
             isNavigated = true;
-            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+            
+            AppPreference pref = new AppPreference(this);
+            Intent intent;
+            if (pref.getBoolean("isFirstLaunch", true)) {
+                intent = new Intent(SplashActivity.this, OnboardingActivity.class);
+            } else {
+                intent = new Intent(SplashActivity.this, MainActivity.class);
+            }
+
             if (getIntent() != null && getIntent().getExtras() != null) {
                 intent.putExtras(getIntent().getExtras());
             }
-            // intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
             startActivity(intent);
             finish();
         }

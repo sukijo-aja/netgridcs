@@ -13,6 +13,7 @@ public class App extends Application {
         super.onCreate();
         
         com.google.firebase.FirebaseApp.initializeApp(this);
+        com.androidstarter.app.utils.AppAnalytics.init(this);
         createNotificationChannel();
         
         SettingsManager settingsManager = SettingsManager.getInstance(this);

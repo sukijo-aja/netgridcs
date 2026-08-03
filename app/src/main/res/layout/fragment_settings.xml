@@ -87,7 +87,7 @@
             <com.google.android.material.switchmaterial.SwitchMaterial
                 android:id="@+id/switchNotifications"
                 style="@style/SettingsSwitch"
-                android:text="@string/push_notifications"
+                android:text="@string/notification"
                 android:drawableStart="@drawable/ic_notifications"
                 />
 
@@ -103,6 +103,31 @@
                 style="@style/SettingsSwitch"
                 android:text="@string/simulate_premium"
                 android:drawableStart="@android:drawable/btn_star"
+                android:visibility="gone"
+                />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="8dp" />
+
+            <!-- SECURITY SECTION -->
+            <TextView
+                style="@style/SettingsHeader"
+                android:text="Security" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switchPinLock"
+                style="@style/SettingsSwitch"
+                android:text="PIN Lock"
+                android:drawableStart="@android:drawable/ic_lock_lock"
+                />
+
+            <TextView
+                android:id="@+id/btnChangePin"
+                style="@style/SettingsItem"
+                android:text="Change PIN"
+                android:drawableStart="@android:drawable/ic_lock_lock"
                 android:visibility="gone"
                 />
 

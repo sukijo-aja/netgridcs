@@ -38,6 +38,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         String title = null;
         String body = null;
+        String actionType = null;
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
@@ -45,6 +46,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             title = remoteMessage.getData().get("title");
             body = remoteMessage.getData().get("body");
             if (body == null) body = remoteMessage.getData().get("message");
+            actionType = remoteMessage.getData().get("action_type");
+            if (actionType == null) actionType = remoteMessage.getData().get("target_screen");
         }
 
         // Check if message contains a notification payload.
@@ -52,17 +55,21 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             Log.d(TAG, "Message Notification Body: " + remoteMessage.getNotification().getBody());
             title = remoteMessage.getNotification().getTitle();
             body = remoteMessage.getNotification().getBody();
-            sendNotification(title, body);
+            sendNotification(title, body, actionType);
+        } else if (title != null || body != null) {
+            sendNotification(title, body, actionType);
         }
 
         // Save to Database
         if (title != null || body != null) {
             final String finalTitle = title != null ? title : "Notification";
             final String finalBody = body != null ? body : "";
+            final String finalAction = actionType != null ? actionType : "info";
+            final String msgId = remoteMessage.getMessageId() != null ? remoteMessage.getMessageId() : "N/A";
             com.androidstarter.app.data.local.AppDatabase.databaseWriteExecutor.execute(() -> {
                 com.androidstarter.app.data.local.AppDatabase db = com.androidstarter.app.data.local.AppDatabase.getDatabase(getApplicationContext());
                 db.notificationDao().insert(new com.androidstarter.app.data.local.entity.NotificationEntity(
-                        finalTitle, finalBody, System.currentTimeMillis(), false
+                        finalTitle, finalBody, msgId, finalAction, System.currentTimeMillis(), false
                 ));
             });
         }
@@ -93,6 +100,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         com.androidstarter.app.utils.AppPreference appPreference = new com.androidstarter.app.utils.AppPreference(this);
         appPreference.saveString("fcm_token", token);
         Log.d(TAG, "FCM Token saved to preferences");
+        
+        // Jika pengguna sudah login, sinkronisasikan token baru ini ke server
+        com.androidstarter.app.utils.TokenSyncManager.syncTokenIfNeeded(getApplicationContext());
     }
 
 
@@ -101,13 +111,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
      *
      * @param title FCM message title received.
      * @param messageBody FCM message body received.
+     * @param actionType Optional action type for routing.
      */
-    private void sendNotification(String title, String messageBody) {
+    private void sendNotification(String title, String messageBody, String actionType) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("open_notification_detail", true);
         intent.putExtra("title", title);
         intent.putExtra("message", messageBody);
+        intent.putExtra("action_type", actionType != null ? actionType : "info");
         intent.putExtra("date", new java.text.SimpleDateFormat("dd MMM yyyy, HH:mm", java.util.Locale.getDefault()).format(new java.util.Date()));
         
         PendingIntent pendingIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis() /* Request code */, intent,

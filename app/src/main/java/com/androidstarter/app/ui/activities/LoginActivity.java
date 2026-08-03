@@ -27,6 +27,9 @@ import com.androidstarter.app.utils.AppPreference;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import com.androidstarter.app.data.model.DeviceTokenRequest;
+import com.androidstarter.app.data.remote.services.DeviceApiService;
+
 public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
@@ -54,6 +57,8 @@ public class LoginActivity extends AppCompatActivity {
 
         progressBar = findViewById(R.id.progressBar);
         btnGoogleSignIn = findViewById(R.id.btnGoogleSignIn);
+        
+        findViewById(R.id.btnClose).setOnClickListener(v -> finish());
         
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
@@ -121,12 +126,21 @@ public class LoginActivity extends AppCompatActivity {
     private void handleAuthSuccess() {
         Log.d("LoginActivity", "Auth:success");
         AppPreference appPreference = new AppPreference(LoginActivity.this);
+        String uid = "";
         if (mAuth.getCurrentUser() != null) {
-            appPreference.saveString("UID", mAuth.getCurrentUser().getUid());
+            uid = mAuth.getCurrentUser().getUid();
+            appPreference.saveString("UID", uid);
             appPreference.saveString("USER_EMAIL", mAuth.getCurrentUser().getEmail());
             String name = mAuth.getCurrentUser().getDisplayName();
             appPreference.saveString("USER_NAME", name != null ? name : "User");
         }
+        
+        // Hapus status token terakhir agar aplikasi terpaksa melakukan sinkronisasi ulang
+        appPreference.remove("last_synced_token");
+        
+        // Mulai sinkronisasi token di background
+        com.androidstarter.app.utils.TokenSyncManager.syncTokenIfNeeded(LoginActivity.this);
+        
         Toast.makeText(LoginActivity.this, "Signed in successfully", Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
         finish();
@@ -207,8 +221,7 @@ public class LoginActivity extends AppCompatActivity {
                         }
 
                         Toast.makeText(LoginActivity.this, "Signed in as " + mAuth.getCurrentUser().getDisplayName(), Toast.LENGTH_SHORT).show();
-                        setResult(RESULT_OK);
-                        finish();
+                        handleAuthSuccess();
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("LoginActivity", "signInWithCredential:failure", task.getException());

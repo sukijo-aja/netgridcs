@@ -13,18 +13,8 @@ public class VersionResponse {
     public Modules getModules() { return modules; }
 
     public static class Modules {
-        @SerializedName("products")
-        private ModuleInfo products;
-
-        @SerializedName("hadist")
-        private ModuleInfo hadist;
-
-        @SerializedName("khutbah")
-        private ModuleInfo khutbah;
-
-        public ModuleInfo getProducts() { return products; }
-        public ModuleInfo getHadist() { return hadist; }
-        public ModuleInfo getKhutbah() { return khutbah; }
+        // Add your generic modules here if needed in the future
+        // e.g. @SerializedName("module_name") private ModuleInfo moduleName;
     }
 
     public static class ModuleInfo {

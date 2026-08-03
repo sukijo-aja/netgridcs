@@ -56,12 +56,21 @@
             android:textSize="12sp"
             android:layout_marginTop="2dp"
             android:textColor="#9CA3AF" />
+
+        <TextView
+            android:id="@+id/tvMessageId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="ID: 0:1629..."
+            android:textSize="10sp"
+            android:layout_marginTop="2dp"
+            android:textColor="#D1D5DB" />
     </LinearLayout>
     
     <View
         android:id="@+id/vUnreadIndicator"
-        android:layout_width="10dp"
-        android:layout_height="10dp"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
         android:background="@drawable/bg_circle_icon"
         android:backgroundTint="#EF4444"
         android:layout_gravity="center_vertical"

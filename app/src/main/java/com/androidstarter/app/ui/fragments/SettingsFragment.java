@@ -33,13 +33,24 @@ import android.widget.ImageButton;
 
 public class SettingsFragment extends Fragment {
 
-
     private TextView btnLogin;
     private TextView btnEditProfile;
     private TextView btnChangePassword;
     private TextView btnDeleteAccount;
     private TextView tvUserId;
     private FirebaseAuth mAuth;
+
+    private final androidx.activity.result.ActivityResultLauncher<android.content.Intent> pinSetLauncher =
+            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(), result -> {
+                SwitchMaterial switchPinLock = getView() != null ? getView().findViewById(R.id.switchPinLock) : null;
+                TextView btnChangePin = getView() != null ? getView().findViewById(R.id.btnChangePin) : null;
+                if (result.getResultCode() == android.app.Activity.RESULT_OK) {
+                    if (btnChangePin != null) btnChangePin.setVisibility(View.VISIBLE);
+                } else {
+                    // PIN setup was cancelled, revert the switch
+                    if (switchPinLock != null) switchPinLock.setChecked(false);
+                }
+            });
 
     @Nullable
     @Override
@@ -103,10 +114,36 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        // PIN Lock
+        com.androidstarter.app.utils.PinManager pinManager = com.androidstarter.app.utils.PinManager.getInstance(requireContext());
+        SwitchMaterial switchPinLock = view.findViewById(R.id.switchPinLock);
+        TextView btnChangePin = view.findViewById(R.id.btnChangePin);
+
+        switchPinLock.setChecked(pinManager.isPinEnabled());
+        btnChangePin.setVisibility(pinManager.isPinEnabled() ? View.VISIBLE : View.GONE);
+
+        switchPinLock.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                android.content.Intent pinIntent = new android.content.Intent(requireContext(), com.androidstarter.app.ui.activities.PinActivity.class);
+                pinIntent.putExtra(com.androidstarter.app.ui.activities.PinActivity.EXTRA_MODE, com.androidstarter.app.ui.activities.PinActivity.MODE_SET);
+                pinSetLauncher.launch(pinIntent);
+            } else {
+                pinManager.clearPin();
+                btnChangePin.setVisibility(View.GONE);
+                Toast.makeText(requireContext(), "PIN Lock disabled", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnChangePin.setOnClickListener(v -> {
+            android.content.Intent pinIntent = new android.content.Intent(requireContext(), com.androidstarter.app.ui.activities.PinActivity.class);
+            pinIntent.putExtra(com.androidstarter.app.ui.activities.PinActivity.EXTRA_MODE, com.androidstarter.app.ui.activities.PinActivity.MODE_CHANGE);
+            startActivity(pinIntent);
+        });
+
         TextView btnClearCache = view.findViewById(R.id.btnClearCache);
         btnClearCache.setOnClickListener(v -> {
             try {
-                requireContext().getCacheDir().delete();
+                deleteDir(requireContext().getCacheDir());
                 Toast.makeText(requireContext(), R.string.cache_cleared, Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -151,14 +188,18 @@ public class SettingsFragment extends Fragment {
 
         TextView btnTermsOfService = view.findViewById(R.id.btnTermsOfService);
         btnTermsOfService.setOnClickListener(v -> {
-            android.content.Intent browserIntent = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://policies.google.com/terms"));
-            startActivity(browserIntent);
+            android.content.Intent intent = new android.content.Intent(requireContext(), com.androidstarter.app.ui.activities.WebViewActivity.class);
+            intent.putExtra(com.androidstarter.app.ui.activities.WebViewActivity.EXTRA_URL, "https://policies.google.com/terms");
+            intent.putExtra(com.androidstarter.app.ui.activities.WebViewActivity.EXTRA_TITLE, "Terms of Service");
+            startActivity(intent);
         });
 
         TextView btnPrivacyPolicy = view.findViewById(R.id.btnPrivacyPolicy);
         btnPrivacyPolicy.setOnClickListener(v -> {
-            android.content.Intent browserIntent = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://policies.google.com/privacy"));
-            startActivity(browserIntent);
+            android.content.Intent intent = new android.content.Intent(requireContext(), com.androidstarter.app.ui.activities.WebViewActivity.class);
+            intent.putExtra(com.androidstarter.app.ui.activities.WebViewActivity.EXTRA_URL, "https://policies.google.com/privacy");
+            intent.putExtra(com.androidstarter.app.ui.activities.WebViewActivity.EXTRA_TITLE, "Privacy Policy");
+            startActivity(intent);
         });
 
         TextView tvAppVersion = view.findViewById(R.id.tvAppVersion);
@@ -363,6 +404,11 @@ public class SettingsFragment extends Fragment {
                 // Mock delete account
                 if (mAuth.getCurrentUser() != null) {
                     mAuth.signOut();
+                    
+                    AppPreference appPreference = new AppPreference(requireContext());
+                    appPreference.remove("UID");
+                    appPreference.remove("USER_EMAIL");
+                    appPreference.remove("USER_NAME");
                 }
                 Toast.makeText(requireContext(), R.string.account_deleted_successfully, Toast.LENGTH_SHORT).show();
                 updateLoginUI();
@@ -370,5 +416,19 @@ public class SettingsFragment extends Fragment {
             .setNegativeButton("Cancel", null)
             .show();
     }
-}
 
+    private boolean deleteDir(java.io.File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            if (children != null) {
+                for (int i = 0; i < children.length; i++) {
+                    boolean success = deleteDir(new java.io.File(dir, children[i]));
+                    if (!success) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return dir != null && dir.delete();
+    }
+}

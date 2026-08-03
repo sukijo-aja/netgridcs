@@ -14,9 +14,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.installations.FirebaseInstallations;
 import com.androidstarter.app.databinding.ActivityMainBinding;
 import com.androidstarter.app.ui.fragments.SettingsFragment;
 import com.androidstarter.app.ui.fragments.HomeFragment;
+import com.androidstarter.app.ui.fragments.HistoryFragment;
+import com.androidstarter.app.ui.fragments.NotificationFragment;
 import com.androidstarter.app.utils.AppPreference;
 
 import com.androidstarter.app.utils.AdMobUtil;
@@ -87,7 +90,7 @@ public class MainActivity extends BaseActivity {
         if (existingToken != null) {
             Log.d(TAG, "FCM_TEST: Current saved FCM Token: " + existingToken);
             System.out.println("FCM_TEST_TOKEN: " + existingToken);
-            runOnUiThread(() -> Toast.makeText(MainActivity.this, "FCM Ready", Toast.LENGTH_SHORT).show());
+//            runOnUiThread(() -> Toast.makeText(MainActivity.this, "FCM Ready", Toast.LENGTH_SHORT).show());
         } else {
             Log.d(TAG, "FCM_TEST: Requesting new FCM Token...");
             try {
@@ -97,20 +100,37 @@ public class MainActivity extends BaseActivity {
                         appPref.saveString("fcm_token", newToken);
                         Log.d(TAG, "FCM_TEST: Token successfully initialized: " + newToken);
                         System.out.println("FCM_TEST_TOKEN: " + newToken);
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "FCM Token Success", Toast.LENGTH_SHORT).show());
+//                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "FCM Token Success", Toast.LENGTH_SHORT).show());
                     } else {
                         Log.e(TAG, "FCM_TEST: Token retrieval failed", task.getException());
-                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "FCM Token Failed", Toast.LENGTH_SHORT).show());
+//                        runOnUiThread(() -> Toast.makeText(MainActivity.this, "FCM Token Failed", Toast.LENGTH_SHORT).show());
                     }
                 });
             } catch (Exception e) {
                 Log.e(TAG, "FCM_TEST: Error during FirebaseMessaging.getInstance().getToken()", e);
-                runOnUiThread(() -> Toast.makeText(MainActivity.this, "FCM Token Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+//                runOnUiThread(() -> Toast.makeText(MainActivity.this, "FCM Token Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
         }
 
-
-
+        // Initialize Firebase Installation ID
+        String existingInstallId = appPref.getString("firebase_install_id", null);
+        if (existingInstallId == null) {
+            try {
+                FirebaseInstallations.getInstance().getId().addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        String installId = task.getResult();
+                        appPref.saveString("firebase_install_id", installId);
+                        Log.d(TAG, "Firebase Installation ID successfully initialized: " + installId);
+                    } else {
+                        Log.e(TAG, "Firebase Installation ID retrieval failed", task.getException());
+                    }
+                });
+            } catch (Exception e) {
+                Log.e(TAG, "Error during FirebaseInstallations.getInstance().getId()", e);
+            }
+        } else {
+            Log.d(TAG, "Current saved Firebase Installation ID: " + existingInstallId);
+        }
 
         // Double back to exit or pop backstack
         getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
@@ -138,12 +158,12 @@ public class MainActivity extends BaseActivity {
             
             if (itemId == R.id.nav_home) {
                 selectedFragment = new HomeFragment();
-            } else if (itemId == R.id.nav_quran) {
-                Toast.makeText(MainActivity.this, "Fitur ini segera hadir", Toast.LENGTH_SHORT).show();
+            } else if (itemId == R.id.nav_history) {
+                selectedFragment = new HistoryFragment();
             } else if (itemId == R.id.nav_settings) {
                 selectedFragment = new SettingsFragment();
-            } else if (itemId == R.id.nav_hadith) {
-                Toast.makeText(MainActivity.this, "Fitur ini segera hadir", Toast.LENGTH_SHORT).show();
+            } else if (itemId == R.id.nav_notification) {
+                selectedFragment = new NotificationFragment();
             }
 
             if (selectedFragment != null) {
@@ -160,6 +180,12 @@ public class MainActivity extends BaseActivity {
                 binding.bottomNavigation.setVisibility(android.view.View.VISIBLE);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        com.androidstarter.app.utils.PlayCoreHelper.checkForUpdate(this);
     }
 
     @Override
@@ -183,15 +209,53 @@ public class MainActivity extends BaseActivity {
                 String title = extras.getString("title", "Notifikasi");
                 String message = extras.getString("message", extras.getString("body", ""));
                 String date = extras.getString("date", new java.text.SimpleDateFormat("dd MMM yyyy, HH:mm", java.util.Locale.getDefault()).format(new java.util.Date()));
-                
+                String actionType = extras.getString("action_type", extras.getString("target_screen", "info"));
+
                 com.androidstarter.app.ui.fragments.NotificationDetailFragment detailFragment = new com.androidstarter.app.ui.fragments.NotificationDetailFragment();
                 Bundle args = new Bundle();
-                args.putString("title", title);
-                args.putString("message", message);
-                args.putString("date", date);
-                detailFragment.setArguments(args);
-                
-                loadFragmentWithBackStack(detailFragment);
+
+                switch (actionType) {
+                    case "settings":
+                        com.androidstarter.app.ui.fragments.SettingsFragment settingsFragment = new com.androidstarter.app.ui.fragments.SettingsFragment();
+                        loadFragmentWithBackStack(settingsFragment);
+                        break;
+                    case "billing":
+                        detailFragment = new com.androidstarter.app.ui.fragments.NotificationDetailFragment();
+                        args = new Bundle();
+                        args.putString("title", "Billing");
+                        args.putString("message", message);
+                        args.putString("date", date);
+                        detailFragment.setArguments(args);
+                        loadFragmentWithBackStack(detailFragment);
+                        break;
+                    case "promo":
+                        detailFragment = new com.androidstarter.app.ui.fragments.NotificationDetailFragment();
+                        args = new Bundle();
+                        args.putString("title", "Promo");
+                        args.putString("message", message);
+                        args.putString("date", date);
+                        detailFragment.setArguments(args);
+                        loadFragmentWithBackStack(detailFragment);
+                        break;
+                    case "info":
+                        detailFragment = new com.androidstarter.app.ui.fragments.NotificationDetailFragment();
+                        args = new Bundle();
+                        args.putString("title", "Informasi");
+                        args.putString("message", message);
+                        args.putString("date", date);
+                        detailFragment.setArguments(args);
+                        loadFragmentWithBackStack(detailFragment);
+                        break;
+                    default:
+                        detailFragment = new com.androidstarter.app.ui.fragments.NotificationDetailFragment();
+                        args = new Bundle();
+                        args.putString("title", title);
+                        args.putString("message", message);
+                        args.putString("date", date);
+                        detailFragment.setArguments(args);
+                        loadFragmentWithBackStack(detailFragment);
+                        break;
+                }
             }
         }
     }
