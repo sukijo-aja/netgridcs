@@ -5,16 +5,24 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.androidstarter.app.utils.NetworkMonitor;
+import com.androidstarter.app.utils.SessionManager;
 import com.google.android.material.snackbar.Snackbar;
 
 public class BaseActivity extends AppCompatActivity implements NetworkMonitor.NetworkCallbackListener {
 
     private NetworkMonitor networkMonitor;
     private Snackbar networkSnackbar;
+
+    /**
+     * Override to false in activities that don't require authentication
+     * (e.g. SplashActivity, LoginActivity, OnboardingActivity).
+     */
+    protected boolean requiresAuth() {
+        return true;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -27,6 +35,15 @@ public class BaseActivity extends AppCompatActivity implements NetworkMonitor.Ne
         super.onResume();
         networkMonitor.registerNetworkCallback();
         checkInitialNetworkState();
+
+        // Validate session and reset idle timer on every resume
+        if (requiresAuth()) {
+            if (!SessionManager.isSessionValid(this)) {
+                SessionManager.logout(this);
+                return;
+            }
+            SessionManager.touchActivity(this);
+        }
     }
 
     @Override
@@ -70,11 +87,12 @@ public class BaseActivity extends AppCompatActivity implements NetworkMonitor.Ne
     }
 
     private void hideSystemUI() {
-//        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-        if (controller != null) {
-//            controller.hide(WindowInsetsCompat.Type.systemBars());
-//            controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-        }
+        // Uncomment to enable full immersive mode:
+        // if (controller != null) {
+        //     controller.hide(WindowInsetsCompat.Type.systemBars());
+        //     controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+        // }
     }
 }
+
